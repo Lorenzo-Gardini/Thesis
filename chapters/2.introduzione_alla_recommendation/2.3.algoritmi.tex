@@ -32,13 +32,123 @@ La notazione utilizzata è la seguente:
 
 \subsection{Algoritmi per Feedback Esplicito}\label{algoritmi-per-feedback-esplicito}
 
-\subsubsection{Matrix Factorization}\label{matrix-factorization}
+\subsubsection{SVD e SVD++}\label{matrix-factorization}
+
+L'algoritmo SVD (\textit{singular value decomposition}), è stato reso popolare da Simon Funk durante la competizione \textit{the Netflix Prize} dimostrando come modelli di fattorizzazione matriciale sono superiori alle tecniche classiche basate su \textit{nearest neighbor}\ref{knn} per
+la produzione di raccomandazioni.
+
+I modelli di \textit{matrix factorization} mappano gli \textit{user} e gli \textit{item} in uno spazio latente comune di dimensione $k$, che rappresenta il numero di caratteristiche latenti. Ogni \textit{item} $i$ è associato a un vettore $q_i$ di dimensione $k$, che misura quanto l'\textit{item} possieda ciascuna di queste caratteristiche latenti. Per ogni \textit{user} $u$, invece, il vettore $p_u$ misura l'interesse dello \textit{user} per gli \textit{item}. Il numero di fattori è un iper-parametro dell'algoritmo.
+
+In questo spazio, le interazioni tra \textit{user} e \textit{item} vengono modellate come prodotti scalari tra i rispettivi vettori. Lo spazio latente cerca di spiegare i \textit{rating} caratterizzando sia gli \textit{item} che gli textit{user} in base a fattori che vengono automaticamente dedotti. Ad esempio, se gli \textit{item} sono film, i fattori potrebbero appresentare il genere piuttosto che un altro (e.g. Azione contro Drama), profondità della trama o il concetto di "adatto ai bambini".
+
+Il prodotto scalare risultante cattura l'interazione tra lo \textit{user} $u$ e l'\textit{item} $i$, che corrisponde all'interesse complessivo dello \textit{user} per le caratteristiche dell'\textit{item}. Il \textit{rating} finale viene ottenuto aggiungendo anche i predittori di base sopra menzionati, che dipendono solo dallo \textit{user} o dall'\textit{item}. Pertanto, un \textit{rating} viene predetto dalla regola~\cite{SVD_analysis}~\cite{Recommendation_book}:
+
+\[
+\hat{r}_{ui} = \mu + b_u + b_i + q_i^T p_u
+\]
+
+Dove:
+\begin{itemize}
+    \item $ \hat{r}_{ui} $ è il \textit{rating} previsto per
+    l'\textit{item} $i$ da parte dello \textit{user} $u$.
+    \item $ \mu $ è la media generale delle \textit{rating}.
+    \item $ b_u $ e $ b_i $ sono i bias dello \textit{user} $u$ e dell'\textit{item} $i$ rispettivamente. Sono una sorta di correzione basata sull'effetto dello \textit{user} e dell'\textit{item}.
+    \item $ q_i^T p_u $ è il prodotto interno tra i vettori latenti dello \textit{user} e dell'\textit{item}.
+\end{itemize}
+
+Se lo \textit{user} $u$ è sconosciuto, allora il bias $b_u$ e i fattori $p_u$ vengono considerati uguali a zero. Lo stesso vale per
+l'\textit{item} $i$, con $b_i$ e $q_i$ anch'essi assunti uguali a zero.
+
+Per apprendere i parametri del modello ($b_u$, $b_i$, $p_u$, $q_i$), si minimizza l'errore quadratico regolarizzato tra le \textit{rating} reali e quelle previste. L'errore quadratico è dato da:
+
+\[
+\text{min} \sum_{(u,i) \in K} \left (r_{ui} - \hat{r}_{ui})^2 + \lambda (\|q_i\|^2 + \|p_u\|^2 + b_u^2 + b_i^2 \right)
+\]
+
+Dove il primo termine è l'errore quadratico tra le \textit{rating} previste e reali e il secondo termine è la regolarizzazione, che penalizza valori troppo grandi per i parametri $b_u$, $b_i$, $p_u$, $q_i$ per evitare l'overfitting.
+
+Per ottimizzare questi parametri, viene usata la \textit{stochastic gradient descent} (SGD), che aggiorna i parametri dopo ogni  esempio di training (ad esempio, per ogni \textit{rating} di un \textit{user}).
+
+Per ogni \textit{rating} ($r_{ui}$) data, viene fatta una previsione ($\hat{r}_{ui}$), e l'errore di previsione associato ($e_{ui} = r_{ui} - \hat{r}_{ui}$) viene calcolato. Per un dato caso di addestramento ($r_{ui}$), modifichiamo i parametri spostandoci nella
+direzione opposta al gradiente, ottenendo:
+
+\begin{itemize}
+    \item $b_u \leftarrow b_u + \gamma \cdot e_{ui}$
+    \item $b_i \leftarrow b_i + \gamma \cdot e_{ui}$
+    \item $q_i \leftarrow q_i + \gamma \cdot e_{ui} \cdot p_u$
+    \item $p_u \leftarrow p_u + \gamma \cdot e_{ui} \cdot q_i$
+\end{itemize}
+
+dove $\gamma$ è il \textit{learning rate}. $\gamma$ e $\lambda$ sono iperparametri dell'algoritmo.
+
+Queste formule vengono utilizzate per aggiornare i parametri durante l'addestramento del modello, in modo da ridurre l'errore tra le
+\textit{rating} reali e quelle previste.
+
+Per ottenere un ulteriore miglioramento, possono applicare $\gamma$ e $\lambda$ separati per i bias degli \textit{user}, i bias degli
+\textit{item} e i fattori stessi~\cite{SVD_optimized}.
+
+I punti di forza dell'algoritmo sono:
+
+\begin{itemize}
+    \item semplicità: l'algoritmo SVD è relativamente semplice da comprendere e implementare.
+    \item riduzione della dimensionalità: l'algoritmo permette di ridurre la dimensione del problema mappando sia gli \textit{user} che gli \textit{item} in uno spazio latente di dimensione inferiore, gestendo la sparsità delle matrici. Funziona molto bene quando la matrice delle valutazioni è abbastanza completa. \item caratteristiche latenti: identifica strutture sottostanti che non sono immediatamente evidenti.
+\end{itemize}
+
+L'algoritmo soffre anche di diverse problematiche:
+
+\begin{itemize}
+    \item problemi con la sparsità: può produrre raccomandazioni imprecise quando la matrice delle valutazioni è troppo sparsa, perché la decomposizione non riesce a estrarre informazioni significative. 
+    \item non tiene conto di informazioni aggiuntive: non considera altri fattori come informazioni temporali, contenuti aggiuntivi sugli \textit{item} o preferenze esplicite/implicite dell'utente che non sono registrati nella matrice.
+    \item computazionalmente costosa: la decomposizione di una matrice grande è costosa in termini di tempo e risorse.
+    \item overfitting: se non adeguatamente regolarizzato si rischia l'overfitting.
+\end{itemize}
+
+La precisione delle previsioni può essere migliorata considerando anche il feedback implicito, che fornisce un'indicazione aggiuntiva delle preferenze degli \textit{user}. Questo è particolarmente utile per gli \textit{user} che hanno fornito molto più feedback implicito che esplicito. Anche nei casi in cui il feedback implicito indipendente è assente, è possibile catturare un segnale significativo tenendo conto degli \textit{item} che gli \textit{user} hanno valutato, indipendentemente dal valore del \textit{rating}. Ciò ha portato a diversi metodi (\textit{Asymmetric-SVD}, \textit{SVD++}, \textit{SVD\_KNN}, ecc.~\cite{SVD++, SVD_KNN}) che modellano il fattore \textit{user} in base agli \textit{item} valutati. Il metodo \textit{SVD++} ha dimostrato di offrire una precisione superiore rispetto a \textit{SVD}.
+
+Viene aggiunto un secondo set di fattori degli \textit{item}, che collega ogni \textit{item} $i$ a un vettore di fattori $y_i$ di dimensione $k$. Questi nuovi fattori vengono utilizzati per caratterizzare gli \textit{user} in base al set di \textit{item} che hanno valutato. La nuova predizione si calcola come segue:
+
+\[
+\hat{r}_{ui} = \mu + b_u + b_i + q_i^T \left(p_u + |I_u|^{\frac{1}{2}} \sum_{j \in I_u} y_j \right)
+\]
+
+Ora, un \textit{user} $u$ viene modellato come $p_u + |I_u|^{\frac{1}{2}} \sum_{j \in I_u} y_j$, mentre la parte $\sum_{j \in I_u} y_j$ rappresenta i feedback impliciti. Poiché i vettori $y_j$ sono centrati intorno a zero grazie alla regolarizzazione $|I_u|^{\frac{1}{2}}$, la varianza rispetto all'intervallo di valori osservati $|I_u|$ viene stabilizzata.
+
+I parametri del modello vengono determinati minimizzando la funzione di errore quadratico regolarizzato, utilizzando sempre \textit{stochastic gradient descent}. Si itera su tutti i \textit{rating}:
+
+\begin{itemize}
+  \item $b_u \leftarrow b_u + \gamma \cdot (e_{ui} - \lambda \cdot b_u)$
+  \item $b_i \leftarrow b_i + \gamma \cdot (e_{ui} - \lambda \cdot b_i)$
+  \item $q_i \leftarrow q_i + \gamma \cdot \left( e_{ui} \cdot \left( p_u + |I_u|^{-\frac{1}{2}} \sum_{j \in I_u} y_j \right) - \lambda \cdot q_i \right)$
+  \item $p_u \leftarrow p_u + \gamma \cdot (e_{ui} \cdot q_i - \lambda \cdot p_u)$
+  \item $\forall j \in I_u: \quad y_j \leftarrow y_j + \gamma \cdot \left( e_{ui} \cdot |I_u|^{-\frac{1}{2}} \cdot q_i - \lambda \cdot y_j \right)$
+\end{itemize}
+
+
+
+È possibile introdurre diversi tipi di feedback implicito nel modello simultaneamente, utilizzando set aggiuntivi di fattori degli \textit{item}.
+
+I punti di forza dell'algoritmo sono:
+
+\begin{itemize}
+    \item miglioramento della personalizzazione: SVD++ è un miglioramento significativo rispetto a SVD, poiché prende in considerazione anche l'influenza degli \textit{item} che lo \textit{user} ha già valutato nel termine $\sum_{j \in I_u} y_j$, il che lo rende molto più sensibile alle preferenze individuali dello \textit{user}.
+    \item migliore gestione della sparsità: poiché SVD++ tiene conto dei feedback impliciti, riesce a fare previsioni migliori anche quando la matrice delle valutazioni è sparsa.
+    \item previsioni più accurate: i feedback impliciti aiutano a produrre previsioni più accurate, soprattutto in scenari dove gli \textit{user} hanno interagito con più \textit{item}.
+\end{itemize}
+
+L'algoritmo soffre anche di diverse problematiche:
+
+\begin{itemize}
+    \item complessità computazionale maggiore: la necessità di aggiornare $y_i$ aumenta il carico computazionale.
+    \item richiede più dati: poiché prende in considerazione anche i feedback impliciti, ha bisogno di un numero maggiore di dati per generare previsioni precise.
+    \item overfitting: SVD++ è più propenso a overfitting su dataset piccoli.
+\end{itemize}
+
 
 \subsubsection{KNN}\label{knn}
 
 \subsubsection{CoClustering}\label{coclustering}
 
-La soluzione proposta da Thomas George e Srujana Merugu\cite{Co-Clustering} utilizza il \textit{co-clustering}. Questa tecnica viene utilizzata per raggruppare simultaneamente due entità in un dataset. Nel caso di un sistema di \textit{recommendation} basato su \textit{collaborative filtering}, l'obiettivo è trovare gruppi di \textit{user} simili e gruppi di \textit{item} simili. Il co-clustering cerca di partizionare simultaneamente le righe (\textit{user}) e le colonne (\textit{item}) della matrice dei \textit{rating} in modo tale che gli \textit{user} all'interno dello stesso co-cluster abbiano comportamenti di valutazione simili e \textit{item} all'interno dello stesso co-cluster siano valutati in modo simile dagli \textit{user} del co-cluster. Il numero di cluster è da definire a priori sia per gli \textit{user} che per gli \textit{item}. Il processo di co-clustering è simile al clustering tradizionale, ma mentre nel clustering classico si raggruppa solo per righe o colonne, nel co-clustering si raggruppano contemporaneamente. 
+La soluzione proposta da Thomas George e Srujana Merugu~\cite{Co-Clustering} utilizza il \textit{co-clustering}. Questa tecnica viene utilizzata per raggruppare simultaneamente due entità in un dataset. Nel caso di un sistema di \textit{recommendation} basato su \textit{collaborative filtering}, l'obiettivo è trovare gruppi di \textit{user} simili e gruppi di \textit{item} simili. Il co-clustering cerca di partizionare simultaneamente le righe (\textit{user}) e le colonne (\textit{item}) della matrice dei \textit{rating} in modo tale che gli \textit{user} all'interno dello stesso co-cluster abbiano comportamenti di valutazione simili e \textit{item} all'interno dello stesso co-cluster siano valutati in modo simile dagli \textit{user} del co-cluster. Il numero di cluster è da definire a priori sia per gli \textit{user} che per gli \textit{item}. Il processo di co-clustering è simile al clustering tradizionale, ma mentre nel clustering classico si raggruppa solo per righe o colonne, nel co-clustering si raggruppano contemporaneamente. 
 
 L'algoritmo, nella fase di inizializzazione, assegna casualmente i co-cluster a \textit{user} e \textit{item}. Durante l'esecuzione i co-cluster vengono aggiornati iterativamente, per cercare di migliorare la qualità del raggruppamento, alternando tra il raggruppamento degli \textit{user} e degli \textit{item} fino a convergenza. Una volta che i co-cluster sono definiti si può calcolare la media dei \textit{rating} all'interno di ciascun co-cluster. $ \overline{C_{ui}} $ rappresenta la media dei \textit{rating} all'interno del co-cluster che contiene lo \textit{user} $ u $ e l'\textit{item} $ i $. In altre parole, è il \textit{rating} medio tra gli \textit{user} e gli \textit{item} che appartengono allo stesso co-cluster.
 
@@ -89,7 +199,7 @@ L'aggiornamento ha quindi costo pari a $O(1)$.
 
 \subsubsection{Slope One}\label{slopeone}
 
-L'algoritmo Slope One, introdotto da Daniel Lemire e Anna Maclachlan\cite{SlopeOne}, è una delle soluzioni più semplici ed efficienti di collaborative filtering.
+L'algoritmo Slope One, introdotto da Daniel Lemire e Anna Maclachlan~\cite{SlopeOne}, è una delle soluzioni più semplici ed efficienti di collaborative filtering.
 %
 Le caratteristiche che lo rendono un ottimo algoritmo per la \textit{recommendation} sono:
 \begin{itemize}
