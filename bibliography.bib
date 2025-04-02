@@ -107,3 +107,23 @@ title = {Improving regularized singular value decomposition for collaborative fi
 journal = {Proceedings of KDD Cup and Workshop}
 }
 
+@article{KNN_baseline,
+author = {Koren, Yehuda},
+title = {Factor in the neighbors: Scalable and accurate collaborative filtering},
+year = {2010},
+issue_date = {January 2010},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {4},
+number = {1},
+issn = {1556-4681},
+url = {https://doi.org/10.1145/1644873.1644874},
+doi = {10.1145/1644873.1644874},
+abstract = {Recommender systems provide users with personalized suggestions for products or services. These systems often rely on collaborating filtering (CF), where past transactions are analyzed in order to establish connections between users and products. The most common approach to CF is based on neighborhood models, which originate from similarities between products or users. In this work we introduce a new neighborhood model with an improved prediction accuracy. Unlike previous approaches that are based on heuristic similarities, we model neighborhood relations by minimizing a global cost function. Further accuracy improvements are achieved by extending the model to exploit both explicit and implicit feedback by the users. Past models were limited by the need to compute all pairwise similarities between items or users, which grow quadratically with input size. In particular, this limitation vastly complicates adopting user similarity models, due to the typical large number of users. Our new model solves these limitations by factoring the neighborhood model, thus making both item-item and user-user implementations scale linearly with the size of the data. The methods are tested on the Netflix data, with encouraging results.},
+journal = {ACM Trans. Knowl. Discov. Data},
+month = jan,
+articleno = {1},
+numpages = {24},
+keywords = {collaborative filtering, Recommender systems, Netflix Prize}
+}
+

@@ -145,6 +145,186 @@ L'algoritmo soffre anche di diverse problematiche:
 
 
 \subsubsection{KNN}\label{knn}
+Si tratta di algoritmi derivati direttamente da un approccio di base basato sui \emph{nearest neighbors}.
+
+Gli algoritmi ispirati al KNN (\emph{K Nearest Neighbors}) sono una classe di algoritmi di raccomandazione che si basano sull'idea che gli \emph{user} simili tendono a valutare gli stessi \emph{item} in modo simile. Questi algoritmi sono semplici da implementare e possono essere molto efficaci per problemi di raccomandazione a piccola scala.
+
+Il numero effettivo di vicini che vengono considerati per calcolare la predizione è minore o uguale a \(k\): potrebbero non esserci abbastanza vicini e/o gli insiemi \(N_i^k(u)\) e \(N_u^k(i)\) includono solo vicini per i quali la misura di similarità è positiva (non avrebbe senso considerare \emph{user} o \emph{item} correlati negativamente).
+
+\(k\) è un iperparametro di ciascun algoritmo.
+
+Alcune misure di similarità, sia per \emph{user} che per \emph{item}, sono:
+\begin{itemize}
+    \item Coseno:
+        \[
+        \text{cosine\_sim}(u, v) = \frac{\sum_{i \in I_{uv}} r_{ui} \cdot r_{vi}}{\sqrt{\sum_{i \in I_{uv}} r_{ui}^2} \cdot \sqrt{\sum_{i \in I_{uv}} r_{vi}^2}}
+        \]
+        oppure
+        \[
+        \text{cosine\_sim}(i, j) = \frac{\sum_{u \in U_{ij}} r_{ui} \cdot r_{uj}}{\sqrt{\sum_{u \in U_{ij}} r_{ui}^2} \cdot \sqrt{\sum_{u \in U_{ij}} r_{uj}^2}}
+        \]
+    \item \emph{Mean Square Difference} (MSD):
+        \[
+        \text{msd}(u, v) = \frac{1}{|I_{uv}|} \cdot \sum_{i \in I_{uv}} (r_{ui} - r_{vi})^2
+        \]
+        oppure
+        \[
+        \text{msd}(i, j) = \frac{1}{|U_{ij}|} \cdot \sum_{u \in U_{ij}} (r_{ui} - r_{uj})^2
+        \]
+        La similarità è calcolata come:
+        \begin{align*}
+            \text{msd\_sim}(u, v) &= \frac{1}{\text{msd}(u, v) + 1} \\
+            \text{msd\_sim}(i, j) &= \frac{1}{\text{msd}(i, j) + 1}
+        \end{align*}
+        Il termine \(+1\) viene aggiunto per evitare divisioni per zero.
+    \item Pearson: Il coefficiente di correlazione di Pearson può essere visto come una similarità del coseno centrato sulla media. Se non ci sono \emph{item} comuni, la similarità è 0 (non -1).
+        \[
+        \text{pearson\_sim}(u, v) = \frac{\sum_{i \in I_{uv}} (r_{ui} - \mu_u) \cdot (r_{vi} - \mu_v)}{\sqrt{\sum_{i \in I_{uv}} (r_{ui} - \mu_u)^2} \cdot \sqrt{\sum_{i \in I_{uv}} (r_{vi} - \mu_v)^2}}
+        \]
+        oppure
+        \[
+        \text{pearson\_sim}(i, j) = \frac{\sum_{u \in U_{ij}} (r_{ui} - \mu_i) \cdot (r_{uj} - \mu_j)}{\sqrt{\sum_{u \in U_{ij}} (r_{ui} - \mu_i)^2} \cdot \sqrt{\sum_{u \in U_{ij}} (r_{uj} - \mu_j)^2}}
+        \]
+    \item Pearson con baseline \cite{Recommendation_book}: calcola il coefficiente di correlazione di Pearson (ridotto) tra tutte le coppie di \emph{user} (o \emph{item}) utilizzando le baseline anziché le medie. Il parametro di riduzione aiuta a evitare l'overfitting quando sono disponibili solo poche valutazioni. Se non ci sono \emph{item} comuni, la similarità è 0 (non -1). Introduce un nuovo iperparametro che corrisponde alla riduzione (o \emph{``shrinkage''}). Se impostato uguale a 0, non viene applicata nessuna riduzione.
+        \[
+        \text{pearson\_baseline\_sim}(u, v) = \hat{\rho}_{uv} = \frac{\sum_{i \in I_{uv}} (r_{ui} - b_{ui}) \cdot (r_{vi} - b_{vi})}{\sqrt{\sum_{i \in I_{uv}} (r_{ui} - b_{ui})^2} \cdot \sqrt{\sum_{i \in I_{uv}} (r_{vi} - b_{vi})^2}}
+        \]
+        oppure
+        \[
+        \text{pearson\_baseline\_sim}(i, j) = \hat{\rho}_{ij} = \frac{\sum_{u \in U_{ij}} (r_{ui} - b_{ui}) \cdot (r_{uj} - b_{uj})}{\sqrt{\sum_{u \in U_{ij}} (r_{ui} - b_{ui})^2} \cdot \sqrt{\sum_{u \in U_{ij}} (r_{uj} - b_{uj})^2}}
+        \]
+        Il coefficiente ridotto si calcola come:
+        \begin{align*}
+            \text{pearson\_baseline\_shrunk\_sim}(u, v) &= \frac{|I_{uv}| - 1}{|I_{uv}| - 1 + \text{shrinkage}} \cdot \hat{\rho}_{uv} \\
+            \text{pearson\_baseline\_shrunk\_sim}(i, j) &= \frac{|U_{ij}| - 1}{|U_{ij}| - 1 + \text{shrinkage}} \cdot \hat{\rho}_{ij}
+        \end{align*}
+        Per il calcolo della baseline, si consideri la parte di \ref{knn_baseline}.
+\end{itemize}
+
+Altro iperparametro da considerare è il supporto minimo, che corrisponde al numero minimo di \emph{item} in comune o il numero minimo di \emph{user} in comune affinché la similarità non sia zero, i.e., se \(|I_{uv}| < \text{min support}\), allora \(\text{sim}(u, v) = 0\). Lo stesso vale per gli \emph{item}.
+
+\subsubsection*{KNN base}
+
+L'algoritmo KNN base è l'algoritmo più semplice. Prevede il \textbf{rating} di un utente \(u\) per un \emph{item} \(i\) come la media ponderata dei \emph{rating} degli \(k\) vicini più simili di \(u\) o \(i\), a seconda che si utilizzi un approccio basato sugli \emph{user} o sugli \emph{item}.
+
+La predizione viene calcolata come:
+
+\[
+\hat{r}_{ui} = \frac{\sum_{v \in N^k_i(u)} \text{sim}(u, v) \cdot r_{vi}}{\sum_{v \in N^k_i(u)} \text{sim}(u, v)}
+\]
+
+oppure
+
+\[
+\hat{r}_{ui} = \frac{\sum_{j \in N^k_u(i)} \text{sim}(i, j) \cdot r_{uj}}{\sum_{j \in N^k_u(i)} \text{sim}(i, j)}
+\]
+
+dipendentemente dall'approccio utilizzato.
+
+\subsubsection{Algoritmo KNN con la media}
+\label{algoritmo-knn-con-la-media}
+
+L'algoritmo è una variante dell'algoritmo KNN base che tiene conto della media dei \emph{rating} degli \emph{user} o degli \emph{item}.
+
+La predizione viene calcolata come:
+
+\[
+\hat{r}_{ui} = \mu_u + \frac{\sum_{v \in N_k(u)} \text{sim}(u, v) \cdot (r_{vi} - \mu_v)}{\sum_{v \in N_k(u)} \text{sim}(u, v)}
+\]
+
+oppure
+
+\[
+\hat{r}_{ui} = \mu_i + \frac{\sum_{j \in N^k_u(i)} \text{sim}(i, j) \cdot (r_{uj} - \mu_j)}{\sum_{j \in N^k_u(i)} \text{sim}(i, j)}
+\]
+
+dipendentemente dall'approccio utilizzato.
+
+\subsubsection{Algoritmo KNN normalizzato}
+\label{algoritmo-knn-normalizzato}
+
+L'algoritmo è una variante dell'algoritmo che utilizza la media con l'aggiunta della normalizzazione \emph{z-score}, con la deviazione standard dell'utente o dell'\emph{item}, dei \emph{rating} corrispondenti prima di calcolare la similarità.
+
+La predizione viene calcolata come:
+
+\[
+\hat{r}_{ui} = \mu_u + \sigma_u \frac{\sum_{v \in N^k_i(u)} \text{sim}(u, v) \cdot (r_{vi} - \mu_v) / \sigma_v}{\sum_{v \in N^k_i(u)} \text{sim}(u, v)}
+\]
+
+oppure
+
+\[
+\hat{r}_{ui} = \mu_i + \sigma_i \frac{\sum_{j \in N^k_u(i)} \text{sim}(i, j) \cdot (r_{uj} - \mu_j) / \sigma_j}{\sum_{j \in N^k_u(i)} \text{sim}(i, j)}
+\]
+
+dipendentemente dall'approccio utilizzato.
+
+\subsubsection{KNN con baseline}
+\label{knn-con-baseline}
+
+L'algoritmo KNN con baseline \cite{KNN_baseline} è una variante dell'algoritmo base che tiene conto degli effetti di bias degli \emph{user} o degli \emph{item}.
+
+La predizione viene calcolata come:
+
+\[
+\hat{r}_{ui} = b_{ui} + \frac{\sum_{v \in N^k_i(u)} \text{sim}(u, v) \cdot (r_{vi} - b_{vi})}{\sum_{v \in N^k_i(u)} \text{sim}(u, v)}
+\]
+
+oppure
+
+\[
+\hat{r}_{ui} = b_{ui} + \frac{\sum_{j \in N^k_u(i)} \text{sim}(i, j) \cdot (r_{uj} - b_{uj})}{\sum_{j \in N^k_u(i)} \text{sim}(i, j)}
+\]
+
+dipendentemente dall'approccio utilizzato.
+
+La baseline \(b_{ui}\) viene calcolata come:
+
+\[
+b_{ui} = \mu + b_u + b_i
+\]
+
+Per calcolare \(b_u\) e \(b_i\), occorre minimizzare il seguente errore quadratico regolarizzato:
+
+\[
+\sum_{r_{ui} \in R_{train}} \left(r_{ui} - \mu + b_u + b_i\right)^2 + \lambda \left(b_u^2 + b_i^2 \right).
+\]
+
+Il termine di regolarizzazione \(\lambda \left(b_u^2 + b_i^2 \right)\) serve per evitare l'overfitting penalizzando la grandezza dei parametri.
+
+La minimizzazione può essere effettuata tramite \emph{Stochastic Gradient Descent} o \emph{Alternating Least Squares}.
+
+Per \emph{Stochastic Gradient Descent}, si introduce \(\lambda\) per la regolarizzazione, \(\gamma\) il \emph{learning rate} e \(N\) il numero di epoche.
+
+Per \emph{Alternating Least Squares}, i due valori di \(b_u\) e \(b_i\) si ottengono come:
+
+\[
+b_i = \frac{\sum_{r_{ui} \in R_{train}} (r_{ui} - \mu)}{\lambda_2 + |U_i|}
+\]
+
+e
+
+\[
+b_u = \frac{\sum_{r_{ui} \in R_{train}} (r_{ui} - \mu - b_i)}{\lambda_3 + |I_u|}
+\]
+
+e si introducono come iperparametri \(\lambda_1\) e \(\lambda_2\) per la regolarizzazione e \(N\) per il numero di epoche.
+
+I punti di forza della famiglia di algoritmi KNN sono:
+\begin{itemize}
+    \item Semplicità: Gli algoritmi KNN sono facili da capire e implementare. L'idea di base di trovare ``vicini'' simili è intuitiva e facilmente comprensibile.
+    \item Nessuna assunzione sui dati: l'algoritmo non fa assunzioni sulla distribuzione dei dati. Questo lo rende flessibile e adatto a una varietà di dataset.
+    \item Aggiornamento: l'aggiunta di nuovi dati non richiede una fase di addestramento esplicita. Questo lo rende utile in ambienti in cui i dati cambiano frequentemente o per previsioni online.
+    \item Flessibilità: KNN può essere utilizzato sia per problemi di raccomandazione basati su \emph{user} che basati su \emph{item}.
+\end{itemize}
+
+Gli algoritmi soffrono anche di diverse problematiche:
+\begin{itemize}
+    \item Costo computazionale: KNN può essere computazionalmente costoso, soprattutto con set di dati di grandi dimensioni.
+    \item Requisiti di memoria: KNN richiede la memorizzazione dell'intero set di dati, il che può essere problematico per set di dati molto grandi.
+    \item Sensibilità alla scelta di k: La scelta del valore di k può avere un impatto significativo sulle prestazioni di KNN. Un valore di k troppo piccolo può portare a un overfitting, mentre un valore di k troppo grande può portare a un underfitting. Inoltre, la ricerca dei \(k\) vicini più prossimi richiede il calcolo delle distanze tra tutti i punti dati.
+    \item Gestione della sparsità dei dati: la sparsità può rendere difficile trovare vicini significativi e quindi portare a raccomandazioni di bassa qualità.
+\end{itemize}
 
 \subsubsection{CoClustering}\label{coclustering}
 
