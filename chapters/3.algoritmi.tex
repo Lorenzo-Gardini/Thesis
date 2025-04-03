@@ -149,6 +149,27 @@ L'algoritmo soffre anche di diverse problematiche:
 
 \subsubsection{NMF}
 
+\[
+\hat{r}_{ui} = q_i^Tp_u
+\] 
+
+\begin{equation}
+    \begin{split}
+    p_{uf} &\leftarrow p_{uf} \cdot \frac{\sum_{i \in I_u} q_{if} \cdot r_{ui}}
+    {\sum_{i \in I_u} q_{if} \cdot \hat{r}_{ui} + \lambda_u |I_u| p_{uf}} \\
+    q_{if} &\leftarrow q_{if} \cdot \frac{\sum_{u \in U_i} p_{uf} \cdot r_{ui}}
+    {\sum_{u \in U_i} p_{uf} \cdot \hat{r}_{ui} + \lambda_i |U_i| q_{if}}
+    \end{split}
+\end{equation}
+    
+
+\[
+\hat{r}_{ui} = \mu + b_u + b_i + q_i^Tp_u
+\]
+
+citazione1~\cite{NMF}, citazione2~\cite{NMF2}, citazione3~\cite{NMF3}
+
+
 \subsection{KNN (K-Nearest Neighbors)}\label{knn}
 Si tratta di algoritmi derivati direttamente da un approccio di base basato sui \textit{nearest neighbors}.
 
