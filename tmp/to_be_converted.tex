@@ -1,0 +1,116 @@
+\documentclass{article}
+
+% Pacchetti utili
+\usepackage[utf8]{inputenc} % Per la codifica dei caratteri
+\usepackage[T1]{fontenc} % Per i font
+\usepackage{graphicx} % Per le immagini
+\usepackage{amsmath, amssymb} % Per la matematica
+\usepackage{hyperref} % Per i link
+\usepackage{natbib} % Per le citazioni
+
+\begin{document}
+
+\section{Introduzione}
+
+L'algoritmo \textbf{Bayesian Personalized Ranking (BPR)} è stato sviluppato per affrontare il problema del \textit{personalized ranking} a partire da \textit{implicit feedback}, come click, visualizzazioni o acquisti. A differenza degli approcci tradizionali che cercano di prevedere le valutazioni esplicite $r_{ui}$, BPR mira a modellare l'\textit{ordine di preferenza} degli \textit{item} per ciascuno \textit{user} $u$.
+
+\section{Motivazione}
+
+Nei sistemi basati su \textit{feedback impliciti}, la mancanza di interazione tra un utente e un item non implica necessariamente una preferenza negativa. Per affrontare tale ambiguità, BPR adotta le seguenti ipotesi:
+
+\begin{itemize}
+    \item Se $(u, i) \in R$, cioè l'utente $u$ ha interagito con l'item $i$, allora $u$ preferisce $i$ a tutti gli item $j$ con cui non ha interagito.
+    \item A partire da questo principio, si costruisce un insieme di triple:
+    \[
+    D_S := \{(u, i, j) \mid i \in I_u \wedge j \in I \setminus I_u\}
+    \]
+    dove ogni tripla rappresenta la preferenza dell'utente $u$ per l'item $i$ rispetto all'item $j$.
+\end{itemize}
+
+\section{Criterio di Ottimizzazione (BPR-Opt)}
+
+L'obiettivo di BPR è massimizzare la probabilità a posteriori dei parametri del modello $\Theta$, dati i dati osservati:
+\[
+\text{BPR-Opt} = \sum_{(u, i, j) \in D_S} \ln \sigma(\hat{x}_{uij}) - \lambda_\Theta ||\Theta||^2
+\]
+dove:
+\begin{itemize}
+    \item $\hat{x}_{uij} = \hat{r}_{ui} - \hat{r}_{uj}$ è la differenza tra le valutazioni stimate per $i$ e $j$;
+    \item $\sigma(x) = \frac{1}{1 + e^{-x}}$ è la funzione sigmoide;
+    \item $\lambda_\Theta$ è il parametro di regolarizzazione.
+\end{itemize}
+
+Questo criterio è strettamente legato all'ottimizzazione dell'AUC (Area Under the ROC Curve), che misura la qualità del ranking.
+
+\section{Algoritmo LearnBPR}
+
+L'ottimizzazione di BPR-Opt viene effettuata tramite \textit{stochastic gradient descent} con campionamento bootstrap:
+
+% \begin{algorithm}[H]
+% \caption{LearnBPR}
+% \begin{algorithmic}[1]
+% \Procedure{LearnBPR}{$D_S, \Theta$}
+%     \State Inizializza $\Theta$
+%     \Repeat
+%         \State Campiona $(u, i, j)$ da $D_S$
+%         \State $\Theta \gets \Theta + \alpha \cdot \left( \frac{e^{-\hat{x}_{uij}}}{1 + e^{-\hat{x}_{uij}}} \cdot \frac{\partial \hat{x}_{uij}}{\partial \Theta} - \lambda_\Theta \cdot \Theta \right)$
+%     \Until{convergenza}
+%     \State \Return $\Theta$
+% \EndProcedure
+% \end{algorithmic}
+% \end{algorithm}
+
+Questo approccio consente una rapida convergenza e un buon bilanciamento tra classi positive e negative.
+
+\section{Applicazioni di BPR}
+
+BPR può essere applicato a diverse famiglie di modelli. Di seguito due esempi noti:
+
+\subsection{Matrix Factorization (BPR-MF)}
+
+Ogni \textit{user} $u$ e \textit{item} $i$ sono rappresentati da vettori latenti $\mathbf{w}_u$ e $\mathbf{h}_i$. La valutazione stimata è:
+\[
+\hat{r}_{ui} = \langle \mathbf{w}_u, \mathbf{h}_i \rangle = \sum_{f=1}^k w_{uf} \cdot h_{if}
+\]
+e quindi:
+\[
+\hat{x}_{uij} = \hat{r}_{ui} - \hat{r}_{uj} = \langle \mathbf{w}_u, \mathbf{h}_i - \mathbf{h}_j \rangle
+\]
+
+\subsection{Adaptive k-Nearest-Neighbor (BPR-kNN)}
+
+La stima della preferenza è basata sulla somma delle similarità tra l’item $i$ e gli item già valutati:
+\[
+\hat{r}_{ui} = \sum_{l \in I_u} c_{il}
+\]
+\[
+\hat{x}_{uij} = \sum_{l \in I_u} (c_{il} - c_{jl})
+\]
+
+\section{Vantaggi del BPR}
+
+\begin{itemize}
+    \item Ottimizza direttamente l'obiettivo di ranking anziché i rating.
+    \item Si adatta bene a scenari con feedback impliciti.
+    \item È flessibile e applicabile a vari modelli di raccomandazione.
+    \item È empiricamente superiore a metodi classici come WR-MF e SVD.
+\end{itemize}
+
+\section{Esempio}
+
+Supponiamo che l’utente $u_1$ abbia interagito con $i_2$ ma non con $i_1$ e $i_4$. Le triple generate saranno:
+\[
+(u_1, i_2, i_1), \quad (u_1, i_2, i_4)
+\]
+che esprimono la preferenza implicita di $u_1$ per $i_2$ rispetto agli altri.
+
+\section{Conclusione}
+
+L’approccio BPR introduce un framework bayesiano per l’ottimizzazione del ranking personalizzato, fornendo migliori prestazioni grazie all’adattamento del criterio di apprendimento all’obiettivo finale. Il suo algoritmo LearnBPR è efficiente e facilmente adattabile a diversi modelli.
+
+
+
+\bibliographystyle{plain}
+\bibliography{../bibliography}
+
+\end{document}

@@ -34,7 +34,7 @@ La notazione utilizzata è la seguente:
 
 \subsection{Matrix Factorization}
 
-\subsubsection{SVD}
+\subsubsection{SVD}\label{svd}
 
 L'algoritmo SVD (\textit{singular value decomposition}), è stato reso popolare da Simon Funk durante la competizione \textit{the Netflix Prize} dimostrando come modelli di fattorizzazione matriciale sono superiori alle tecniche classiche basate su \textit{nearest neighbor}\ref{knn} per
 la produzione di raccomandazioni.
@@ -149,26 +149,80 @@ L'algoritmo soffre anche di diverse problematiche:
 
 \subsubsection{NMF}
 
+Un algoritmo di \textit{collaborative filtering} basato sulla \textit{fattorizzazione matriciale non negativa}.  
+
+Questo algoritmo è molto simile a SVD\ref{svd} ma con una restrizione che tutti gli elementi devono essere non negativi. Questo ha senso, ad esempio, quando si tratta di rating o quantità (che non possono essere negativi).
+
+L'idea è approssimare la matrice $R$ come prodotto di due matrici più piccole:
+
 \[
-\hat{r}_{ui} = q_i^Tp_u
-\] 
+R \approx WH
+\]
+
+dove:
+\begin{itemize}
+    \item $W \in \mathbb{R}_{\geq 0}^{m \times k}$ rappresenta la matrice dei profili latenti degli \textit{user};
+    \item $H \in \mathbb{R}_{\geq 0}^{k \times n}$ rappresenta la matrice dei profili latenti degli \textit{item};
+    \item $k$ è il numero di fattori latenti. Anche in questo caso è iper-parametro dell'algoritmo
+\end{itemize}
+
+Il \textit{rating} stimato dello \textit{user} $u$ per l'\textit{item} $i$ è calcolato come~\cite{NMF2}~\cite{NMF3}:
+
+\[
+\hat{r}_{ui} = \sum_{f=1}^k W_{uf} H_{fi} = q_i^T p_u
+\]
+
+dove i fattori utente e articolo vengono mantenuti positivi
+
+L'obiettivo di apprendimento è minimizzare l'errore quadratico sui \textit{rating} osservati nel set di addestramento $R_{train}$:
+
+\[
+\min_{W, H} \sum_{(u,i) \in R_{train}} \left( r_{ui} - \hat{r}_{ui} \right)^2 \quad \text{s.t.} \quad W \geq 0,\ H \geq 0
+\]
+
+In forma matriciale, questo si può esprimere come:
+
+\[
+\min_{W, H} \ \| R_{train} - WH \|_F^2 \quad \text{con} \quad W \geq 0,\ H \geq 0
+\]
+
+dove $\| \cdot \|_F$ è la norma di Frobenius.
+
+La procedura di ottimizzazione è una SGD regolarizzata~\cite{NMF} con una scelta specifica della dimensione del passo che garantisce la non negatività dei fattori, a condizione che anche i loro valori iniziali siano positivi.
+
+A ogni iterazione i fattori vengono aggiornati come segue:
 
 \begin{equation}
     \begin{split}
-    p_{uf} &\leftarrow p_{uf} \cdot \frac{\sum_{i \in I_u} q_{if} \cdot r_{ui}}
-    {\sum_{i \in I_u} q_{if} \cdot \hat{r}_{ui} + \lambda_u |I_u| p_{uf}} \\
-    q_{if} &\leftarrow q_{if} \cdot \frac{\sum_{u \in U_i} p_{uf} \cdot r_{ui}}
-    {\sum_{u \in U_i} p_{uf} \cdot \hat{r}_{ui} + \lambda_i |U_i| q_{if}}
+        p_{uf} &\leftarrow p_{uf} \cdot \frac{\sum\limits_{i \in I_u} q_{if} \cdot r_{ui}}{\sum\limits_{i \in I_u} q_{if} \cdot \hat{r}_{ui} + \lambda_u |I_u| p_{uf}}\\
+        q_{if} &\leftarrow q_{if} \cdot \frac{\sum\limits_{u \in U_i} p_{uf} \cdot r_{ui}}{\sum\limits_{u \in U_i} p_{uf} \cdot \hat{r}_{ui} + \lambda_i |U_i| q_{if}}
     \end{split}
 \end{equation}
-    
+
+Questo algoritmo è altamente dipendente dai valori iniziali con cui vengono inizializzate le matrici $H$ e $W$. I fattori latenti degli \textit{user} e degli \textit{item} vengono inizializzati casualmente in modo uniforme tra un minimo e un massimo, solitamente nell'intervallo $[0, 1]$.
+
+Vengono introdotti due nuovi iper-parametri $\lambda_u$ e $\lambda_i$ che corrispondono alla regolarizzazione rispettivamente per \textit{user} e \textit{item}.
+
+Anche in questo caso si può utilizzare la predizione con l'utilizzo di baseline\ref{svd}.
 
 \[
-\hat{r}_{ui} = \mu + b_u + b_i + q_i^Tp_u
+\hat{r}_{ui} = \mu + b_u + b_i + q_i^T p_u
 \]
 
-citazione1~\cite{NMF}, citazione2~\cite{NMF2}, citazione3~\cite{NMF3}
+garantendo comunque fattori positivi. Le baselines sono ottimizzate nello stesso modo dell'algoritmo SVD. Pur producendo una migliore accuratezza, la versione che utilizza baseline sembra molto incline all'overfitting, che può essere ridotto diminuendo $k$ o aumentando la regolarizzazione.
 
+NFM, grazie al vincolo della non negatività, è più interpretabile di SVD: i valori nelle matrici fattorizzate $W$ e $H$ sono tutti $\geq 0$, quindi possono essere interpretati come pesi o intensità (es. quanto un utente apprezza un certo genere, quanto un item rappresenta un tema).
+
+L'algoritmo soffre anche di diverse problematiche:
+
+\begin{itemize}
+    \item dipendenza dall’inizializzazione: l’algoritmo può convergere a minimi locali diversi a seconda dei valori iniziali, e non garantisce una soluzione unica o ottima
+    
+    \item non adatta per dati con valori negativi: NMF non può gestire valori negativi nei dati di input, a differenza di SVD
+    
+    \item convergenza più lenta: rispetto ad altri metodi la convergenza può essere più lenta e richiede tuning di più parametri
+    \item mancanza di soluzione chiusa: SVD può gestire valori negativi e ha una soluzione ottima in termini di errore quadratico minimo
+\end{itemize}
 
 \subsection{KNN (K-Nearest Neighbors)}\label{knn}
 Si tratta di algoritmi derivati direttamente da un approccio di base basato sui \textit{nearest neighbors}.
