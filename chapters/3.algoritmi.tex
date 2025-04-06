@@ -28,6 +28,10 @@ La notazione utilizzata è la seguente:
     \item $\sigma_i$ : la deviazione standard di tutte le valutazioni date all'\textit{item} $i$.
     \item $N_i^k(u)$ : i $k$ vicini più prossimi dello \textit{user} $u$ che hanno valutato l'\textit{item} $i$. Questo insieme è calcolato utilizzando una metrica di similarità.
     \item $N_u^k(i)$ : i $k$ vicini più prossimi dell'\textit{item} $i$ che sono valutati dallo \textit{user} $u$. Questo insieme è calcolato utilizzando una metrica di similarità.
+    \item $\gamma$: iper-parametro, il \textit{learning rate} utilizzato per l'algoritmo SGD.
+    \item $\lambda$: iper-parametro, corrisponde al fattore di regolarizzazione nella funzione obbiettivo
+    \item $\hat{x}_{uij}$: score che rappresenta la preferenza dello \textit{user} \textit{i} per l'\textit{item} \textit{i} rispetto all'\textit{item} \textit{j}
+    \item $N$: numero di epoche per l'algoritmo \textit{Gradient Descent}.
 \end{itemize}
 
 \section{Algoritmi per il feedback esplicito}\label{algoritmi-per-feedback-esplicito}
@@ -70,7 +74,7 @@ Per apprendere i parametri del modello ($b_u$, $b_i$, $p_u$, $q_i$), si minimizz
 
 Dove il primo termine è l'errore quadratico tra le \textit{rating} previste e reali e il secondo termine è la regolarizzazione, che penalizza valori troppo grandi per i parametri $b_u$, $b_i$, $p_u$, $q_i$ per evitare l'overfitting.
 
-Per ottimizzare questi parametri, viene usata la \textit{stochastic gradient descent} (SGD), che aggiorna i parametri dopo ogni  esempio di training (ad esempio, per ogni \textit{rating} di un \textit{user}).
+Per ottimizzare questi parametri, viene usata la \textit{Stochastic Gradient Descent} (SGD), che aggiorna i parametri dopo ogni  esempio di training (ad esempio, per ogni \textit{rating} di un \textit{user}).
 
 Per ogni \textit{rating} ($r_{ui}$) data, viene fatta una previsione ($\hat{r}_{ui}$), e l'errore di previsione associato ($e_{ui} = r_{ui} - \hat{r}_{ui}$) viene calcolato. Per un dato caso di addestramento ($r_{ui}$), modifichiamo i parametri spostandoci nella
 direzione opposta al gradiente, ottenendo:
@@ -82,12 +86,10 @@ direzione opposta al gradiente, ottenendo:
     \item $p_u \leftarrow p_u + \gamma \cdot e_{ui} \cdot q_i$
 \end{itemize}
 
-dove $\gamma$ è il \textit{learning rate}. $\gamma$ e $\lambda$ sono iperparametri dell'algoritmo.
-
 Queste formule vengono utilizzate per aggiornare i parametri durante l'addestramento del modello, in modo da ridurre l'errore tra le
 \textit{rating} reali e quelle previste.
 
-Per ottenere un ulteriore miglioramento, possono applicare $\gamma$ e $\lambda$ separati per i bias degli \textit{user}, i bias degli
+Per ottenere un ulteriore miglioramento, si possono applicare $\gamma$ e $\lambda$ separati per i bias degli \textit{user}, i bias degli
 \textit{item} e i fattori stessi~\cite{SVD_optimized}.
 
 I punti di forza dell'algoritmo sono:
@@ -147,7 +149,7 @@ L'algoritmo soffre anche di diverse problematiche:
     \item overfitting: SVD++ è più propenso a overfitting su dataset piccoli.
 \end{itemize}
 
-\subsubsection{NMF}
+\subsubsection{NMF}\label{nmf}
 
 Un algoritmo di \textit{collaborative filtering} basato sulla \textit{fattorizzazione matriciale non negativa}.  
 
@@ -201,7 +203,7 @@ A ogni iterazione i fattori vengono aggiornati come segue:
 
 Questo algoritmo è altamente dipendente dai valori iniziali con cui vengono inizializzate le matrici $H$ e $W$. I fattori latenti degli \textit{user} e degli \textit{item} vengono inizializzati casualmente in modo uniforme tra un minimo e un massimo, solitamente nell'intervallo $[0, 1]$.
 
-Vengono introdotti due nuovi iper-parametri $\lambda_u$ e $\lambda_i$ che corrispondono alla regolarizzazione rispettivamente per \textit{user} e \textit{item}.
+Gli iper-parametri $\lambda_u$ e $\lambda_i$ corrispondono alla regolarizzazione rispettivamente per \textit{user} e \textit{item}.
 
 Anche in questo caso si può utilizzare la predizione con l'utilizzo di baseline\ref{svd}.
 
@@ -231,7 +233,7 @@ Gli algoritmi ispirati al KNN (\textit{K Nearest Neighbors}) sono una classe di 
 
 Il numero effettivo di vicini che vengono considerati per calcolare la predizione è minore o uguale a $k$: potrebbero non esserci abbastanza vicini e/o gli insiemi $N_i^k(u)$ e $N_u^k(i)$ includono solo vicini per i quali la misura di similarità è positiva (non avrebbe senso considerare \textit{user} o \textit{item} correlati negativamente).
 
-$k$ è un iperparametro di ciascun algoritmo.
+$k$ è un iper-parametro di ciascun algoritmo.
 
 Alcune misure di similarità, sia per \textit{user} che per \textit{item}, sono:
 \begin{itemize}
@@ -265,7 +267,7 @@ Alcune misure di similarità, sia per \textit{user} che per \textit{item}, sono:
         \[
         \text{pearson sim}(i, j) = \frac{\sum\limits_{u \in U_{ij}} (r_{ui} - \mu_i) \cdot (r_{uj} - \mu_j)}{\sqrt{\sum\limits_{u \in U_{ij}} (r_{ui} - \mu_i)^2} \cdot \sqrt{\sum\limits_{u \in U_{ij}} (r_{uj} - \mu_j)^2}}
         \]
-    \item Pearson con baseline \cite{Recommendation_book}: calcola il coefficiente di correlazione di Pearson (ridotto) tra tutte le coppie di \textit{user} (o \textit{item}) utilizzando le baseline anziché le medie. Il parametro di riduzione aiuta a evitare l'overfitting quando sono disponibili solo poche valutazioni. Se non ci sono \textit{item} comuni, la similarità è 0 (non -1). Introduce un nuovo iperparametro che corrisponde alla riduzione (o \textit{``shrinkage''}). Se impostato uguale a 0, non viene applicata nessuna riduzione.
+    \item Pearson con baseline \cite{Recommendation_book}: calcola il coefficiente di correlazione di Pearson (ridotto) tra tutte le coppie di \textit{user} (o \textit{item}) utilizzando le baseline anziché le medie. Il parametro di riduzione aiuta a evitare l'overfitting quando sono disponibili solo poche valutazioni. Se non ci sono \textit{item} comuni, la similarità è 0 (non -1). Introduce un nuovo iper-parametro che corrisponde alla riduzione (o \textit{``shrinkage''}). Se impostato uguale a 0, non viene applicata nessuna riduzione.
         \[
         \text{pearson baseline sim}(u, v) = \hat{\rho}_{uv} = \frac{\sum\limits_{i \in I_{uv}} (r_{ui} - b_{ui}) \cdot (r_{vi} - b_{vi})}{\sqrt{\sum\limits_{i \in I_{uv}} (r_{ui} - b_{ui})^2} \cdot \sqrt{\sum\limits_{i \in I_{uv}} (r_{vi} - b_{vi})^2}}
         \]
@@ -374,8 +376,6 @@ Il termine di regolarizzazione $\lambda \left(b_u^2 + b_i^2 \right)$ serve per e
 
 La minimizzazione può essere effettuata tramite \textit{Stochastic Gradient Descent} o \textit{Alternating Least Squares}.
 
-Per \textit{Stochastic Gradient Descent}, si introduce $\lambda$ per la regolarizzazione, $\gamma$ il \textit{learning rate} e $N$ il numero di epoche.
-
 Per \textit{Alternating Least Squares}, i due valori di $b_u$ e $b_i$ si ottengono come:
 
 \[
@@ -388,22 +388,20 @@ e
 b_u = \frac{\sum\limits_{r_{ui} \in R_{train}} (r_{ui} - \mu - b_i)}{\lambda_3 + |I_u|}
 \]
 
-e si introducono come iperparametri $\lambda_1$ e $\lambda_2$ per la regolarizzazione e $N$ per il numero di epoche.
-
 I punti di forza della famiglia di algoritmi KNN sono:
 \begin{itemize}
-    \item Semplicità: Gli algoritmi KNN sono facili da capire e implementare. L'idea di base di trovare ``vicini'' simili è intuitiva e facilmente comprensibile.
-    \item Nessuna assunzione sui dati: l'algoritmo non fa assunzioni sulla distribuzione dei dati. Questo lo rende flessibile e adatto a una varietà di dataset.
-    \item Aggiornamento: l'aggiunta di nuovi dati non richiede una fase di addestramento esplicita. Questo lo rende utile in ambienti in cui i dati cambiano frequentemente o per previsioni online.
-    \item Flessibilità: KNN può essere utilizzato sia per problemi di raccomandazione basati su \textit{user} che basati su \textit{item}.
+    \item semplicità: Gli algoritmi KNN sono facili da capire e implementare. L'idea di base di trovare ``vicini'' simili è intuitiva e facilmente comprensibile.
+    \item nessuna assunzione sui dati: l'algoritmo non fa assunzioni sulla distribuzione dei dati. Questo lo rende flessibile e adatto a una varietà di dataset.
+    \item aggiornamento: l'aggiunta di nuovi dati non richiede una fase di addestramento esplicita. Questo lo rende utile in ambienti in cui i dati cambiano frequentemente o per previsioni online.
+    \item flessibilità: KNN può essere utilizzato sia per problemi di raccomandazione basati su \textit{user} che basati su \textit{item}.
 \end{itemize}
 
 Gli algoritmi soffrono anche di diverse problematiche:
 \begin{itemize}
-    \item Costo computazionale: KNN può essere computazionalmente costoso, soprattutto con set di dati di grandi dimensioni.
-    \item Requisiti di memoria: KNN richiede la memorizzazione dell'intero set di dati, il che può essere problematico per set di dati molto grandi.
-    \item Sensibilità alla scelta di k: La scelta del valore di k può avere un impatto significativo sulle prestazioni di KNN. Un valore di k troppo piccolo può portare a un overfitting, mentre un valore di k troppo grande può portare a un underfitting. Inoltre, la ricerca dei $k$ vicini più prossimi richiede il calcolo delle distanze tra tutti i punti dati.
-    \item Gestione della sparsità dei dati: la sparsità può rendere difficile trovare vicini significativi e quindi portare a raccomandazioni di bassa qualità.
+    \item costo computazionale: KNN può essere computazionalmente costoso, soprattutto con set di dati di grandi dimensioni.
+    \item requisiti di memoria: KNN richiede la memorizzazione dell'intero set di dati, il che può essere problematico per set di dati molto grandi.
+    \item sensibilità alla scelta di $k$: La scelta del valore di k può avere un impatto significativo sulle prestazioni di KNN. Un valore di k troppo piccolo può portare a un overfitting, mentre un valore di k troppo grande può portare a un underfitting. Inoltre, la ricerca dei $k$ vicini più prossimi richiede il calcolo delle distanze tra tutti i punti dati.
+    \item gestione della sparsità dei dati: la sparsità può rendere difficile trovare vicini significativi e quindi portare a raccomandazioni di bassa qualità.
 \end{itemize}
 
 \subsection{CoClustering}\label{coclustering}
@@ -513,9 +511,141 @@ L'approccio può essere esteso a modelli ponderati e versioni più avanzate, com
 
 \section{Algoritmi per il feedback implicito}\label{algoritmi-per-feedback-implicito}
 
-\subsection{ALS (Alternating Least Squares)}\label{als-alternating-least-squares}
+\subsection{ALS (Alternating Least Squares)}\label{als}
 
-\subsection{BPR (Bayesian Personalized Ranking)}\label{bpr-bayesian-personalized-ranking}
+\subsection{BPR (Bayesian Personalized Ranking)}\label{bpr}
+
+Nei sistemi basati su \textit{feedback impliciti}, la mancanza di interazione tra un \textit{user} e un \textit{item} non implica necessariamente una preferenza negativa. Per affrontare tale ambiguità, BPR adotta le seguenti ipotesi:
+
+\begin{itemize}
+    \item Se $(u, i) \in R$, cioè lo \textit{user} $u$ ha interagito con l'\textit{item} $i$, allora $u$ preferisce $i$ a tutti gli \textit{item} $j$ con cui non ha interagito.
+    \item A partire da questo principio, si costruisce un insieme di triple:
+    \[
+    D_S := \{(u, i, j) \mid i \in I_u \wedge j \in I \setminus I_u\}
+    \]
+    dove ogni tripla rappresenta la preferenza dello \textit{user} $u$ per l'\textit{item} $i$ rispetto all'\textit{item} $j$.
+\end{itemize}
+
+L'obiettivo di BPR è massimizzare la probabilità a posteriori dei parametri del modello $\Theta$, dati i dati osservati:
+\[
+\text{BPR-Opt} = \sum_{(u, i, j) \in D_S} \ln \sigma(\hat{x}_{uij}) - \lambda_\Theta ||\Theta||^2
+\]
+dove:
+\begin{itemize}
+    \item $\hat{x}_{uij} = \hat{x}_{ui} - \hat{x}_{uj}$ è la differenza tra le valutazioni stimate per $i$ e $j$;
+    \item $\sigma(x) = \frac{1}{1 + e^{-x}}$ è la funzione sigmoide;
+    \item $\lambda_\Theta$ è il parametro di regolarizzazione.
+\end{itemize}
+
+Questo criterio è strettamente legato all'ottimizzazione dell'AUC (Area Under the ROC Curve), che misura la qualità del ranking.
+
+Per prima cosa si calcola il gradiente di BPR-Opt come:
+
+\[
+\frac{\partial \text{BPR-Opt}}{\partial \Theta} =
+\sum_{(u,i,j) \in D_S} 
+\frac{\partial}{\partial \Theta} \ln \sigma(\hat{x}_{uij}) - 
+\lambda \frac{\partial}{\partial \Theta} ||\Theta||^2
+\]
+
+\[
+\propto 
+\sum_{(u,i,j) \in D_S} 
+\frac{-e^{-\hat{x}_{uij}}}{1 + e^{-\hat{x}_{uij}}} 
+\cdot \frac{\partial}{\partial \Theta} \hat{x}_{uij} 
+- \lambda \Theta
+\]
+
+L'ottimizzazione di BPR-Opt viene effettuata tramite \textit{stochastic gradient descent}. I parametri del modello sono aggirnati con:
+
+\[
+\Theta \gets \Theta - \gamma \frac{\partial \text{BPR-Opt}}{\partial \Theta}
+\]
+
+
+L'algoritmo effettua un campionamento \textit{bootstrap}:
+
+\begin{algorithm}[H]
+\caption{LearnBPR}
+\begin{algorithmic}[1]
+\Procedure{LearnBPR}{$D_S, \Theta$}
+    \State Inizializza $\Theta$
+    \Repeat
+        \State Campiona $(u, i, j)$ da $D_S$
+        \State $\Theta \gets \Theta + \gamma \cdot \left( \frac{e^{-\hat{x}_{uij}}}{1 + e^{-\hat{x}_{uij}}} \cdot \frac{\partial \hat{x}_{uij}}{\partial \Theta} - \lambda_\Theta \cdot \Theta \right)$
+    \Until{convergenza}
+    \State \Return $\Theta$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+Questo approccio consente una rapida convergenza e un buon bilanciamento tra classi positive e negative.
+
+BPR può essere applicato a diverse famiglie di modelli. Di seguito viene presentata la versione con \textit{matrix factorization} (BPR-MF):
+
+Ogni \textit{user} \( u \in U \) e ogni \textit{item} \( i \in I \) sono rappresentati da un vettore latente in \( \mathbb{R}^k \):
+
+\[
+\mathbf{w}_u \in \mathbb{R}^k \quad \text{(user)} \qquad
+\mathbf{h}_i \in \mathbb{R}^k \quad \text{(item)}
+\]
+
+
+Per ogni tripla \( (u, i, j) \), il modello calcola:
+
+\[
+\hat{x}_{ui} = \langle \mathbf{w}_u, \mathbf{h}_i \rangle = \sum_{f=1}^{k} w_{uf} \cdot h_{if}
+\]
+
+\[
+\hat{x}_{uj} = \langle \mathbf{w}_u, \mathbf{h}_j \rangle = \sum_{f=1}^{k} w_{uf} \cdot h_{jf}
+\]
+
+\[
+\hat{x}_{uij} = \hat{x}_{ui} - \hat{x}_{uj} = \langle \mathbf{w}_u, \mathbf{h}_i - \mathbf{h}_j \rangle
+\]
+
+
+La funzione obiettivo da massimizzare è:
+
+\[
+\text{BPR-Opt} = \sum_{(u,i,j) \in D_S} \log \sigma(\hat{x}_{uij}) 
+- \lambda \left( \|\mathbf{w}_u\|^2 + \|\mathbf{h}_i\|^2 + \|\mathbf{h}_j\|^2 \right)
+\]
+
+Definiamo:
+
+\[
+z = -\frac{\partial}{\partial \Theta} \ln \sigma(\hat{x}_{uij}) = \frac{e^{-\hat{x}_{uij}}}{1 + e^{-\hat{x}_{uij}}}
+\]
+
+Gli aggiornamenti dei parametri sono:
+
+\begin{align*}
+\mathbf{w}_u &\leftarrow \mathbf{w}_u + \gamma \left( z \cdot (\mathbf{h}_i - \mathbf{h}_j) - \lambda \cdot \mathbf{w}_u \right) \\
+\mathbf{h}_i &\leftarrow \mathbf{h}_i + \gamma \left( z \cdot \mathbf{w}_u - \lambda \cdot \mathbf{h}_i \right) \\
+\mathbf{h}_j &\leftarrow \mathbf{h}_j + \gamma \left( -z \cdot \mathbf{w}_u - \lambda \cdot \mathbf{h}_j \right)
+\end{align*}
+
+I punti di forza dell'algoritmo sono:
+
+\begin{itemize}
+    \item ottimizzazione diretta: massimizza la probabilità che un item positivo sia sopra uno negativo.
+    \item scalabilità: efficiente con \textit{SGD} e \textit{negative sampling}, anche su grandi dataset.
+    \item flessibilità: compatibile con \textit{matrix factorization}, \textit{Neural Collaborative Filtering} e modelli più avanzati (CNN, RNN, GNN).
+    \item empiricamente superiore: spesso batte metodi classici come \textit{Weighted Regularized Matrix Factorization} e \textit{SVD}\ref{svd}.
+    \item indipendente da valutazioni esplicite: non richiede rating numerici.
+\end{itemize}
+
+L'algoritmo soffre anche di diverse problematiche:
+
+\begin{itemize}
+    \item negative sampling critico: la scelta degli item negativi influisce molto sull'apprendimento.
+    \item convergenza lenta: su dati sparsi può avere una convergenza lenta
+    \item rischio overfitting: sensibile alla mancanza di regolarizzazione.
+    \item limiti nelle relazioni globali: non cattura bene la struttura complessiva degli item.
+    \item poca interpretabilità: difficile capire il motivo dietro una raccomandazione.
+\end{itemize}
 
 \subsection{LMF (Logistic Matrix Factorization)}\label{lmf-logistic-matrix-factorization}
 
