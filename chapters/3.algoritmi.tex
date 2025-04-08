@@ -28,8 +28,8 @@ La notazione utilizzata è la seguente:
     \item $\sigma_i$ : la deviazione standard di tutte le valutazioni date all'\textit{item} $i$.
     \item $N_i^k(u)$ : i $k$ vicini più prossimi dello \textit{user} $u$ che hanno valutato l'\textit{item} $i$. Questo insieme è calcolato utilizzando una metrica di similarità.
     \item $N_u^k(i)$ : i $k$ vicini più prossimi dell'\textit{item} $i$ che sono valutati dallo \textit{user} $u$. Questo insieme è calcolato utilizzando una metrica di similarità.
-    \item $\gamma$: iper-parametro, il \textit{learning rate} utilizzato per l'algoritmo SGD.
-    \item $\lambda$: iper-parametro, corrisponde al fattore di regolarizzazione nella funzione obbiettivo
+    \item $\gamma$: iperparametro, il \textit{learning rate} utilizzato per l'algoritmo SGD.
+    \item $\lambda$: iperparametro, corrisponde al fattore di regolarizzazione nella funzione obbiettivo
     \item $\hat{x}_{uij}$: score che rappresenta la preferenza dello \textit{user} \textit{i} per l'\textit{item} \textit{i} rispetto all'\textit{item} \textit{j}
     \item $N$: numero di epoche per l'algoritmo \textit{Gradient Descent}.
 \end{itemize}
@@ -43,7 +43,7 @@ La notazione utilizzata è la seguente:
 L'algoritmo SVD (\textit{singular value decomposition}), è stato reso popolare da Simon Funk durante la competizione \textit{the Netflix Prize} dimostrando come modelli di fattorizzazione matriciale sono superiori alle tecniche classiche basate su \textit{nearest neighbor}\ref{knn} per
 la produzione di raccomandazioni.
 
-I modelli di \textit{matrix factorization} mappano gli \textit{user} e gli \textit{item} in uno spazio latente comune di dimensione $k$, che rappresenta il numero di caratteristiche latenti. Ogni \textit{item} $i$ è associato a un vettore $q_i$ di dimensione $k$, che misura quanto l'\textit{item} possieda ciascuna di queste caratteristiche latenti. Per ogni \textit{user} $u$, invece, il vettore $p_u$ misura l'interesse dello \textit{user} per gli \textit{item}. Il numero di fattori è un iper-parametro dell'algoritmo.
+I modelli di \textit{matrix factorization} mappano gli \textit{user} e gli \textit{item} in uno spazio latente comune di dimensione $k$, che rappresenta il numero di caratteristiche latenti. Ogni \textit{item} $i$ è associato a un vettore $q_i$ di dimensione $k$, che misura quanto l'\textit{item} possieda ciascuna di queste caratteristiche latenti. Per ogni \textit{user} $u$, invece, il vettore $p_u$ misura l'interesse dello \textit{user} per gli \textit{item}. Il numero di fattori è un iperparametro dell'algoritmo.
 
 In questo spazio, le interazioni tra \textit{user} e \textit{item} vengono modellate come prodotti scalari tra i rispettivi vettori. Lo spazio latente cerca di spiegare i \textit{rating} caratterizzando sia gli \textit{item} che gli textit{user} in base a fattori che vengono automaticamente dedotti. Ad esempio, se gli \textit{item} sono film, i fattori potrebbero appresentare il genere piuttosto che un altro (e.g. Azione contro Drama), profondità della trama o il concetto di "adatto ai bambini".
 
@@ -158,14 +158,14 @@ Questo algoritmo è molto simile a SVD\ref{svd} ma con una restrizione che tutti
 L'idea è approssimare la matrice $R$ come prodotto di due matrici più piccole:
 
 \[
-R \approx WH
+R \approx WH^T
 \]
 
 dove:
 \begin{itemize}
     \item $W \in \mathbb{R}_{\geq 0}^{m \times k}$ rappresenta la matrice dei profili latenti degli \textit{user};
     \item $H \in \mathbb{R}_{\geq 0}^{k \times n}$ rappresenta la matrice dei profili latenti degli \textit{item};
-    \item $k$ è il numero di fattori latenti. Anche in questo caso è iper-parametro dell'algoritmo
+    \item $k$ è il numero di fattori latenti. Anche in questo caso è iperparametro dell'algoritmo
 \end{itemize}
 
 Il \textit{rating} stimato dello \textit{user} $u$ per l'\textit{item} $i$ è calcolato come~\cite{NMF2}~\cite{NMF3}:
@@ -174,7 +174,7 @@ Il \textit{rating} stimato dello \textit{user} $u$ per l'\textit{item} $i$ è ca
 \hat{r}_{ui} = \sum_{f=1}^k W_{uf} H_{fi} = q_i^T p_u
 \]
 
-dove i fattori utente e articolo vengono mantenuti positivi
+dove i fattori \textit{user} e articolo vengono mantenuti positivi
 
 L'obiettivo di apprendimento è minimizzare l'errore quadratico sui \textit{rating} osservati nel set di addestramento $R_{train}$:
 
@@ -213,12 +213,12 @@ Anche in questo caso si può utilizzare la predizione con l'utilizzo di baseline
 
 garantendo comunque fattori positivi. Le baselines sono ottimizzate nello stesso modo dell'algoritmo SVD. Pur producendo una migliore accuratezza, la versione che utilizza baseline sembra molto incline all'overfitting, che può essere ridotto diminuendo $k$ o aumentando la regolarizzazione.
 
-NFM, grazie al vincolo della non negatività, è più interpretabile di SVD: i valori nelle matrici fattorizzate $W$ e $H$ sono tutti $\geq 0$, quindi possono essere interpretati come pesi o intensità (es. quanto un utente apprezza un certo genere, quanto un item rappresenta un tema).
+NFM, grazie al vincolo della non negatività, è più interpretabile di SVD: i valori nelle matrici fattorizzate $W$ e $H$ sono tutti $\geq 0$, quindi possono essere interpretati come pesi o intensità (es. quanto uno \textit{user} apprezza un certo genere, quanto un \textit{item} rappresenta un tema).
 
 L'algoritmo soffre anche di diverse problematiche:
 
 \begin{itemize}
-    \item dipendenza dall’inizializzazione: l’algoritmo può convergere a minimi locali diversi a seconda dei valori iniziali, e non garantisce una soluzione unica o ottima
+    \item dipendenza dall'inizializzazione: l'algoritmo può convergere a minimi locali diversi a seconda dei valori iniziali, e non garantisce una soluzione unica o ottima
     
     \item non adatta per dati con valori negativi: NMF non può gestire valori negativi nei dati di input, a differenza di SVD
     
@@ -233,7 +233,7 @@ Gli algoritmi ispirati al KNN (\textit{K Nearest Neighbors}) sono una classe di 
 
 Il numero effettivo di vicini che vengono considerati per calcolare la predizione è minore o uguale a $k$: potrebbero non esserci abbastanza vicini e/o gli insiemi $N_i^k(u)$ e $N_u^k(i)$ includono solo vicini per i quali la misura di similarità è positiva (non avrebbe senso considerare \textit{user} o \textit{item} correlati negativamente).
 
-$k$ è un iper-parametro di ciascun algoritmo.
+$k$ è un iperparametro di ciascun algoritmo.
 
 Alcune misure di similarità, sia per \textit{user} che per \textit{item}, sono:
 \begin{itemize}
@@ -267,7 +267,7 @@ Alcune misure di similarità, sia per \textit{user} che per \textit{item}, sono:
         \[
         \text{pearson sim}(i, j) = \frac{\sum\limits_{u \in U_{ij}} (r_{ui} - \mu_i) \cdot (r_{uj} - \mu_j)}{\sqrt{\sum\limits_{u \in U_{ij}} (r_{ui} - \mu_i)^2} \cdot \sqrt{\sum\limits_{u \in U_{ij}} (r_{uj} - \mu_j)^2}}
         \]
-    \item Pearson con baseline \cite{Recommendation_book}: calcola il coefficiente di correlazione di Pearson (ridotto) tra tutte le coppie di \textit{user} (o \textit{item}) utilizzando le baseline anziché le medie. Il parametro di riduzione aiuta a evitare l'overfitting quando sono disponibili solo poche valutazioni. Se non ci sono \textit{item} comuni, la similarità è 0 (non -1). Introduce un nuovo iper-parametro che corrisponde alla riduzione (o \textit{``shrinkage''}). Se impostato uguale a 0, non viene applicata nessuna riduzione.
+    \item Pearson con baseline \cite{Recommendation_book}: calcola il coefficiente di correlazione di Pearson (ridotto) tra tutte le coppie di \textit{user} (o \textit{item}) utilizzando le baseline anziché le medie. Il parametro di riduzione aiuta a evitare l'overfitting quando sono disponibili solo poche valutazioni. Se non ci sono \textit{item} comuni, la similarità è 0 (non -1). Introduce un nuovo iperparametro che corrisponde alla riduzione (o \textit{``shrinkage''}). Se impostato uguale a 0, non viene applicata nessuna riduzione.
         \[
         \text{pearson baseline sim}(u, v) = \hat{\rho}_{uv} = \frac{\sum\limits_{i \in I_{uv}} (r_{ui} - b_{ui}) \cdot (r_{vi} - b_{vi})}{\sqrt{\sum\limits_{i \in I_{uv}} (r_{ui} - b_{ui})^2} \cdot \sqrt{\sum\limits_{i \in I_{uv}} (r_{vi} - b_{vi})^2}}
         \]
@@ -283,7 +283,7 @@ Alcune misure di similarità, sia per \textit{user} che per \textit{item}, sono:
         Per il calcolo della baseline, si consideri la parte di \ref{knn_baseline}.
 \end{itemize}
 
-Altro iper-parametro da considerare è il supporto minimo, che corrisponde al numero minimo di \textit{item} in comune o il numero minimo di \textit{user} in comune affinché la similarità non sia zero, i.e., se $|I_{uv}| < \text{min support}$, allora $\text{sim}(u, v) = 0$. Lo stesso vale per gli \textit{item}.
+Altro iperparametro da considerare è il supporto minimo, che corrisponde al numero minimo di \textit{item} in comune o il numero minimo di \textit{user} in comune affinché la similarità non sia zero, i.e., se $|I_{uv}| < \text{min support}$, allora $\text{sim}(u, v) = 0$. Lo stesso vale per gli \textit{item}.
 
 \subsubsection{KNN base}
 
@@ -486,7 +486,7 @@ dove:
 
 \begin{itemize}
     \item $R_j = \{ i \mid i \in S(u), i \neq j, |S_{j,i}(\chi)| > 0 \}$ è l'insieme degli \textit{item} rilevanti
-    \item $S(u)$ è il sottoinsieme degli item valutati dallo \textit{user} $u$
+    \item $S(u)$ è il sottoinsieme degli \textit{item} valutati dallo \textit{user} $u$
     \item $S_{j,i}(\chi)$ è l'insieme di tutte le valutazioni $u$ nel dataset $\chi$ che contengono gli \textit{item} $i$ e $j$
 \end{itemize}
 
@@ -513,9 +513,142 @@ L'approccio può essere esteso a modelli ponderati e versioni più avanzate, com
 
 \subsection{ALS (Alternating Least Squares)}\label{als}
 
+Il lavoro di Hu, Koren e Volinsky~\cite{ALS} propone una formulazione adatta a modellare feedback impliciti, come click, acquisti o visualizzazioni.
+
+Si basa sulla \textit{Matrix Factorization}, e una delle sue tecniche di ottimizzazione più efficaci è \textit{ALS (Alternating Least Squares)}, in particolare per dataset con \textit{feedback impliciti}.
+
+L'obiettivo è approssimare la matrice osservata $R \in \mathbb{R}^{m \times n}$ (dove $m$ è il numero di \textit{user} e $n$ il numero di \textit{item}) come il prodotto di due matrici a bassa dimensionalità:
+
+\[
+R \approx X Y^\top
+\]
+
+dove:
+
+\begin{itemize}
+    \item $X \in \mathbb{R}^{m \times k}$: matrice dei fattori latenti degli utenti,
+    \item $Y \in \mathbb{R}^{n \times k}$: matrice dei fattori latenti degli item,
+    \item $k$: numero di fattori latenti (dimensione dello spazio latente).
+\end{itemize}
+
+Si definisce la variabile binaria \textit{preferenza} $p_{ui}$ che indica la preferenza per uno \textit{user} \textit{u} per un \textit{item} \textit{i}:
+\[
+p_{ui} =
+\begin{cases}
+    1 & \text{se lo \textit{user} } u \text{ ha interagito con l'\textit{item} } i \\
+    0 & \text{altrimenti}
+\end{cases}
+\]
+
+e la confidenza
+    
+\[
+c_{ui} = 1 + \alpha \cdot r_{ui}
+\]
+dove $r_{ui}$ in questo caso è l'interazione (es. \% visualizzazione o numero di acquisti), e $\alpha$ è un iperparametro che modula l'importanza delle osservazioni positive.
+
+Il problema di ottimizzazione da risolvere è:
+
+\[
+\min_{X, Y} \sum_{u=1}^m \sum_{i=1}^n c_{ui} (p_{ui} - x_u^\top y_i)^2 + \lambda \left( \sum_u \|x_u\|^2 + \sum_i \|y_i\|^2 \right)
+\]
+
+dove:
+
+\begin{itemize}
+    \item $x_u$: vettore dei fattori latenti per lo \textit{user} $u$,
+    \item $y_i$: vettore dei fattori latenti per l' \textit{item} $i$,
+\end{itemize}
+
+Il primo termine rappresenta l'\textit{errore quadratico pesato} tra la preferenza osservata e la previsione del modello. Il secondo termine è una \textit{regolarizzazione} di tipo L2 per evitare overfitting.
+
+Il problema in $(X,Y)$ non è convesso (cioè potrebbe avere più minimi locali e non è facile trovare il minimo assoluto) ma lo diventa diventa se si fissa una delle due variabili. Questo significa che si può trovare il minimo facilmente rispetto a $X$ tenendo $Y$ fisso e viceversa. Per questo motivo, si usa un metodo iterativo finché non si arriva a una soluzione stabile:
+
+\begin{enumerate}
+    \item Si fissa $Y$ e si ottimizza $X$,
+    \item Si fissa $X$ e si ottimizza $Y$,
+    \item Si ripete per un numero prefissato di iterazioni $T$.
+\end{enumerate}
+
+Fissata $Y$, per ogni \textit{user} $u$ si risolve il sistema:
+
+\[
+x_u = \left( Y^\top C^u Y + \lambda I \right)^{-1} Y^\top C^u p^u
+\]
+
+Analogamente, per ogni \textit{item} $i$:
+
+\[
+y_i = \left( X^\top C^i X + \lambda I \right)^{-1} X^\top C^i p^i
+\]
+
+dove:
+
+\begin{itemize}
+    \item $C^u = \text{diag}(c_{u1}, \dots, c_{un})$,
+    \item $p^u = (p_{u1}, \dots, p_{un})^\top$.
+\end{itemize}
+
+Il calcolo diretto dell'inversa richiede $\mathcal{O}(k^3)$ per ogni \textit{user}/\textit{item}, troppo oneroso per grandi dataset. Si può invece risolvere il sistema lineare associato:
+
+\[
+A x = b \quad \text{con} \quad A = Y^\top C^u Y + \lambda I, \quad b = Y^\top C^u p^u
+\]
+
+utilizzando il \textit{metodo del gradiente coniugato (CG)}~\cite{ALS_opt}. Questo metodo è iterativo e richiede solo moltiplicazioni matrice-vettore, con complessità per iterazione $\mathcal{O}(k^2)$.
+
+\begin{algorithm}[H]
+    \caption{Metodo del Gradiente Coniugato per risolvere $Ax = b$}
+    \begin{algorithmic}[1]
+    \Require Matrice $A \in \mathbb{R}^{n \times n}$ simmetrica e definita positiva, vettore $b \in \mathbb{R}^n$, iniziale $x_0$, tolleranza $\epsilon$
+    \State $r_0 \gets b - A x_0$
+    \State $p_0 \gets r_0$
+    \State $k \gets 0$
+    \While{$\|r_k\| > \epsilon$ e $k < \text{max\_iter}$}
+        \State $\alpha_k \gets \dfrac{r_k^\top r_k}{p_k^\top A p_k}$
+        \State $x_{k+1} \gets x_k + \alpha_k p_k$
+        \State $r_{k+1} \gets r_k - \alpha_k A p_k$
+        \If{$\|r_{k+1}\| < \epsilon$}
+            \State \textbf{break}
+        \EndIf
+        \State $\beta_k \gets \dfrac{r_{k+1}^\top r_{k+1}}{r_k^\top r_k}$
+        \State $p_{k+1} \gets r_{k+1} + \beta_k p_k$
+        \State $k \gets k + 1$
+    \EndWhile
+    \State \Return $x_{k+1}$
+    \end{algorithmic}
+\end{algorithm}
+    
+Il numero di iterazioni di \textit{GC} è un iperparametro.
+
+Infine, lo score viene calcolato come
+
+\[
+\hat{x}_{ui} = x_u^Ty_i
+\]
+
+I punti di forza dell'algoritmo sono:
+\begin{itemize}
+    \item efficienza computazionale: il metodo del gradiente coniugato riduce il costo computazionale rispetto all'inversione esplicita delle matrici.
+    \item scalabilità: permette di gestire dataset di grandi dimensioni, grazie alla natura iterativa e alla possibilità di eseguire il calcolo in parallelo.
+    \item minore uso di memoria rispetto all'inversione diretta: non è necessario costruire esplicitamente la matrice intera da invertire.
+    \item velocità di convergenza: in molti casi, bastano poche iterazioni per ottenere una buona approssimazione della soluzione.
+    \item supporto gpu: il calcolo iterativo si adatta bene all'accelerazione hardware, migliorando ulteriormente i tempi di addestramento.
+\end{itemize}
+
+L'algoritmo soffre anche di diverse problematiche:
+
+\begin{itemize}
+    \item approssimazione: il metodo \textit{GC} fornisce una soluzione approssimata, la cui precisione dipende dal numero di iterazioni utilizzate.
+    \item sensibilità ai parametri: il numero di iterazioni (\textit{GC steps}) è un iperparametro che va scelto con attenzione per bilanciare accuratezza e prestazioni.
+    \item stabilità numerica: se la matrice del sistema è mal condizionata, la convergenza del metodo \textit{GC} può essere lenta o instabile.
+    \item maggiore complessità implementativa: integrare \textit{GC} richiede strutture dati e operazioni più sofisticate rispetto all'inversione diretta.
+    \item overhead per piccoli dataset: su dataset piccoli, l'uso di \textit{GC} può risultare meno vantaggioso rispetto ad una soluzione esatta diretta.
+\end{itemize}
+
 \subsection{BPR (Bayesian Personalized Ranking)}\label{bpr}
 
-Nei sistemi basati su \textit{feedback impliciti}, la mancanza di interazione tra un \textit{user} e un \textit{item} non implica necessariamente una preferenza negativa. Per affrontare tale ambiguità, BPR adotta le seguenti ipotesi:
+Nei sistemi basati su \textit{feedback impliciti}, la mancanza di interazione tra un \textit{user} e un \textit{item} non implica necessariamente una preferenza negativa. Per affrontare tale ambiguità, BPR~\cite{BPR} adotta le seguenti ipotesi:
 
 \begin{itemize}
     \item Se $(u, i) \in R$, cioè lo \textit{user} $u$ ha interagito con l'\textit{item} $i$, allora $u$ preferisce $i$ a tutti gli \textit{item} $j$ con cui non ha interagito.
@@ -630,7 +763,7 @@ Gli aggiornamenti dei parametri sono:
 I punti di forza dell'algoritmo sono:
 
 \begin{itemize}
-    \item ottimizzazione diretta: massimizza la probabilità che un item positivo sia sopra uno negativo.
+    \item ottimizzazione diretta: massimizza la probabilità che un \textit{item} positivo sia sopra uno negativo.
     \item scalabilità: efficiente con \textit{SGD} e \textit{negative sampling}, anche su grandi dataset.
     \item flessibilità: compatibile con \textit{matrix factorization}, \textit{Neural Collaborative Filtering} e modelli più avanzati (CNN, RNN, GNN).
     \item empiricamente superiore: spesso batte metodi classici come \textit{Weighted Regularized Matrix Factorization} e \textit{SVD}\ref{svd}.
@@ -640,7 +773,7 @@ I punti di forza dell'algoritmo sono:
 L'algoritmo soffre anche di diverse problematiche:
 
 \begin{itemize}
-    \item negative sampling critico: la scelta degli item negativi influisce molto sull'apprendimento.
+    \item negative sampling critico: la scelta degli \textit{item} negativi influisce molto sull'apprendimento.
     \item convergenza lenta: su dati sparsi può avere una convergenza lenta
     \item rischio overfitting: sensibile alla mancanza di regolarizzazione.
     \item limiti nelle relazioni globali: non cattura bene la struttura complessiva degli item.
