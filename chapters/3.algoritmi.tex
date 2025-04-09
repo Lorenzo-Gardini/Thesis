@@ -55,9 +55,6 @@ Il prodotto scalare risultante cattura l'interazione tra lo \textit{user} $u$ e 
 
 Dove:
 \begin{itemize}
-    \item $ \hat{r}_{ui} $ è il \textit{rating} previsto per
-    l'\textit{item} $i$ da parte dello \textit{user} $u$.
-    \item $ \mu $ è la media generale delle \textit{rating}.
     \item $ b_u $ e $ b_i $ sono i bias dello \textit{user} $u$ e dell'\textit{item} $i$ rispettivamente. Sono una sorta di correzione basata sull'effetto dello \textit{user} e dell'\textit{item}.
     \item $ q_i^T p_u $ è il prodotto interno tra i vettori latenti dello \textit{user} e dell'\textit{item}.
 \end{itemize}
@@ -158,7 +155,7 @@ Questo algoritmo è molto simile a SVD\ref{svd} ma con una restrizione che tutti
 L'idea è approssimare la matrice $R$ come prodotto di due matrici più piccole:
 
 \[
-R \approx WH^T
+R \approx WH
 \]
 
 dove:
@@ -520,15 +517,15 @@ Si basa sulla \textit{Matrix Factorization}, e una delle sue tecniche di ottimiz
 L'obiettivo è approssimare la matrice osservata $R \in \mathbb{R}^{m \times n}$ (dove $m$ è il numero di \textit{user} e $n$ il numero di \textit{item}) come il prodotto di due matrici a bassa dimensionalità:
 
 \[
-R \approx X Y^\top
+R \approx W H^\top
 \]
 
 dove:
 
 \begin{itemize}
-    \item $X \in \mathbb{R}^{m \times k}$: matrice dei fattori latenti degli utenti,
-    \item $Y \in \mathbb{R}^{n \times k}$: matrice dei fattori latenti degli item,
-    \item $k$: numero di fattori latenti (dimensione dello spazio latente).
+    \item $W \in \mathbb{R}^{m \times k}$: matrice dei fattori latenti degli utenti,
+    \item $H \in \mathbb{R}^{n \times k}$: matrice dei fattori latenti degli item,
+    \item $k$: numero di fattori latenti (dimensione dello spazio latente) e iperparametro.
 \end{itemize}
 
 Si definisce la variabile binaria \textit{preferenza} $p_{ui}$ che indica la preferenza per uno \textit{user} \textit{u} per un \textit{item} \textit{i}:
@@ -550,36 +547,36 @@ dove $r_{ui}$ in questo caso è l'interazione (es. \% visualizzazione o numero d
 Il problema di ottimizzazione da risolvere è:
 
 \[
-\min_{X, Y} \sum_{u=1}^m \sum_{i=1}^n c_{ui} (p_{ui} - x_u^\top y_i)^2 + \lambda \left( \sum_u \|x_u\|^2 + \sum_i \|y_i\|^2 \right)
+\min_{W, H} \sum_{u=1}^m \sum_{i=1}^n c_{ui} (p_{ui} - w_u^\top h_i)^2 + \lambda \left( \sum_u \|w_u\|^2 + \sum_i \|h_i\|^2 \right)
 \]
 
 dove:
 
 \begin{itemize}
-    \item $x_u$: vettore dei fattori latenti per lo \textit{user} $u$,
-    \item $y_i$: vettore dei fattori latenti per l' \textit{item} $i$,
+    \item $w_u$: vettore dei fattori latenti per lo \textit{user} $u$,
+    \item $h_i$: vettore dei fattori latenti per l' \textit{item} $i$,
 \end{itemize}
 
 Il primo termine rappresenta l'\textit{errore quadratico pesato} tra la preferenza osservata e la previsione del modello. Il secondo termine è una \textit{regolarizzazione} di tipo L2 per evitare overfitting.
 
-Il problema in $(X,Y)$ non è convesso (cioè potrebbe avere più minimi locali e non è facile trovare il minimo assoluto) ma lo diventa diventa se si fissa una delle due variabili. Questo significa che si può trovare il minimo facilmente rispetto a $X$ tenendo $Y$ fisso e viceversa. Per questo motivo, si usa un metodo iterativo finché non si arriva a una soluzione stabile:
+Il problema in $(W,H)$ non è convesso (cioè potrebbe avere più minimi locali e non è facile trovare il minimo assoluto) ma lo diventa se si fissa una delle due variabili. Questo significa che si può trovare il minimo facilmente rispetto a $W$ tenendo $H$ fisso e viceversa. Per questo motivo, si usa un metodo iterativo finché non si arriva a una soluzione stabile:
 
 \begin{enumerate}
-    \item Si fissa $Y$ e si ottimizza $X$,
-    \item Si fissa $X$ e si ottimizza $Y$,
+    \item Si fissa $H$ e si ottimizza $W$,
+    \item Si fissa $W$ e si ottimizza $H$,
     \item Si ripete per un numero prefissato di iterazioni $T$.
 \end{enumerate}
 
-Fissata $Y$, per ogni \textit{user} $u$ si risolve il sistema:
+Fissata $H$, per ogni \textit{user} $u$ si risolve il sistema:
 
 \[
-x_u = \left( Y^\top C^u Y + \lambda I \right)^{-1} Y^\top C^u p^u
+w_u = \left( H^\top C^u H + \lambda I \right)^{-1} H^\top C^u p^u
 \]
 
 Analogamente, per ogni \textit{item} $i$:
 
 \[
-y_i = \left( X^\top C^i X + \lambda I \right)^{-1} X^\top C^i p^i
+h_i = \left( W^\top C^i W + \lambda I \right)^{-1} W^\top C^i p^i
 \]
 
 dove:
@@ -592,7 +589,7 @@ dove:
 Il calcolo diretto dell'inversa richiede $\mathcal{O}(k^3)$ per ogni \textit{user}/\textit{item}, troppo oneroso per grandi dataset. Si può invece risolvere il sistema lineare associato:
 
 \[
-A x = b \quad \text{con} \quad A = Y^\top C^u Y + \lambda I, \quad b = Y^\top C^u p^u
+A x = b \quad \text{con} \quad A = H^\top C^u H + \lambda I, \quad b = H^\top C^u p^u
 \]
 
 utilizzando il \textit{metodo del gradiente coniugato (CG)}~\cite{ALS_opt}. Questo metodo è iterativo e richiede solo moltiplicazioni matrice-vettore, con complessità per iterazione $\mathcal{O}(k^2)$.
@@ -611,7 +608,7 @@ utilizzando il \textit{metodo del gradiente coniugato (CG)}~\cite{ALS_opt}. Ques
         \If{$\|r_{k+1}\| < \epsilon$}
             \State \textbf{break}
         \EndIf
-        \State $\beta_k \gets \dfrac{r_{k+1}^\top r_{k+1}}{r_k^\top r_k}$
+        \State $\beta_k \gets \dfrac{r_{k+1}^\top r_{r+1}}{r_k^\top r_k}$
         \State $p_{k+1} \gets r_{k+1} + \beta_k p_k$
         \State $k \gets k + 1$
     \EndWhile
@@ -624,7 +621,7 @@ Il numero di iterazioni di \textit{GC} è un iperparametro.
 Infine, lo score viene calcolato come
 
 \[
-\hat{x}_{ui} = x_u^Ty_i
+\hat{x}_{ui} = w_u^T h_i
 \]
 
 I punti di forza dell'algoritmo sono:
