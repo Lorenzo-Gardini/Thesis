@@ -10,7 +10,7 @@ La notazione utilizzata è la seguente:
     \item \textit{rating}: valutazione/i
     \item $m$: numero di \textit{user}
     \item $n$: numero di \textit{item}
-    \item $R$: l'insieme di tutti i \textit{rating}.
+    \item $R$: l'insieme di tutti i \textit{rating}/interazioni.
     \item $R_{train}$, $R_{test}$ e $\hat{R}$ indicano il set di addestramento, il set di test e l'insieme dei \textit{rating} previsti.
     \item $U$ : l'insieme di tutti gli \textit{user}. $u$ e $v$ indicano gli \textit{user}.
     \item $I$ : l'insieme di tutti gli \textit{item}. $i$ e $j$ indicano gli \textit{item}.
@@ -162,7 +162,7 @@ dove:
 \begin{itemize}
     \item $W \in \mathbb{R}_{\geq 0}^{m \times k}$ rappresenta la matrice dei profili latenti degli \textit{user};
     \item $H \in \mathbb{R}_{\geq 0}^{k \times n}$ rappresenta la matrice dei profili latenti degli \textit{item};
-    \item $k$ è il numero di fattori latenti. Anche in questo caso è iperparametro dell'algoritmo
+    \item $k$ è il numero di fattori latenti e iperparametro dell'algoritmo
 \end{itemize}
 
 Il \textit{rating} stimato dello \textit{user} $u$ per l'\textit{item} $i$ è calcolato come~\cite{NMF2}~\cite{NMF3}:
@@ -778,6 +778,113 @@ L'algoritmo soffre anche di diverse problematiche:
 \end{itemize}
 
 \subsection{LMF (Logistic Matrix Factorization)}\label{lmf-logistic-matrix-factorization}
+
+Il modello di \textit{Logistic Matrix Factorization (LMF)}~\cite{LMF} descrive un approccio probabilistico per la fattorizzazione di matrici nel caso di feedback implicito. La probabilità che uno \textit{user} $u$ interagisca con un \textit{item} $i$ è modellata tramite una funzione logistica.
+
+L'idea è approssimare la matrice $R$ come prodotto di due matrici più piccole:
+
+\[
+R \approx WH
+\]
+
+dove:
+\begin{itemize}
+    \item $W \in \mathbb{R}_{\geq 0}^{m \times k}$ rappresenta la matrice dei profili latenti degli \textit{user};
+    \item $H \in \mathbb{R}_{\geq 0}^{k \times n}$ rappresenta la matrice dei profili latenti degli \textit{item};
+    \item $k$ è il numero di fattori latenti e iperparametro dell'algoritmo
+\end{itemize}
+
+La probabilità che uno \textit{user} $u$ preferisca un \textit{item} $i$ è data dalla funzione logistica applicata al prodotto scalare dei fattori latenti dello \textit{user} e dell'\textit{item}, più i rispettivi bias:
+
+\[
+p(l_{ui} | w_u, h_i, \beta_u, \beta_i) = \frac{\exp(w_u^T h_i + \beta_u + \beta_i)}{1 + \exp(w_u^T h_i + \beta_u + \beta_i)}
+\]
+
+Dove:
+\begin{itemize}
+    \item $w_u$ è il vettore dei fattori latenti dell'\textit{user} $u$
+    \item $h_i$ è il vettore dei fattori latenti dell'\textit{item} $i$
+    \item $\beta_u$ è il bias dello \textit{user}
+    \item $\beta_i$ è il bias dell'\textit{item}
+\end{itemize}
+
+La verosimiglianza dei dati osservati $R$ data dai parametri $W$, $H$, e $\beta$ è espressa come segue:
+
+\[
+L(R \mid W, H, \beta) = \prod_{u, i} p(l_{ui} \mid w_u, h_i, \beta_u, \beta_i)^{\alpha r_{ui}} 
+\left( 1 - p(l_{ui} \mid w_u, h_i, \beta_u, \beta_i) \right)^{(1 - \alpha r_{ui})}
+\]
+
+Dove $\alpha$ è un iperparametro che bilancia il peso tra le osservazioni positive e negative.
+
+La funzione di verosimiglianza descrive la probabilità complessiva del modello dato il comportamento osservato. In altre parole, misura quanto bene il modello spiega $R$.
+
+Per evitare l'overfitting, si impone una distribuzione gaussiana a media zero sui vettori latenti degli utenti e degli oggetti:
+
+\[
+p(W \mid \sigma^2) = \prod_u N(w_u \mid 0, \sigma_u^2 I), \quad 
+p(H \mid \sigma^2) = \prod_i N(h_i \mid 0, \sigma_i^2 I)
+\]
+
+Dove $\sigma_u^2$ e $\sigma_i^2$ sono i parametri di varianza per le distribuzioni degli utenti e degli oggetti.
+
+L'obiettivo del modello è massimizzare il logaritmo della funzione di verosimiglianza (log-likelihood), che è dato da:
+
+\[
+\log p(W, H, \beta \mid R) = \sum_{u,i} \alpha r_{ui} (w_u^T h_i + \beta_u + \beta_i) 
+- (1 + \alpha r_{ui}) \log(1 + \exp(w_u^T h_i + \beta_u + \beta_i)) 
+- \lambda \|w_u\|^2 - \lambda \|h_i\|^2
+\]
+
+
+Il termine di regolarizzazione $\lambda$ aiuta a prevenire l'overfitting, penalizzando la grandezza dei vettori latenti.
+
+Per ottimizzare la funzione obiettivo, vengono calcolati i gradienti parziali rispetto ai fattori latenti $w_u$ e $h_i$ e ai bias $\beta_u$ e $\beta_i$, come segue:
+
+\[
+\frac{\partial}{\partial w_u} \log p(W, H, \beta \mid R) = 
+\sum_i \alpha r_{ui} h_i 
+- \frac{h_i (1 + \alpha r_{ui}) \exp(w_u^T h_i + \beta_u + \beta_i)}{1 + \exp(w_u^T h_i + \beta_u + \beta_i)} 
+- \lambda w_u
+\]
+
+\[
+\frac{\partial}{\partial \beta_u} \log p(W, H, \beta \mid R) = 
+\sum_i \alpha r_{ui} 
+- \frac{(1 + \alpha r_{ui}) \exp(w_u^T h_i + \beta_u + \beta_i)}{1 + \exp(w_u^T h_i + \beta_u + \beta_i)}
+\]
+
+L'ottimizzazione avviene alternando l'ottimizzazione dei fattori latenti prima per gli \textit{user} e poi degli \textit{item}. 
+
+Per migliorare la velocità di convergenza, viene utilizzato l'algoritmo \textit{AdaGrad} per aggiornare i parametri, adattando il tasso di apprendimento in base alla somma dei gradienti passati:
+
+\[
+w_u^t = w_u^{t-1} + \gamma \frac{g_u^{t-1}}{\sqrt{\sum_{t'=1}^t (g_u^{t'})^2}}
+\]
+
+
+Dove $g_u^{t-1}$ è il gradiente calcolato all'iterazione precedente e $\gamma$ è il passo di apprendimento.
+
+Infine lo score per la coppia \textit{user} $u$ e \textit{item} $i$ si calcola come:
+
+\[
+\hat{x}_{ui} = \sigma(w_u^T h_i + \beta_u + \beta_i)
+\]
+
+I punti di forza dell'algoritmo sono:
+
+\begin{itemize}
+    \item migliore qualità e velocità di convergenza: l'utilizzo di \textit{AdaGrad} permette di migliorare e velocizzare la convergenza grazie ad una regolazione automatica dei \textit{learning rate} per ogni parametro
+    \item scalabilità e semplicità: il metodo è adatto per grandi dataset e facilmente implementabile, senza la necessità di configurare iperparametri complessi
+    \item modello probabilistico: LMF prevede le preferenze degli \textit{user} in modo probabilistico, il che lo rende interpretabile e facile da usare
+\end{itemize}
+
+L'algoritmo soffre anche di diverse problematiche:
+
+\begin{itemize}
+    \item complessità computazionale: nonostante sia scalabile, l'allenamento del modello su grandi dataset può richiedere una notevole potenza computazionale, specialmente con un alto numero di fattori latenti.
+    \item sensibilità alla scelta dei parametri: il modello è molto dipendente dagli iperparametri, come il \textit{learning rate} e la regolarizzazione
+\end{itemize}
 
 \subsection{Evaluation implicita}\label{evaluation-implicita}
 
