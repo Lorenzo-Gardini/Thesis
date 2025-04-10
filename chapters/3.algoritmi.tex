@@ -34,11 +34,30 @@ La notazione utilizzata è la seguente:
     \item $N$: numero di epoche per l'algoritmo \textit{Gradient Descent}.
 \end{itemize}
 
+\section{Matrix Factorization}
+
+In questa parte viene data una breve introduzione alla tecnica della \textit{Matrix Factorization} dato che molti degli algoritmi presentati la utilizzano come base dei propri algoritmi.
+
+La \textit{Matrix Factorization} è una tecnica utilizzata per rappresentare una matrice come prodotto di due o più matrici. Consente di estrarre strutture latenti dai dati, rendendo possibile la scoperta di relazioni implicite tra entità \cite{MC}.
+
+Questa tecnica è alla base di molte applicazioni in ambiti diversi, tra cui l'elaborazione di segnali, la compressione dei dati, la visione artificiale e, in particolare, i sistemi di \textit{recommendation}.
+
+Formalmente, data una matrice $R \in \mathbb{R}^{m \times n}$, la fattorizzazione mira a trovare due matrici $W \in \mathbb{R}^{m \times k}$ e $H \in \mathbb{R}^{n \times k}$ tali che:
+\[
+R \approx WH^T
+\]
+dove $k \ll \min(m,n)$ è il rango latente scelto. Questa approssimazione riduce la dimensionalità dei dati, semplifica il modello e cattura le relazioni principali presenti nella matrice originaria.
+
+Un celebre esempio dell'efficacia di questa tecnica nei sistemi di \textit{recommendation} è il \textit{Netflix Prize} del 2006. Il team vincente la utilizzò per migliorare le previsioni di rating del 10\% rispetto al sistema originario di Netflix \cite{TheNP}.
+
+I principali vantaggi nel suo utilizzo sono la scalabilità, poiché i modelli sono efficienti da memorizzare e computare, e la capacità di generalizzazione, in quanto riescono a catturare relazioni latenti non esplicitamente osservate. Tuttavia, esistono anche alcuni limiti, tra cui il problema della \textit{cold start}, che rende difficile raccomandare per nuovi utenti o nuovi item, e la sparsità, che può portare a una una bassa qualità delle raccomandazioni\cite{SVD_analysis}.
+
+Pur con alcune limitazioni, essa costituisce la base per molti degli algoritmi di \textit{recommendation} più efficaci oggi in uso, ed è spesso integrata con approcci più complessi, come i modelli Deep Learning o i grafi.
+
+
 \section{Algoritmi per il feedback esplicito}\label{algoritmi-per-feedback-esplicito}
 
-\subsection{Matrix Factorization}
-
-\subsubsection{SVD}\label{svd}
+\subsection{SVD}\label{svd}
 
 L'algoritmo SVD (\textit{singular value decomposition}), è stato reso popolare da Simon Funk durante la competizione \textit{the Netflix Prize} dimostrando come modelli di fattorizzazione matriciale sono superiori alle tecniche classiche basate su \textit{nearest neighbor}\ref{knn} per
 la produzione di raccomandazioni.
@@ -106,7 +125,7 @@ L'algoritmo soffre anche di diverse problematiche:
     \item overfitting: se non adeguatamente regolarizzato si rischia l'overfitting.
 \end{itemize}
 
-\subsubsection{SVD\protect++}
+\subsection{SVD\protect++}
 
 La precisione delle previsioni può essere migliorata considerando anche il feedback implicito, che fornisce un'indicazione aggiuntiva delle preferenze degli \textit{user}. Questo è particolarmente utile per gli \textit{user} che hanno fornito molto più feedback implicito che esplicito. Anche nei casi in cui il feedback implicito indipendente è assente, è possibile catturare un segnale significativo tenendo conto degli \textit{item} che gli \textit{user} hanno valutato, indipendentemente dal valore del \textit{rating}. Ciò ha portato a diversi metodi (\textit{Asymmetric-SVD}, \textit{SVD++}, \textit{SVD\_KNN}, ecc.~\cite{SVD++, SVD_KNN}) che modellano il fattore \textit{user} in base agli \textit{item} valutati. Il metodo \textit{SVD++} ha dimostrato di offrire una precisione superiore rispetto a \textit{SVD}.
 
@@ -146,7 +165,7 @@ L'algoritmo soffre anche di diverse problematiche:
     \item overfitting: SVD++ è più propenso a overfitting su dataset piccoli.
 \end{itemize}
 
-\subsubsection{NMF}\label{nmf}
+\subsection{NMF}\label{nmf}
 
 Un algoritmo di \textit{collaborative filtering} basato sulla \textit{fattorizzazione matriciale non negativa}.  
 
@@ -226,7 +245,7 @@ L'algoritmo soffre anche di diverse problematiche:
 \subsection{KNN (K-Nearest Neighbors)}\label{knn}
 Si tratta di algoritmi derivati direttamente da un approccio di base basato sui \textit{nearest neighbors}.
 
-Gli algoritmi ispirati al KNN (\textit{K Nearest Neighbors}) sono una classe di algoritmi di raccomandazione che si basano sull'idea che gli \textit{user} simili tendono a valutare gli stessi \textit{item} in modo simile. Questi algoritmi sono semplici da implementare e possono essere molto efficaci per problemi di raccomandazione a piccola scala.
+Gli algoritmi ispirati al KNN (\textit{K Nearest Neighbors}) sono una classe di algoritmi di \textit{recommendation} che si basano sull'idea che gli \textit{user} simili tendono a valutare gli stessi \textit{item} in modo simile. Questi algoritmi sono semplici da implementare e possono essere molto efficaci per problemi a piccola scala.
 
 Il numero effettivo di vicini che vengono considerati per calcolare la predizione è minore o uguale a $k$: potrebbero non esserci abbastanza vicini e/o gli insiemi $N_i^k(u)$ e $N_u^k(i)$ includono solo vicini per i quali la misura di similarità è positiva (non avrebbe senso considerare \textit{user} o \textit{item} correlati negativamente).
 
@@ -390,7 +409,7 @@ I punti di forza della famiglia di algoritmi KNN sono:
     \item semplicità: Gli algoritmi KNN sono facili da capire e implementare. L'idea di base di trovare ``vicini'' simili è intuitiva e facilmente comprensibile.
     \item nessuna assunzione sui dati: l'algoritmo non fa assunzioni sulla distribuzione dei dati. Questo lo rende flessibile e adatto a una varietà di dataset.
     \item aggiornamento: l'aggiunta di nuovi dati non richiede una fase di addestramento esplicita. Questo lo rende utile in ambienti in cui i dati cambiano frequentemente o per previsioni online.
-    \item flessibilità: KNN può essere utilizzato sia per problemi di raccomandazione basati su \textit{user} che basati su \textit{item}.
+    \item flessibilità: KNN può essere utilizzato sia per problemi di \textit{recommendation} basati su \textit{user} che basati su \textit{item}.
 \end{itemize}
 
 Gli algoritmi soffrono anche di diverse problematiche:
