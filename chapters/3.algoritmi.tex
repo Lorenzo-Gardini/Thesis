@@ -11,7 +11,7 @@ La notazione utilizzata è la seguente:
     \item $m$: numero di \textit{user}
     \item $n$: numero di \textit{item}
     \item $R$: l'insieme di tutti i \textit{rating}/interazioni.
-    \item $R_{train}$, $R_{test}$ e $\hat{R}$ indicano il set di addestramento, il set di test e l'insieme dei \textit{rating} previsti.
+    \item $R_{train}$, $R_{test}$ e $\hat{R}$ indicano il \textit{training set}, il \textit{test set} e l'insieme dei \textit{rating} previsti.
     \item $U$ : l'insieme di tutti gli \textit{user}. $u$ e $v$ indicano gli \textit{user}.
     \item $I$ : l'insieme di tutti gli \textit{item}. $i$ e $j$ indicano gli \textit{item}.
     \item $U_i$ : l'insieme di tutti gli \textit{user} che hanno valutato l'\textit{item} $i$.
@@ -71,7 +71,7 @@ Dove il primo termine è l'errore quadratico tra le \textit{rating} previste e r
 
 Per ottimizzare questi parametri, viene usata la \textit{Stochastic Gradient Descent} (SGD), che aggiorna i parametri dopo ogni  esempio di training (ad esempio, per ogni \textit{rating} di un \textit{user}).
 
-Per ogni \textit{rating} ($r_{ui}$) data, viene fatta una previsione ($\hat{r}_{ui}$), e l'errore di previsione associato ($e_{ui} = r_{ui} - \hat{r}_{ui}$) viene calcolato. Per un dato caso di addestramento ($r_{ui}$), modifichiamo i parametri spostandoci nella
+Per ogni \textit{rating} ($r_{ui}$) data, viene fatta una previsione ($\hat{r}_{ui}$), e l'errore di previsione associato ($e_{ui} = r_{ui} - \hat{r}_{ui}$) viene calcolato. Per un dato caso di \textit{addestramento} ($r_{ui}$), modifichiamo i parametri spostandoci nella
 direzione opposta al gradiente, ottenendo:
 
 \begin{itemize}
@@ -171,7 +171,7 @@ Il \textit{rating} stimato dello \textit{user} $u$ per l'\textit{item} $i$ è ca
 
 dove i fattori \textit{user} e articolo vengono mantenuti positivi
 
-L'obiettivo di apprendimento è minimizzare l'errore quadratico sui \textit{rating} osservati nel set di addestramento $R_{train}$:
+L'obiettivo di apprendimento è minimizzare l'errore quadratico sui \textit{rating} osservati nel \textit{training set} $R_{train}$:
 
 \[
 \min_{W, H} \sum_{(u,i) \in R_{train}} \left( r_{ui} - \hat{r}_{ui} \right)^2 \quad \text{s.t.} \quad W \geq 0,\ H \geq 0
@@ -385,7 +385,7 @@ b_u = \frac{\sum\limits_{r_{ui} \in R_{train}} (r_{ui} - \mu - b_i)}{\lambda_3 +
 
 I punti di forza della famiglia di algoritmi KNN sono:
 \begin{itemize}
-    \item semplicità: Gli algoritmi KNN sono facili da capire e implementare. L'idea di base di trovare ``vicini'' simili è intuitiva e facilmente comprensibile.
+    \item semplicità: Gli algoritmi KNN sono facili da capire e implementare. L'idea di base di trovare "vicini" simili è intuitiva e facilmente comprensibile.
     \item nessuna assunzione sui dati: l'algoritmo non fa assunzioni sulla distribuzione dei dati. Questo lo rende flessibile e adatto a una varietà di dataset.
     \item aggiornamento: l'aggiunta di nuovi dati non richiede una fase di addestramento esplicita. Questo lo rende utile in ambienti in cui i dati cambiano frequentemente o per previsioni online.
     \item flessibilità: KNN può essere utilizzato sia per problemi di \textit{recommendation} basati su \textit{user} che basati su \textit{item}.
@@ -430,7 +430,7 @@ I punti di forza dell'algoritmo sono:
 L'algoritmo soffre anche di diverse problematiche:
 
 \begin{itemize}
-  \item Sensibilità ai co-cluster: la qualità delle previsioni dipende molto dal numero di co-cluster scelto e dalla loro qualità. Se il numero di co-cluster è troppo basso, il modello potrebbe non riuscire a catturare le complessità dei dati e fare previsioni imprecise. Se il numero è troppo alto, il modello potrebbe overfittare i dati di addestramento, riducendo la sua generalizzazione. Inoltre, se i co-cluster non sono ben definiti, il modello potrebbe produrre previsioni inaccurate. La scelta iniziale dei co-cluster è fondamentale. Una soluzione è quella di utilizzare l'algoritmo \textit{K-means} per definire la posizione iniziale dei cluster.
+  \item Sensibilità ai co-cluster: la qualità delle previsioni dipende molto dal numero di co-cluster scelto e dalla loro qualità. Se il numero di co-cluster è troppo basso, il modello potrebbe non riuscire a catturare le complessità dei dati e fare previsioni imprecise. Se il numero è troppo alto, il modello potrebbe overfittare il \textit{training set}, riducendo la sua generalizzazione. Inoltre, se i co-cluster non sono ben definiti, il modello potrebbe produrre previsioni inaccurate. La scelta iniziale dei co-cluster è fondamentale. Una soluzione è quella di utilizzare l'algoritmo \textit{K-means} per definire la posizione iniziale dei cluster.
   \item Bias del co-cluster: $ \mu_u - \overline{C_u} $ e $ \mu_i - \overline{C_i} $ potrebbero non essere sempre utili in tutte le situazioni. Alcuni \textit{user} o \textit{item} potrebbero avere comportamenti che non sono ben rappresentati dai co-cluster e il modello potrebbe non adattarsi bene a queste situazioni. Ad esempio, \textit{user} che tendono a esprimere \textit{rating} bassi potrebbero non essere gestiti correttamente.
   \item Alto costo computazionale iniziale: l'algoritmo ha un alto costo computazionale durante la fase di addestramento, soprattutto con set di dati molto grandi. Anche se è scalabile, l'ottimizzazione del processo di clustering e la ricerca del numero ottimale di co-cluster richiedono parecchia computazione.
   \item Difficoltà di interpretazione: il co-clustering fornisce gruppi di \textit{user} e \textit{item} che potrebbero non essere sempre facili da interpretare o da analizzare in modo intuitivo.
