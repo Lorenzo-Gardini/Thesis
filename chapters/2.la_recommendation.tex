@@ -1,5 +1,66 @@
 \chapter{La recommendation}
 
+\section{Introduzione}
+
+Come fa \textit{Spotify} a sapere quale canzone potresti voler ascoltare? E come fa \textit{Netflix} a suggerirti la prossima serie da guardare? Questo è possibile grazie al modello di \textit{recommendation} basato su \textit{machine learning} che analizza cosa piace all'utente e gli propone contenuti su misura. Di solito si utilizzano due tipi principali di raccomandazioni:
+
+\begin{itemize}
+    \item per la \textit{home page}: i consigli sono personalizzati per un utente in base ai suoi interessi. Ogni utente vede consigli diversi
+    \item su articoli correlati: sono consigli simili a un di un articolo specifico. Per esempio in Google Play, gli utenti che visualizzano la pagina di un'app di matematica potrebbero vedere anche un riquadro con app correlate, come altre app di matematica o di scienze
+\end{itemize}
+
+Un sistema di \textit{recommendation} aiuta gli utenti a scoprire contenuti interessanti all'interno di un'enorme quantità di dati. Per esempio su YouTube ci sono miliardi di video, con nuovi contenuti che vengono aggiunti ogni giorno. Come può un utente trovare qualcosa di nuovo che valga la pena guardare o provare? La ricerca manuale è un'opzione. Tuttavia, un motore di raccomandazione è in grado di suggerire contenuti che magari l'utente non avrebbe mai pensato di cercare da solo. Basti sapere che, secondo quanto dice \textit{Google}:
+
+\begin{itemize}
+    \item il 40\% delle app installate dal \textit{Google Play} derivano da raccomandazioni
+    \item il 60\% del tempo di visualizzazione su \textit{YouTube} proviene dalle raccomandazioni
+\end{itemize}
+
+
+Ci sono alcuni termini da introdurre:
+
+\begin{itemize}
+    \item \textit{item}: sono gli elementi/entità consigliate dal sistema. Su \textit{Spotify} sono le canzoni, su \textit{Amazon} sono i prodotti, su \textit{Intragram} sono i \textit{post}
+    \item \textit{query}: sono le informazioni utilizzate da un sistema per fornire consigli. Le \textit{query} possono essere una combinazione di informazioni dell'utente (e.g. ID, elementi con i quali ha interagito in passato etc.) e contesto aggiuntivo (e.g. ora del giorno, per quanto tempo ha osservato quel prodotto o quell'episodio etc.)
+\end{itemize}
+
+I passaggi tipici che ti utilizzano sono: 
+
+\begin{enumerate}
+    \item generazione dei candidati: il sistema parte da un corpus di \textit{item}, potenzialmente enorme, e ne estrae un sottoinsieme molto più piccolo di candidati
+    \item calcolo dello \textit{score}: un altro modello, più preciso del primo dato che lavora su una quantità molto minore di dati, assegna un punteggio ai candidati
+    \item \textit{re-ranking}: i candidati vengono ordinati per lo score ricevuto considerando eventuali ulteriori vincoli (e.g. rimuovendo contenuti che l'utente ha segnalato come non graditi, oppure aumentare il punteggio di contenuti più recenti). Il riordinamento può garantire maggiore varietà, attualità e imparzialità.
+\end{enumerate}
+
+\section{Generazione dei candidati}
+
+Gli \textit{item} e le \textit{query} vengono mappate su  vettore di \textit{embedding} in uno spazio comune $E = \mathbb{R}^k$. Tipicamente, lo spazio di incorporamento è a bassa dimensione (cioè, la dimensione è molto più piccola rispetto alla grandezza del corpus) e cattura alcune strutture latenti dell'insieme di elementi o query. Gli elementi simili, come i video di YouTube che solitamente vengono guardati dallo stesso utente, finiscono per essere vicini nello spazio di incorporamento. Il concetto di "vicinanza" è definito da una misura di somiglianza.
+
+
 \section{Collaborative filtering vs Content based filtering}
+
+% TODO tabella https://developers.google.com/machine-learning/recommendation/overview/candidate-generation
+    
+
+\section{Matrix Factorization}
+
+In questa parte viene data una breve introduzione alla tecnica della \textit{Matrix Factorization} dato che molti degli algoritmi presentati la utilizzano come base dei propri algoritmi.
+
+La \textit{Matrix Factorization} è una tecnica utilizzata per rappresentare una matrice come prodotto di due o più matrici. Consente di estrarre strutture latenti dai dati, rendendo possibile la scoperta di relazioni implicite tra entità \cite{MC}.
+
+Questa tecnica è alla base di molte applicazioni in ambiti diversi, tra cui l'elaborazione di segnali, la compressione dei dati, la visione artificiale e, in particolare, i sistemi di \textit{recommendation}.
+
+Formalmente, data una matrice $R \in \mathbb{R}^{m \times n}$, la fattorizzazione mira a trovare due matrici $W \in \mathbb{R}^{m \times k}$ e $H \in \mathbb{R}^{n \times k}$ tali che:
+\[
+R \approx WH^T
+\]
+dove $k \ll \min(m,n)$ è il rango latente scelto. Questa approssimazione riduce la dimensionalità dei dati, semplifica il modello e cattura le relazioni principali presenti nella matrice originaria.
+
+Un celebre esempio dell'efficacia di questa tecnica nei sistemi di \textit{recommendation} è il \textit{Netflix Prize} del 2006. Il team vincente la utilizzò per migliorare le previsioni di rating del 10\% rispetto al sistema originario di Netflix \cite{TheNP}.
+
+I principali vantaggi nel suo utilizzo sono la scalabilità, poiché i modelli sono efficienti da memorizzare e computare, e la capacità di generalizzazione, in quanto riescono a catturare relazioni latenti non esplicitamente osservate. Tuttavia, esistono anche alcuni limiti, tra cui il problema della \textit{cold start}, che rende difficile raccomandare per nuovi utenti o nuovi item, e la sparsità, che può portare a una una bassa qualità delle raccomandazioni\cite{SVD_analysis}.
+
+Pur con alcune limitazioni, essa costituisce la base per molti degli algoritmi di \textit{recommendation} più efficaci oggi in uso, ed è spesso integrata con approcci più complessi, come i modelli Deep Learning o i grafi.
+
 
 \section{Sistemi ibridi}
