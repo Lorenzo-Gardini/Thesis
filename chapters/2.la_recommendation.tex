@@ -17,6 +17,7 @@ Un sistema di \textit{recommendation} aiuta gli utenti a scoprire contenuti inte
 \end{itemize}
 
 
+\subsubsection{Terminologia}
 Ci sono alcuni termini da introdurre:
 
 \begin{itemize}
@@ -32,10 +33,14 @@ I passaggi tipici che ti utilizzano sono:
     \item \textit{re-ranking}: i candidati vengono ordinati per lo score ricevuto considerando eventuali ulteriori vincoli (e.g. rimuovendo contenuti che l'utente ha segnalato come non graditi, oppure aumentare il punteggio di contenuti più recenti). Il riordinamento può garantire maggiore varietà, attualità e imparzialità.
 \end{enumerate}
 
-\section{Generazione dei candidati}
+\section{Generazione dei candidati}\label{generazione_dei_candidati}
 
-Gli \textit{item} e le \textit{query} vengono mappati su  vettore di \textit{embedding} in uno spazio comune $E = \mathbb{R}^k$. Normalmente lo spazio di \textit{embedding} ha una dimensione molto più piccola rispetto alla grandezza del corpus e cattura alcune strutture latenti dell'insieme di \textit{item} o \textit{query}. Gli elementi tra loro simili finiscono per essere vicini nello spazio di \textit{embedding}. Il concetto di "vicinanza" è definito da una misura di similarità.
+\subsubsection{Embedding}
+
+Gli \textit{item} e le \textit{query} vengono mappati su  vettore di \textit{embedding} in uno spazio comune $E = \mathbb{R}^k$. Normalmente lo spazio di \textit{embedding} ha una dimensione molto più piccola rispetto alla grandezza del corpus e cattura alcune strutture latenti dell'insieme di \textit{item} o \textit{query}. Gli elementi tra loro simili finiscono per essere vicini nello spazio di \textit{embedding}. Il concetto di ``vicinanza" è definito da una misura di similarità.
  
+\subsubsection{Calcolo della similarità}
+
 Una misura di similarità è una funzione $s: E \times E \to \mathbb{R}$ che prende in input una coppia di vettori di \textit{embedding} e restituisce un valore scalare che ne misura la similarità. Gli \textit{embedding} possono essere utilizzati per la generazione dei candidati come segue: dato un vettore di \textit{embedding} per una query $q \in E$, il sistema cerca gli \textit{embedding} degli elementi $x \in E$ che sono vicini a $q$, ossia, gli \textit{embedding} con una similarità elevata.
 
 Per determinare il grado di similarità, la maggior parte dei sistemi di \textit{recommendation} si basa su una o più delle seguenti misure:
@@ -61,9 +66,101 @@ Rispetto al coseno, la similarità del prodotto scalare è sensibile alla norma 
     \item Gli elementi che appaiono molto raramente potrebbero non essere aggiornati frequentemente durante l'addestramento. Di conseguenza, se vengono inizializzati con una norma elevata, il sistema potrebbe raccomandare elementi rari invece di quelli più rilevanti. Per evitare questo problema, prestare attenzione all'inizializzazione degli \textit{embedding} e utilizzare una regolarizzazione appropriata
 \end{itemize}
 
-\section{Collaborative filtering vs Content based filtering}
 
-% TODO tabella https://developers.google.com/machine-learning/recommendation/overview/candidate-generation
+Le due tecniche più comuni per la generazione dei candidati sono:
+
+\begin{itemize}
+    \item \textit{content-based filtering}
+    \item \textit{collaborative filtering}
+\end{itemize}
+  
+\section{Content-based filtering}
+Il \textit{content-based filtering} utilizza la similarità tra gli oggetti per raccomandare elementi simili a quelli che l'utente apprezza o ha apprezzato. Ad esempio, se l'utente $A$ guarda due film \textit{fantasy}, il sistema può raccomandargli altri film dello stesso genere.
+
+L'idea è che se ad un utente è piaciuto un certo \textit{item} con certe caratteristiche, il sistema proporrà altri \textit{item} simili per contenuto.
+
+Per prima cosa si crea un profilo degli \textit{item}, cioè viene rappresentato tramite un insieme di caratteristiche (\textit{feature}). Per un film, per esempio, si possono utilizzare il/i generi, gli attori principali, l'anno di uscita, la durata etc.
+
+Dopodiché si costruisce un profilo dell'utente analizzando gli oggetti che ha valutato positivamente. Il profilo rappresenta una media delle caratteristiche degli oggetti preferiti.
+
+Si confronta il profilo dell'utente con gli \textit{item} non ancora visti usando una metrica di similarità (es. coseno, distanza euclidea~\ref{generazione_dei_candidati}).
+
+vengono raccomandati gli \textit{item} più simili al profilo dell'utente.
+
+\subsubsection{Esempio}
+
+Si supponga che all'utente $A$ siano piaciuti due film:
+
+\begin{itemize}
+    \item \textit{Matrix} i cui generi sono \textit{Azione} e \textit{Fantascienza}
+    \item \textit{Inception} i cui generi sono \textit{Azione}, \textit{Fantascienza} e \textit{Thriller}
+\end{itemize}
+
+Si crea il profilo dell'utente con la media delle caratteristiche: 
+
+\begin{itemize}
+    \item \textit{Azione} $= 1$
+    \item \textit{Fantascienza} $= 1$
+    \item \textit{Thriller} $= 0.5$
+\end{itemize}
+
+Poi si selezionano altri film dal catalogo, ad esempio:
+
+\begin{itemize}
+    \item \textit{Interstellar} i cui generi sono \textit{Fantascienza} e \textit{Drammatico}
+    \item \textit{John Wick} il cui genere è \textit{Azione}
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{figures/content_based_filtering.PNG}
+    \caption{La figura mostra i vettori delle caratteristiche dei film (in questo caso il genere) per i film in esempio. Se il film appartiene ad uno specifico genere viene posto il valore $1$, altrimenti $0$}
+    \label{fig:item_vector}
+\end{figure}
+
+Si creano vettori per i film considerando tutti i generi analizzati fino ad ora e si calcola la similarità con il profilo dell'utente. Si ottiene, utilizzando per esempio la similarità coseno, un valore di $0.47$ per $Interstellar$ e di $0.67$ per \textit{John Wick}, quindi quest'ultimo viene raccomandato prima di \textit{Interstellar}, perché è più simile al profilo dell'utente.
+
+
+\subsubsection{Vantaggi e svantaggi}
+
+I vantaggi di quest'approccio sono:
+\begin{itemize}
+    \item il modello non ha bisogno di dati su altri utenti, poiché le raccomandazioni sono specifiche per questo utente. questo lo rende più facile da scalare a un grande numero di utenti
+    \item il modello può catturare gli interessi specifici di un utente e può raccomandare \textit{item} di nicchia che interessano a pochissimi altri utenti
+\end{itemize}
+
+Gli svantaggi di quest'approccio sono:
+\begin{itemize}
+    \item poiché la rappresentazione delle caratteristiche degli oggetti è in parte progettata manualmente, questa tecnica richiede molta conoscenza del dominio. Il modello può essere solo quindi valido quanto le caratteristiche progettate manualmente
+    \item il modello può fare raccomandazioni solo basate sugli interessi esistenti dell'utente. In altre parole, ha una capacità limitata di espandere gli interessi dell'utente
+\end{itemize}
+
+\section{Collaborative filtering}
+
+Per affrontare alcune delle limitazioni del \textit{content-base filtering}, il \textit{collaborative filtering} utilizza simultaneamente le somiglianze tra utenti e \textit{item} per fornire raccomandazioni. I modelli possono raccomandare un \textit{item} all’utente $A$ in base agli interessi di un utente simile $B$ anche se $A$ non ha mai visto \textit{item} simili. Inoltre, gli \textit{embedding} possono essere appresi automaticamente, senza dover progettare manualmente le caratteristiche.
+
+Si consideri un sistema di raccomandazione di film in cui i dati di addestramento consistono in una matrice di feedback in cui:
+
+\begin{itemize}
+    \item Ogni riga rappresenta un utente.
+    \item Ogni colonna rappresenta un \textit{item} (un film).
+    \item Il feedback sui film rientra in una delle due categorie:
+    \begin{itemize}
+        \item esplicito: gli utenti specificano quanto gli è piaciuto un determinato film fornendo una valutazione numerica.
+        \item implicito: se un utente guarda un film, il sistema deduce che l'utente è interessato.
+    \end{itemize}
+\end{itemize}
+
+Per semplificare, si supponga che la matrice di feedback sia binaria; cioè, un valore di $1$ indica interesse per il film.
+
+Quando un utente visita la homepage, il sistema dovrebbe raccomandare film basati su:
+
+\begin{enumerate}
+    \item somiglianza con i film che l'utente ha apprezzato in passato,
+    \item film che utenti simili hanno apprezzato.
+\end{enumerate}
+
+Per scopi illustrativi, genereremo manualmente alcune caratteristiche per i film descritti nella seguente tabella.
     
 
 \section{Matrix Factorization}

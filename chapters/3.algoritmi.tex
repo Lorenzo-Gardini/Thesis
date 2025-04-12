@@ -43,7 +43,7 @@ la produzione di raccomandazioni.
 
 I modelli di \textit{matrix factorization} mappano gli \textit{user} e gli \textit{item} in uno spazio latente comune di dimensione $k$, che rappresenta il numero di caratteristiche latenti. Ogni \textit{item} $i$ è associato a un vettore $q_i$ di dimensione $k$, che misura quanto l'\textit{item} possieda ciascuna di queste caratteristiche latenti. Per ogni \textit{user} $u$, invece, il vettore $p_u$ misura l'interesse dello \textit{user} per gli \textit{item}. Il numero di fattori è un iperparametro dell'algoritmo.
 
-In questo spazio, le interazioni tra \textit{user} e \textit{item} vengono modellate come prodotti scalari tra i rispettivi vettori. Lo spazio latente cerca di spiegare i \textit{rating} caratterizzando sia gli \textit{item} che gli textit{user} in base a fattori che vengono automaticamente dedotti. Ad esempio, se gli \textit{item} sono film, i fattori potrebbero appresentare il genere piuttosto che un altro (e.g. Azione contro Drama), profondità della trama o il concetto di "adatto ai bambini".
+In questo spazio, le interazioni tra \textit{user} e \textit{item} vengono modellate come prodotti scalari tra i rispettivi vettori. Lo spazio latente cerca di spiegare i \textit{rating} caratterizzando sia gli \textit{item} che gli textit{user} in base a fattori che vengono automaticamente dedotti. Ad esempio, se gli \textit{item} sono film, i fattori potrebbero appresentare il genere piuttosto che un altro (e.g. Azione contro Drama), profondità della trama o il concetto di ``adatto ai bambini".
 
 Il prodotto scalare risultante cattura l'interazione tra lo \textit{user} $u$ e l'\textit{item} $i$, che corrisponde all'interesse complessivo dello \textit{user} per le caratteristiche dell'\textit{item}. Il \textit{rating} finale viene ottenuto aggiungendo anche i predittori di base sopra menzionati, che dipendono solo dallo \textit{user} o dall'\textit{item}. Pertanto, un \textit{rating} viene predetto dalla regola~\cite{SVD_analysis}~\cite{Recommendation_book}:
 
@@ -385,7 +385,7 @@ b_u = \frac{\sum\limits_{r_{ui} \in R_{train}} (r_{ui} - \mu - b_i)}{\lambda_3 +
 
 I punti di forza della famiglia di algoritmi KNN sono:
 \begin{itemize}
-    \item semplicità: Gli algoritmi KNN sono facili da capire e implementare. L'idea di base di trovare "vicini" simili è intuitiva e facilmente comprensibile.
+    \item semplicità: Gli algoritmi KNN sono facili da capire e implementare. L'idea di base di trovare ``vicini" simili è intuitiva e facilmente comprensibile.
     \item nessuna assunzione sui dati: l'algoritmo non fa assunzioni sulla distribuzione dei dati. Questo lo rende flessibile e adatto a una varietà di dataset.
     \item aggiornamento: l'aggiunta di nuovi dati non richiede una fase di addestramento esplicita. Questo lo rende utile in ambienti in cui i dati cambiano frequentemente o per previsioni online.
     \item flessibilità: KNN può essere utilizzato sia per problemi di \textit{recommendation} basati su \textit{user} che basati su \textit{item}.

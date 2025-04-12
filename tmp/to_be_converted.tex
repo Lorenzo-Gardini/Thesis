@@ -12,38 +12,20 @@
 \usepackage{algpseudocode}
 \usepackage{amsmath}
 \usepackage{amsfonts}
+\usepackage{array}
 
 
 \begin{document}
 
-Gli \textit{item} e le \textit{query} vengono mappati su  vettore di \textit{embedding} in uno spazio comune $E = \mathbb{R}^k$. Normalmente lo spazio di \textit{embedding} ha una dimensione molto più piccola rispetto alla grandezza del corpus e cattura alcune strutture latenti dell'insieme di \textit{item} o \textit{query}. Gli elementi tra loro simili finiscono per essere vicini nello spazio di \textit{embedding}. Il concetto di "vicinanza" è definito da una misura di similarità.
- 
-Una misura di similarità è una funzione $s: E \times E \to \mathbb{R}$ che prende in input una coppia di vettori di \textit{embedding} e restituisce un valore scalare che ne misura la similarità. Gli \textit{embedding} possono essere utilizzati per la generazione dei candidati come segue: dato un vettore di \textit{embedding} per una query $q \in E$, il sistema cerca gli \textit{embedding} degli elementi $x \in E$ che sono vicini a $q$, ossia, gli \textit{embedding} con una similarità elevata.
+Il filtraggio basato sul contenuto utilizza le caratteristiche degli articoli per raccomandare altri articoli simili a quelli che l'utente piace, in base alle sue azioni precedenti o al feedback esplicito.
 
-Per determinare il grado di similarità, la maggior parte dei sistemi di \textit{recommendation} si basa su una o più delle seguenti misure:
+Per dimostrare il filtraggio basato sul contenuto, creiamo manualmente alcune caratteristiche per il Google Play Store. La figura seguente mostra una matrice delle caratteristiche, in cui ogni riga rappresenta un'app e ogni colonna rappresenta una caratteristica. Le caratteristiche potrebbero includere categorie (come Educazione, Casual, Salute), l'editore dell'app e molte altre. Per semplificare, supponiamo che questa matrice di caratteristiche sia binaria: un valore diverso da zero significa che l'app ha quella caratteristica.
 
-\begin{itemize}
-    \item coseno: semplicemente il coseno dell'angolo tra i due vettori $s(q, x) = cos(q, x)$
-    \item prodotto scalare: è dato da: $s(q, x) = \langle q, x \rangle = \sum\limits_{i=1}^{d} q_i x_i$. È anche dato da $s(q, x) = \|x\| \|q\| \cos(q, x)$ che corrisponde al coseno dell'angolo moltiplicato per il prodotto delle norme. Pertanto, se gli \textit{embedding} sono normalizzati, il prodotto scalare e il coseno coincidono    
-    \item distanza euclidea: questa è la distanza usuale nello spazio euclideo $s(q, x) = \|q - x\| = \left[ \sum\limits_{i=1}^{d} (q_i - x_i)^2 \right]^{\frac{1}{2}}$. Una distanza minore indica una similarità maggiore. Da notare che, quando gli \textit{embedding} sono normalizzati, la distanza euclidea al quadrato coincide con il prodotto scalare (e il coseno) fino a una costante, poiché in quel caso $\frac{1}{2} \|q - x\|^2 = 1 - \langle q, x \rangle$
-\end{itemize}
+Rappresenti anche l'utente nello stesso spazio delle caratteristiche. Alcune delle caratteristiche relative all'utente potrebbero essere fornite esplicitamente dall'utente. Ad esempio, un utente seleziona "App di intrattenimento" nel proprio profilo. Altre caratteristiche possono essere implicite, basate sulle app che l'utente ha precedentemente installato. Ad esempio, l'utente ha installato un'altra app pubblicata da Science R Us.
 
+Il modello dovrebbe raccomandare articoli pertinenti a questo utente. Per farlo, è necessario prima scegliere una metrica di similarità (ad esempio, il prodotto scalare). Successivamente, bisogna impostare il sistema per assegnare un punteggio a ciascun articolo candidato in base a questa metrica di similarità. Si noti che le raccomandazioni sono specifiche per questo utente, poiché il modello non ha utilizzato alcuna informazione su altri utenti.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[scale=0.8]{../figures/embedding.PNG}
-    \caption{Il vettore nero illustra l'\textit{embedding} della query. Gli altri tre vettori di \textit{embedding} (\textit{Item A}, \textit{Item B}, \textit{Item C}) rappresentano gli \text{item} candidati. A seconda della misura di similarità utilizzata, la classifica degli elementi può essere diversa}
-    \label{fig:embedding}
-\end{figure}
-
-Rispetto al coseno, la similarità del prodotto scalare è sensibile alla norma dell'\textit{embedding}. Cioè, maggiore è la norma di un \textit{embedding}, maggiore sarà la similarità e più è probabile che l'elemento venga raccomandato. Questo può influenzare le raccomandazioni nei seguenti modi:
-
-\begin{itemize}
-    \item gli elementi che appaiono molto frequentemente nel \textit{training set} (ad esempio, le top canzoni italiane del momento su \textit{Spotify}) tendono ad avere \textit{embedding} con norme grandi. Se è desiderabile catturare informazioni sulla popolarità, allora si dovrebbe preferire il prodotto scalare. Tuttavia, se non si presta attenzione, gli elementi popolari potrebbero finire per dominare le raccomandazioni. In pratica, si possono utilizzare altre varianti delle misure di similarità che pongono meno enfasi sulla norma dell'elemento. Ad esempio, definire $s(q, x) = \|q\|^{\alpha} \|x\|^{\alpha} \cos(q, x)$ per qualche $\alpha \in (0,1)$
-    \item Gli elementi che appaiono molto raramente potrebbero non essere aggiornati frequentemente durante l'addestramento. Di conseguenza, se vengono inizializzati con una norma elevata, il sistema potrebbe raccomandare elementi rari invece di quelli più rilevanti. Per evitare questo problema, prestare attenzione all'inizializzazione degli \textit{embedding} e utilizzare una regolarizzazione appropriata
-\end{itemize}
-
-
+%###########################################
 
 
 
