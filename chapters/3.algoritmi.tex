@@ -892,4 +892,84 @@ L'algoritmo soffre anche di diverse problematiche:
 
 \subsection{LightFM}\label{lightfm}
 
+I sistemi di raccomandazione basati su \textit{matrix factorization} si sono dimostrati estremamente efficaci quando la matrice delle interazioni tra \textit{user} e \textit{item} è sufficientemente densa. Tuttavia, tali metodi risultano inefficaci in scenari di \textit{cold-start}, in cui nuovi \textit{user} o nuovi \textit{item} non hanno ancora prodotto interazioni significative.
+
+I modelli \textit{content-based filtering}, che utilizzano le feature conosciute degli \textit{item} (ad esempio genere, attori, descrizioni) per generare raccomandazioni, superano questo limite, ma mancano della capacità di apprendere dalle interazioni collettive.
+
+Il modello \textit{LightFM}~\cite{LightFM}, proposto da Maciej Kula, fonde questi due approcci: rappresenta \textit{user} e \textit{item} come combinazioni lineari dei loro metadati, appresi attraverso i dati contenuti in $R$, cioè l’insieme di tutte le interazioni osservate.
+
+Utilizziamo la seguente notazione:
+\begin{itemize}
+    \item $U$: insieme di tutti gli \textit{user}, con $u \in U$.
+    \item $I$: insieme di tutti gli \textit{item}, con $i \in I$.
+    \item $R$: insieme di tutte le interazioni (\textit{rating}) osservate.
+    \item Ogni \textit{user} $u$ è descritto da un insieme di feature $f_u$.
+    \item Ogni \textit{item} $i$ è descritto da un insieme di feature $f_i$.
+\end{itemize}
+
+Ad ogni feature $f$ associata a uno \textit{user} o a un \textit{item} viene assegnato:
+\begin{itemize}
+    \item un vettore latente $\mathbf{e}_f \in \mathbb{R}^d$
+    \item un bias scalare $b_f \in \mathbb{R}$
+\end{itemize}
+
+\subsection{Rappresentazioni latenti}
+La rappresentazione latente di uno \textit{user} $u$ è data dalla somma dei vettori latenti delle sue feature:
+\[
+\mathbf{q}_u = \sum_{f \in f_u} \mathbf{e}_f
+\]
+Analogamente, per l'\textit{item} $i$:
+\[
+\mathbf{p}_i = \sum_{f \in f_i} \mathbf{e}_f
+\]
+
+Il bias dello \textit{user} e dell'\textit{item} si calcolano come:
+\[
+b_u = \sum_{f \in f_u} b_f, \quad b_i = \sum_{f \in f_i} b_f
+\]
+
+Lo \textit{score} stimato $\hat{r}_{ui}$ per lo \textit{user} $u$ sull'\textit{item} $i$ è dato da:
+\[
+\hat{x}_{ui} = f\left( \mathbf{q}_u \cdot \mathbf{p}_i + b_u + b_i \right)
+\]
+dove $f(x)$ è una funzione di attivazione. Per problemi di classificazione binaria (ad esempio click o no click), si utilizza la funzione sigmoide:
+\[
+f(x) = \frac{1}{1 + \exp(-x)}
+\]
+
+Il modello viene allenato massimizzando la probabilità di predire correttamente le interazioni osservate. Definiamo:
+
+\begin{itemize}
+    \item $R_{train}$: insieme delle interazioni note usate per il training.
+    \item $R_{test}$: insieme delle interazioni usate per la valutazione.
+    \item $S^+$: insieme delle coppie $(u, i) \in R_{train}$ con interazioni positive.
+    \item $S^-$: insieme di coppie $(u, i) \notin R_{train}$ considerate come negative.
+\end{itemize}
+
+La funzione di verosimiglianza da massimizzare è:
+\[
+\mathcal{L} = \prod_{(u,i) \in S^+} \hat{x}_{ui} \cdot \prod_{(u,i) \in S^-} (1 - \hat{x}_{ui})
+\]
+
+L’ottimizzazione si effettua mediante \textit{stochastic gradient Descent}, con un learning rate adattivo controllato da $\gamma$ (ad esempio tramite \textit{Adagrad}), e regolarizzazione tramite $\lambda$.
+
+Sebbene LightFM non fattorizzi direttamente la matrice $R \in \mathbb{R}^{m \times n}$, dove $m$ è il numero di \textit{user} e $n$ è il numero di \textit{item}, essa viene utilizzata per costruire i set $S^+$ e $S^-$, su cui si basa l’allenamento.
+
+L’informazione di $R$ serve quindi a guidare l’apprendimento degli \textit{embedding} delle feature, anche se non compare esplicitamente nella formulazione come in \textit{matrix factorization} classico.
+
+I punti di forza dell'algoritmo sono:
+
+\begin{itemize}
+    \item robustezza alla \textit{cold-start}: riesce a generare raccomandazioni per nuovi \textit{user} e \textit{item} utilizzando i metadati
+    \item modello flessibile: funziona bene sia in condizioni di densità che di scarsità dei dati.
+\end{itemize}
+
+L'algoritmo soffre anche di diverse problematiche:
+
+\begin{itemize}
+    \item dipendenza dalla qualità delle feature: se sono rumorose o poco informative, le performance del modello degradano
+    \item utilizzo di un modello lineare: può essere troppo semplice per catturare interazioni complesse tra feature
+    \item staticità: non incorpora l'evoluzione temporale delle preferenze degli \textit{user}
+\end{itemize}
+
 \section{Introduzione a modelli di Deep Learning}\label{introduzione-a-modelli-di-deep-learning}
