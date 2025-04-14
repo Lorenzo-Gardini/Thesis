@@ -137,7 +137,7 @@ Gli svantaggi di quest'approccio sono:
 
 \section{Collaborative filtering}
 
-Per affrontare alcune delle limitazioni del \textit{content-base filtering}, il \textit{collaborative filtering} utilizza simultaneamente le somiglianze tra utenti e \textit{item} per fornire raccomandazioni. I modelli possono raccomandare un \textit{item} all’utente $A$ in base agli interessi di un utente simile $B$ anche se $A$ non ha mai visto \textit{item} simili. Inoltre, gli \textit{embedding} possono essere appresi automaticamente, senza dover progettare manualmente le caratteristiche.
+Per affrontare alcune delle limitazioni del \textit{content-base filtering}, il \textit{collaborative filtering} utilizza simultaneamente le somiglianze tra utenti e \textit{item} per fornire raccomandazioni. I modelli possono raccomandare un \textit{item} all'utente $A$ in base agli interessi di un utente simile $B$ anche se $A$ non ha mai visto \textit{item} simili. Inoltre, gli \textit{embedding} possono essere appresi automaticamente, senza dover progettare manualmente le caratteristiche.
 
 Si consideri un sistema di raccomandazione di film in cui i dati di addestramento consistono in una matrice di feedback in cui:
 
@@ -162,7 +162,7 @@ Quando un utente visita la homepage, il sistema dovrebbe raccomandare film basat
 
 \subsubsection{1D embedding}
 
-Si assegna a ciascun film uno scalare in $[-1, 1]$ che descriva se il film è destinato a bambini (valori negativi) o ad adulti (valori positivi). Allo stesso modo, per ciascun utente si assegna uno scalare in $[-1, 1]$ che descriva il suo interesse per i film per bambini o per adulti. Il prodotto dell’\textit{embedding} del film e dell’\textit{embedding} dell’utente dovrebbe essere più alto (vicino a 1) per i film che dovrebbero piacere all’utente.
+Si assegna a ciascun film uno scalare in $[-1, 1]$ che descriva se il film è destinato a bambini (valori negativi) o ad adulti (valori positivi). Allo stesso modo, per ciascun utente si assegna uno scalare in $[-1, 1]$ che descriva il suo interesse per i film per bambini o per adulti. Il prodotto dell'\textit{embedding} del film e dell'\textit{embedding} dell'utente dovrebbe essere più alto (vicino a 1) per i film che dovrebbero piacere all'utente.
 
 \begin{figure}[H]
     \centering
@@ -203,6 +203,52 @@ Nel grafico sono rappresentati sia gli elementi che gli utenti nello stesso spaz
 L'obbiettivo è che per ogni coppia (utente, \textit{item}) il prodotto scalare dell'\textit{embedding} dell'utente e dell'\textit{embedding} dell'\textit{item} fosse vicino a $1$ quando l'utente ha guardato il film e a $0$ in caso contrario.
 
 I modelli apprendono automaticamente un vettore di \textit{embedding} per ciascun utente che spieghi al meglio le sue preferenze. Di conseguenza, gli \textit{embedding} di utenti con gusti simili risulteranno vicini tra loro. Allo stesso modo il modello apprende gli \textit{embedding} dei film in modo da spiegare al meglio la matrice di feedback. Anche in questo caso, gli \textit{embedding} dei film apprezzati da utenti simili saranno vicini nello spazio degli embedding.
+
+\subsubsection{Vantaggi e svantaggi}
+
+I vantaggi di quest'approccio sono:
+
+\begin{itemize}
+  \item non è necessaria conoscenza del dominio: gli embedding vengono appresi automaticamente
+  \item serendipità: anche se il modello non sa che l'utente è interessato a un determinato \textit{item} potrebbe comunque raccomandarlo perché utenti simili sono interessati a quell'\textit{item}
+  \item ottimo punto di partenza: il sistema ha bisogno solo della matrice di feedback, e non di informazioni contestuali, per addestrare un modello
+\end{itemize}
+
+Gli svantaggi di quest'approccio sono:
+
+\begin{itemize}
+  \item non si può gestire \textit{item} nuovi: se un oggetto non è stato visto durante l'addestramento, il sistema non può creare un \textit{embedding} per esso. Questo problema è noto come \textit{cold-start}. Tuttavia, esistono tecniche che possono affrontare in parte questo problema: 
+
+  \begin{itemize}
+    \item proiezione: dato un nuovo \textit{item} $i_0$ non visto durante l'addestramento, se il sistema ha alcune interazioni con utenti, può facilmente calcolare un \textit{embedding} per quell'\textit{item} senza riaddestrare l'intero modello. Basta risolvere la seguente equazione (o la sua versione pesata):
+
+    \[
+    \min_x \sum_{i}(r_{ui} - x^T u_i)^2
+    \]
+
+    Gli \textit{embedding} dell'utente vengono mantenuti fissi, e il sistema risolve per ottenere l'\textit{embedding} dell'\textit{item}. Lo stesso approccio può essere utilizzato per un nuovo utente.
+    \item euristiche: se il sistema non ha interazioni, può approssimare l'\textit{embedding} di un \textit{item} facendo la media degli \textit{embedding} di \textit{item} appartenenti alla stessa categoria
+  \end{itemize}
+
+  \item difficoltà nell'includere caratteristiche aggiuntive per \textit{query}/\textit{item}: le caratteristiche aggiuntive (\textit{side features}) sono tutte quelle informazioni oltre all'ID della query o dell'\text{item}. Per esempio, per i film, le caratteristiche possono includere il paese o l'età. Includere queste caratteristiche migliora la qualità del modello
+
+  Per generalizzare WALS, si può estendere la matrice di input includendo le caratteristiche, definendo una matrice a blocchi $\tilde{R}$:
+
+  \[
+  \tilde{R} = \begin{bmatrix}
+  R & U_f \\
+  I_f & 0
+  \end{bmatrix}
+  \]
+
+  dove:
+  \begin{itemize}
+    \item $R$ è la matrice di feedback tra utenti e \textit{item};
+    \item $U_f$ è una codifica multi-hot delle feature degli utenti (per esempio età, paese, genere);
+    \item $I_f$ è una codifica multi-hot delle feature degli \textit{item} (per esempio categoria, lingua, creatore);
+    \item $0$ è una matrice di zeri, che rappresenta l'assenza di interazioni dirette tra le feature utente e quelle degli \textit{item}.
+  \end{itemize}
+\end{itemize}
 
 \section{Matrix Factorization}
 

@@ -886,8 +886,6 @@ L'algoritmo soffre anche di diverse problematiche:
 
 \subsection{Evaluation implicita}\label{evaluation-implicita}
 
-\section{Algoritmi per la similarità item-item}\label{algoritmi-per-la-similarita-item-item}
-
 \section{Algoritmi ibridi}\label{algoritmi-ibridi}
 
 \subsection{LightFM}\label{lightfm}
@@ -896,7 +894,7 @@ I sistemi di raccomandazione basati su \textit{matrix factorization} si sono dim
 
 I modelli \textit{content-based filtering}, che utilizzano le feature conosciute degli \textit{item} (ad esempio genere, attori, descrizioni) per generare raccomandazioni, superano questo limite, ma mancano della capacità di apprendere dalle interazioni collettive.
 
-Il modello \textit{LightFM}~\cite{LightFM}, proposto da Maciej Kula, fonde questi due approcci: rappresenta \textit{user} e \textit{item} come combinazioni lineari dei loro metadati, appresi attraverso i dati contenuti in $R$, cioè l’insieme di tutte le interazioni osservate.
+Il modello \textit{LightFM}~\cite{LightFM}, proposto da Maciej Kula, fonde questi due approcci: rappresenta \textit{user} e \textit{item} come combinazioni lineari dei loro metadati, appresi attraverso i dati contenuti in $R$, cioè l'insieme di tutte le interazioni osservate.
 
 Utilizziamo la seguente notazione:
 \begin{itemize}
@@ -951,11 +949,11 @@ La funzione di verosimiglianza da massimizzare è:
 \mathcal{L} = \prod_{(u,i) \in S^+} \hat{x}_{ui} \cdot \prod_{(u,i) \in S^-} (1 - \hat{x}_{ui})
 \]
 
-L’ottimizzazione si effettua mediante \textit{stochastic gradient Descent}, con un learning rate adattivo controllato da $\gamma$ (ad esempio tramite \textit{Adagrad}), e regolarizzazione tramite $\lambda$.
+L'ottimizzazione si effettua mediante \textit{stochastic gradient Descent}, con un learning rate adattivo controllato da $\gamma$ (ad esempio tramite \textit{Adagrad}), e regolarizzazione tramite $\lambda$.
 
-Sebbene LightFM non fattorizzi direttamente la matrice $R \in \mathbb{R}^{m \times n}$, dove $m$ è il numero di \textit{user} e $n$ è il numero di \textit{item}, essa viene utilizzata per costruire i set $S^+$ e $S^-$, su cui si basa l’allenamento.
+Sebbene LightFM non fattorizzi direttamente la matrice $R \in \mathbb{R}^{m \times n}$, dove $m$ è il numero di \textit{user} e $n$ è il numero di \textit{item}, essa viene utilizzata per costruire i set $S^+$ e $S^-$, su cui si basa l'allenamento.
 
-L’informazione di $R$ serve quindi a guidare l’apprendimento degli \textit{embedding} delle feature, anche se non compare esplicitamente nella formulazione come in \textit{matrix factorization} classico.
+L'informazione di $R$ serve quindi a guidare l'apprendimento degli \textit{embedding} delle feature, anche se non compare esplicitamente nella formulazione come in \textit{matrix factorization} classico.
 
 I punti di forza dell'algoritmo sono:
 
