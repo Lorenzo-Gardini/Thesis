@@ -59,10 +59,10 @@ Per determinare il grado di similarità, la maggior parte dei sistemi di \textit
     \label{fig:embedding}
 \end{figure}
 
-Rispetto al coseno, la similarità del prodotto scalare è sensibile alla norma dell'\textit{embedding}. Cioè, maggiore è la norma di un \textit{embedding}, maggiore sarà la similarità e più è probabile che l'elemento venga raccomandato. Questo può influenzare le raccomandazioni nei seguenti modi:
+Rispetto al coseno, la similarità del prodotto scalare è sensibile alla norma dell'\textit{embedding}. Cioè, maggiore è la norma di un \textit{embedding}, maggiore sarà la similarità e più è probabile che l'\textit{item} venga raccomandato. Questo può influenzare le raccomandazioni nei seguenti modi:
 
 \begin{itemize}
-    \item gli elementi che appaiono molto frequentemente nel \textit{training set} (ad esempio, le top canzoni italiane del momento su \textit{Spotify}) tendono ad avere \textit{embedding} con norme grandi. Se è desiderabile catturare informazioni sulla popolarità, allora si dovrebbe preferire il prodotto scalare. Tuttavia, se non si presta attenzione, gli elementi popolari potrebbero finire per dominare le raccomandazioni. In pratica, si possono utilizzare altre varianti delle misure di similarità che pongono meno enfasi sulla norma dell'elemento. Ad esempio, definire $s(q, x) = \|q\|^{\alpha} \|x\|^{\alpha} \cos(q, x)$ per qualche $\alpha \in (0,1)$
+    \item gli elementi che appaiono molto frequentemente nel \textit{training set} (ad esempio, le top canzoni italiane del momento su \textit{Spotify}) tendono ad avere \textit{embedding} con norme grandi. Se è desiderabile catturare informazioni sulla popolarità, allora si dovrebbe preferire il prodotto scalare. Tuttavia, se non si presta attenzione, gli elementi popolari potrebbero finire per dominare le raccomandazioni. In pratica, si possono utilizzare altre varianti delle misure di similarità che pongono meno enfasi sulla norma dell'\textit{item}. Ad esempio, definire $s(q, x) = \|q\|^{\alpha} \|x\|^{\alpha} \cos(q, x)$ per qualche $\alpha \in (0,1)$
     \item Gli elementi che appaiono molto raramente potrebbero non essere aggiornati frequentemente durante l'addestramento. Di conseguenza, se vengono inizializzati con una norma elevata, il sistema potrebbe raccomandare elementi rari invece di quelli più rilevanti. Per evitare questo problema, prestare attenzione all'inizializzazione degli \textit{embedding} e utilizzare una regolarizzazione appropriata
 \end{itemize}
 
@@ -160,8 +160,49 @@ Quando un utente visita la homepage, il sistema dovrebbe raccomandare film basat
     \item film che utenti simili hanno apprezzato
 \end{enumerate}
 
-Per scopi illustrativi, genereremo manualmente alcune caratteristiche per i film descritti nella seguente tabella.
-    
+\subsubsection{1D embedding}
+
+Si assegna a ciascun film uno scalare in $[-1, 1]$ che descriva se il film è destinato a bambini (valori negativi) o ad adulti (valori positivi). Allo stesso modo, per ciascun utente si assegna uno scalare in $[-1, 1]$ che descriva il suo interesse per i film per bambini o per adulti. Il prodotto dell’\textit{embedding} del film e dell’\textit{embedding} dell’utente dovrebbe essere più alto (vicino a 1) per i film che dovrebbero piacere all’utente.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.4]{figures/collaborative_filtering/embeddings.PNG}
+    \caption{Rappresentazione su un asse 1D delle posizioni di utenti e film rispetto allo scalare assegnato nell'intervallo $[-1, 1]$}
+    \label{fig:embeddings}
+\end{figure}
+
+Nella seguente matrice, ogni segno di spunta identifica un film che un determinato utente ha guardato. Il terzo e il quarto utente hanno preferenze evidenti per questa caratteristica: il terzo utente preferisce i film per bambini, mentre il quarto preferisce i film per adulti. Ciò non vale invece per il primo e del secondo utente.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{figures/collaborative_filtering/1D_matrix.PNG}
+    \caption{matrice che mostra i film guardati dagli utenti, le categorie dei film e le preferenze degli utenti}
+    \label{fig:1D_matrix}
+\end{figure}
+
+\subsubsection{2D embedding}
+
+Una sola caratteristica non è sufficiente a spiegare le preferenze di tutti gli utenti. Per superare questo problema, si utilizza una seconda caratteristica: il grado in cui ogni film è un \textit{blockbuster} (film molto popolare e di grande successo al botteghino) o un film d'autore. Con una seconda caratteristica, ora si può rappresentare ogni film con il seguente \textit{embedding} bidimensionale:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.4]{figures/collaborative_filtering/axes.PNG}
+    \caption{gli assi mostrano, per ciascuna caratteristica, la posizione dei film e le preferenze degli utenti}
+    \label{fig:embedding_axes}
+\end{figure}
+
+Nel grafico sono rappresentati sia gli elementi che gli utenti nello stesso spazio di \textit{embedding}. Questo perché si può pensare allo spazio di \textit{embedding} come a una rappresentazione astratta comune sia agli \textit{item} che agli utenti, in cui si può misurare la similarità.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.4]{figures/collaborative_filtering/2D_matrix.PNG}
+    \caption{matrice che mostra i film guardati dagli utenti, le categorie dei film e le preferenze degli utenti estese}
+    \label{fig:2D_matrix}
+\end{figure}
+
+L'obbiettivo è che per ogni coppia (utente, \textit{item}) il prodotto scalare dell'\textit{embedding} dell'utente e dell'\textit{embedding} dell'\textit{item} fosse vicino a $1$ quando l'utente ha guardato il film e a $0$ in caso contrario.
+
+I modelli apprendono automaticamente un vettore di \textit{embedding} per ciascun utente che spieghi al meglio le sue preferenze. Di conseguenza, gli \textit{embedding} di utenti con gusti simili risulteranno vicini tra loro. Allo stesso modo il modello apprende gli \textit{embedding} dei film in modo da spiegare al meglio la matrice di feedback. Anche in questo caso, gli \textit{embedding} dei film apprezzati da utenti simili saranno vicini nello spazio degli embedding.
 
 \section{Matrix Factorization}
 
@@ -175,7 +216,21 @@ Formalmente, data una matrice $R \in \mathbb{R}^{m \times n}$, la fattorizzazion
 \[
 R \approx WH^T
 \]
-dove $k \ll \min(m,n)$ è il rango latente scelto. Questa approssimazione riduce la dimensionalità dei dati, semplifica il modello e cattura le relazioni principali presenti nella matrice originaria.
+dove 
+\begin{itemize}
+    \item le righe di $W$ corrispondono agli \textit{embedding} degli utenti
+    \item le righe di $H$ corrispondono agli \textit{embedding} degli \textit{item}
+    \item $k \ll \min(m,n)$ è il rango latente scelto
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{figures/matrix_factorization.PNG}
+    \caption{rappresentazione della matrice $R$ come prodotto delle due matrici $W$ e $H$}
+    \label{fig:matrix_factorization}
+\end{figure}
+
+Questa approssimazione riduce la dimensionalità dei dati, semplifica il modello e cattura le relazioni principali presenti nella matrice originaria.
 
 Un celebre esempio dell'efficacia di questa tecnica nei sistemi di \textit{recommendation} è il \textit{Netflix Prize} del 2006. Il team vincente la utilizzò per migliorare le previsioni di rating del 10\% rispetto al sistema originario di Netflix \cite{TheNP}.
 
