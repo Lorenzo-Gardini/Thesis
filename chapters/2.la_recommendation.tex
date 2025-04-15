@@ -250,9 +250,18 @@ Gli svantaggi di quest'approccio sono:
   \end{itemize}
 \end{itemize}
 
-\section{Matrix Factorization}
+\subsubsection{Approcci}
 
-In questa parte viene data una breve introduzione alla tecnica della \textit{Matrix Factorization} dato che molti degli algoritmi presentati la utilizzano come base dei propri algoritmi.
+
+Esistono due approcci principali per facilitare tale confronto, che costituiscono le due tecniche fondamentali del \textit{collaborative filtering}: 
+
+\begin{itemize}
+    \item approcci \textit{neighborhood}: si concentrano sulle relazioni tra item oppure, alternativamente, tra utenti. Un approccio \textit{item}-\textit{item} modella la preferenza di un utente per un \textit{item} sulla base delle valutazioni di \textit{item} simili da parte dello stesso utente
+    \item modelli basati sulla \textit{Matrix Factorization}: un approccio in cui sia gli \textit{item} che gli utenti vengono proiettati in uno stesso spazio latente, cercando di spiegare le valutazioni osservate attraverso fattori latenti inferiti automaticamente dai feedback
+\end{itemize}
+
+
+\section{Matrix Factorization}
 
 La \textit{Matrix Factorization} è una tecnica utilizzata per rappresentare una matrice come prodotto di due o più matrici. Consente di estrarre strutture latenti dai dati, rendendo possibile la scoperta di relazioni implicite tra entità \cite{MC}.
 
@@ -285,4 +294,52 @@ I principali vantaggi nel suo utilizzo sono la scalabilità, poiché i modelli s
 Pur con alcune limitazioni, essa costituisce la base per molti degli algoritmi di \textit{recommendation} più efficaci oggi in uso, ed è spesso integrata con approcci più complessi, come i modelli Deep Learning o i grafi.
 
 
-\section{Sistemi ibridi}
+\section{Tipologie di feedback}
+
+I sistemi di raccomandazione si basano sull’analisi delle preferenze degli utenti, espresse attraverso due principali modalità: feedback esplicito e feedback implicito. Ogni modalità presenta vantaggi, limitazioni e diverse tipologie di approcci.
+
+\subsection{Feedback Esplicito}
+
+Il feedback esplicito si riferisce a tutte quelle situazioni in cui l’utente comunica consapevolmente il proprio grado di interesse per un oggetto. Esempi includono le valutazioni da $1$ a $5$ stelle per i prodotti su \textit{Amazon} o il pollice su/giù per i video su \textit{YouTube} o semplicemente il \textit{like} su \textit{Instagram}.
+
+I modelli che utilizzano feedback espliciti predicono il \textit{rating} che un dato utente assegnerebbe ad un \text{item}. Per esempio predicono che l'utente $u$ darebbe una votazione di $4$ su $5$ per la serie $i$.
+
+Questi dati forniscono un segnale diretto, ma presentano però anche delle limitazioni:
+
+\begin{itemize}
+    \item più difficili da ottenere: richiedono che l’utente lasci intenzionalmente il suo riscontro
+    \item rari nel mondo reale: molti utenti non lasciano mai valutazioni, dando origine a dati molto sparsi
+    \item possono introdurre bias: ad esempio, utenti soddisfatti sono più propensi a lasciare valutazioni rispetto a quelli neutrali o insoddisfatti o viceversa
+\end{itemize}
+
+Nonostante ciò, il feedback esplicito rimane una delle fonti più affidabili per l’addestramento di modelli di raccomandazione, in quanto consente di formulare il problema come una regressione delle valutazioni mancanti~\cite{Implicit_feedback}.
+
+\subsection{Feedback Implicito}
+
+Il feedback implicito, al contrario, non è fornito direttamente dall’utente, ma viene dedotto osservando i suoi comportamenti. Esempi tipici includono:
+
+\begin{itemize}
+    \item cronologia degli acquisti
+    \item cronologia di navigazione
+    \item pattern di ricerca
+    \item tempo di permanenza su una pagina
+    \item interazioni come click, visualizzazioni o movimenti del mouse
+    \item acquisto o meno di un prodotto
+\end{itemize}
+
+I feedback impliciti possono essere raccolti facilmente in modo automatico e passivo senza che l'utente debba interagire intenzionalmente. Inoltre, sono molto più abbondando rispetto alla controparte esplicita. Forniscono una rappresentazione più completa del comportamento degli utenti, specialmente in contesti in cui il feedback esplicito è assente o insufficiente.
+
+I modelli che utilizzano feedback impliciti non forniscono un \textit{rating} ma uno \textit{score} numerico per la coppia utente-\textit{item}. Questo numero da solo non ha alcun significato, ma messo in relazioni con altri \textit{score}, calcolati per lo stesso utente con \textit{item} diversi, permette di ordinare gli \textit{item} in base alla preferenza predetta dell’utente.
+
+L'utilizzo di dati impliciti può creare complicazioni:
+
+\begin{itemize}
+    \item ambiguità: un’azione (es. visualizzazione di un contenuto) non implica necessariamente una preferenza positiva
+    \item rumore nei dati: molte interazioni potrebbero essere accidentali o non intenzionali
+    \item assenza di segnali negativi chiari: è difficile distinguere tra mancanza di interesse e mancata esposizione all’oggetto
+\end{itemize}
+
+
+\subsection{Approcci ibridi}
+
+Poiché ciascuna forma di feedback fornisce informazioni diverse, un approccio ibrido è spesso preferibile. Ad esempio, nei sistemi che dispongono di valutazioni esplicite, il feedback implicito può essere utilizzato per arricchire il contesto dell’utente, migliorando le prestazioni del modello nei casi in cui i dati espliciti siano scarsi. I modelli basati sul Deep Learning possono essere progettati per combinare diverse fonti, sfruttando il feedback implicito arricchito da attributi contestuali (tempo, luogo, dispositivo, ecc.) per ottimizzare la previsione.

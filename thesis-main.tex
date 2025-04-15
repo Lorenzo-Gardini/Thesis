@@ -19,14 +19,14 @@
 \title{Title}
 \author{Lorenzo Gardini}
 \date{\today}
-\subject{Supervisor's course name}
+\subject{Data Mining}
 \supervisor{Matteo Golfarelli}
 \session{2}
 \academicyear{2025-2026}
 
 % Definition of acronyms
-\acrodef{IoT}{Internet of Thing}
-\acrodef{vm}[VM]{Virtual Machine}
+% \acrodef{IoT}{Internet of Thing}
+% \acrodef{vm}[VM]{Virtual Machine}
 
 
 \mainlinespacing{1.241} % line spacing in mainmatter, comment to default (1)
@@ -36,7 +36,7 @@
 \frontmatter\frontispiece
 
 \begin{abstract}	
-Max 2000 characters, strict.
+    La tesi esplora i principali approcci ai sistemi di raccomandazione, con focus su feedback espliciti e impliciti. Descrive poi l’attività di tirocinio presso Data Reply, dove è stata sviluppata una libreria Python per semplificare l’uso di modelli come Surprise, LightFM e Implicit. L’obiettivo è rendere i sistemi di raccomandazione più accessibili e integrabili in ambito aziendale.
 \end{abstract}
 
 \begin{dedication} % this is optional
@@ -52,8 +52,8 @@ Optional. Max a few lines.
 \mainmatter
 
 %----------------------------------------------------------------------------------------
-\input{chapters/1.introduzione}
-% \input{chapters/2.la_recommendation}
+% \input{chapters/1.introduzione}
+\input{chapters/2.la_recommendation}
 % \input{chapters/3.algoritmi}
 % \input{chapters/4.analisi}
 % \input{chapters/5.progettazione}
@@ -66,8 +66,6 @@ Optional. Max a few lines.
 %----------------------------------------------------------------------------------------
 
 \backmatter
-
-\nocite{*} % Remove this as soon as you have the first citation
 
 \bibliographystyle{alpha}
 \bibliography{bibliography}
