@@ -502,8 +502,6 @@ L'algoritmo soffre anche di diverse problematiche:
 
 L'approccio può essere esteso a modelli ponderati e versioni più avanzate, come per esempio \textit{Weighted Slope One}, che pesa le differenze di \textit{rating} in base alla frequenza di coppie di \textit{item} valutati, e \textit{Regression-based Slope One}, che introduce funzioni non lineari per migliorare la precisione delle previsioni.
 
-\subsection{Evaluation esplicita}\label{evaluation-esplicita}
-
 \section{Algoritmi per il feedback implicito}\label{algoritmi-per-feedback-implicito}
 
 \subsection{ALS (Alternating Least Squares)}\label{als}
@@ -884,8 +882,6 @@ L'algoritmo soffre anche di diverse problematiche:
     \item sensibilità alla scelta dei parametri: il modello è molto dipendente dagli iperparametri, come il \textit{learning rate} e la regolarizzazione
 \end{itemize}
 
-\subsection{Evaluation implicita}\label{evaluation-implicita}
-
 \section{Algoritmi ibridi}\label{algoritmi-ibridi}
 
 \subsection{LightFM}\label{lightfm}
@@ -911,7 +907,7 @@ Ad ogni feature $f$ associata a uno \textit{user} o a un \textit{item} viene ass
     \item un bias scalare $b_f \in \mathbb{R}$
 \end{itemize}
 
-\subsection{Rappresentazioni latenti}
+\subsubsection{Rappresentazioni latenti}
 La rappresentazione latente di uno \textit{user} $u$ è data dalla somma dei vettori latenti delle sue feature:
 \[
 \mathbf{q}_u = \sum_{f \in f_u} \mathbf{e}_f
@@ -971,3 +967,83 @@ L'algoritmo soffre anche di diverse problematiche:
 \end{itemize}
 
 \section{Introduzione a modelli di Deep Learning}\label{introduzione-a-modelli-di-deep-learning}
+
+\section{Evaluation}
+
+In un sistema di \textit{recommendation}, è fondamentale misurare l'efficacia delle raccomandazioni prodotte in base all'interazione dell'utente con gli \textit{item} proposti. Prima di poter elencare alcune delle metriche più utilizzate occorre specificare la notazione utilizzata:
+
+\begin{itemize}
+    \item $I_u^{rel}$ è l'insieme degli \textit{item} rilevanti per $u$, ovvero quelli per cui $r_{ui}$ è maggiore o uguale a una certa soglia di rilevanza (es. $4$ su una scala $1-5$) nel caso di feedback espliciti. Nel caso di feedback impliciti, $I_u^{rel}$ è l'insieme degli \textit{item} con cui l'utente ha \textit{interagito} (es. clic, acquisti, visualizzazioni, ascolti, ecc.). In un contesto di feedback implicito, l'interazione è sufficiente per considerare un \textit{item} come rilevante, senza la necessità di una soglia numerica.
+    \item $\hat{I}_u^K$ è l'insieme dei \textit{top-K item} raccomandati allo \textit{user} $u$, ottenuto ordinando in modo decrescente gli \textit{item} in $I \setminus I_u$ in base allo \textit{rating} $\hat{r}_{ui}$ o \textit{score} $\hat{x}_{ui}$, rispettivamente per feedback espliciti e impliciti, e prendendo i primi $K$.
+    \item L'insieme degli \textit{item} rilevanti tra i top-K per $u$ è dato da:
+    \[
+    I_u^{rel@K} = \hat{I}_u^K \cap I_u^{rel}
+    \]
+    che rappresenta il numero di \textit{item} che appaiono tra i top-K raccomandati e con cui l'utente ha già interagito o che risultano rilevanti a seconda che si tratti di feedback espliciti o impliciti.
+    \item L'insieme degli \textit{item} non rilevanti, ovvero quelli con cui l'utente non ha mai interagito, è dato da:
+    \[
+    I_u^{non-rel} = I \setminus I_u^{rel}
+    \]
+    che corrisponde agli \textit{item} mai interagiti dall'utente. Nel contesto dei feedback impliciti, questi \textit{item} potrebbero essere semplicemente quelli non ancora scoperti dall'utente, quindi la loro rilevanza non è assolutamente garantita.
+\end{itemize}
+
+
+
+
+Di seguito sono presentate le definizioni formali di ciascuna di queste metriche.
+
+Le prime due metriche hanno senso solamente per feedback espliciti in quanto restituiscono un \textit{rating}:
+
+\begin{itemize}
+    \item Root Mean Squared Error (RMSE).\\
+    Errore quadratico medio tra i punteggi previsti e quelli reali; penalizza di più gli errori grandi.
+    \[
+    \text{RMSE} = \sqrt{ \frac{1}{|\hat{R}|} \sum_{\hat{r}_{ui} \in \hat{R}} (\hat{r}_{ui} - r_{ui})^2 }
+    \]
+    
+    \item Mean Absolute Error (MAE).\\
+    Errore assoluto medio tra le predizioni e i valori reali; più facile da interpretare rispetto a RMSE.
+    \[
+    \text{MAE} = \frac{1}{|\hat{R}|} \sum_{\hat{r}_{ui} \in \hat{R}} |\hat{r}_{ui} - r_{ui}|
+    \]
+\end{itemize}   
+
+Le seguenti metriche valgono sia per feedback impliciti che espliciti:
+
+\begin{itemize}
+    \item Precision@K.\\
+    Frazione dei top-K \textit{item} raccomandati che sono effettivamente rilevanti.
+    \[
+    \text{Precision@K}(u) = \frac{|I_u^{rel@K}|}{K}
+    \]
+    
+    \item Recall@K.\\
+    Frazione degli \textit{item} rilevanti che sono stati inclusi nei top-K raccomandati.
+    \[
+    \text{Recall@K}(u) = \frac{|I_u^{rel@K}|}{|I_u^{rel}|}
+    \]
+    
+    \item F1@K.\\
+    Media armonica tra precision@K e recall@K; è alta solo se entrambe le metriche sono alte.
+    \[
+    \text{F1@K}(u) = 2 \cdot \frac{\text{Precision@K}(u) \cdot \text{Recall@K}(u)}{\text{Precision@K}(u) + \text{Recall@K}(u)}
+    \]
+    
+    \item Area Under the ROC Curve (AUC).\\
+    Probabilità che un \textit{item} rilevante riceva uno score più alto rispetto a un \textit{item} non rilevante.
+    \[
+    \text{AUC}(u) = \frac{1}{|I_u^{rel}| \cdot |I_u^{non-rel}|} \sum_{i \in I_u^{rel}} \sum_{j \in I_u^{non-rel}} \mathbf{1}\{\hat{r}_{ui} > \hat{r}_{uj}\}
+    \]
+    
+    \item Normalized Discounted Cumulative Gain (NDCG@K).\\
+    Premia le raccomandazioni rilevanti che si trovano in alto nella lista, simulando la probabilità che vengano viste.
+    \[
+    \text{DCG@K}(u) = \sum_{k=1}^{K} \frac{\mathbf{1}\{i_k \in I_u^{rel}\}}{\log_2(k + 1)}
+    \]
+    \[
+    \text{IDCG@K}(u) = \sum_{k=1}^{\min(K, |I_u^{rel}|)} \frac{1}{\log_2(k + 1)}
+    \]
+    \[
+    \text{NDCG@K}(u) = \frac{\text{DCG@K}(u)}{\text{IDCG@K}(u)}
+    \]
+\end{itemize}
