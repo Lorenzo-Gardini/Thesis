@@ -2,14 +2,14 @@
 
 \section{Introduzione}
 
-Come fa \textit{Spotify} a sapere quale canzone potresti voler ascoltare? E come fa \textit{Netflix} a suggerirti la prossima serie da guardare? Questo è possibile grazie al modello di \textit{recommendation} basato su \textit{machine learning} che analizza cosa piace all'utente e gli propone contenuti su misura. Di solito si utilizzano due tipi principali di raccomandazioni:
+Come fa \textit{Spotify} a sapere quale canzone l'utente vorrebbe ascoltare? E come fa \textit{Netflix} a suggerire la prossima serie da guardare? Questo è possibile grazie al modello di \textit{recommendation} basato su \textit{machine learning} che analizza cosa piace all'utente e gli propone contenuti su misura. Di solito si utilizzano due tipi principali di raccomandazioni:
 
 \begin{itemize}
-    \item per la \textit{home page}: i consigli sono personalizzati per un utente in base ai suoi interessi. Ogni utente vede consigli diversi
-    \item su articoli correlati: sono consigli simili a un di un articolo specifico. Per esempio in Google Play, gli utenti che visualizzano la pagina di un'app di matematica potrebbero vedere anche un riquadro con app correlate, come altre app di matematica o di scienze
+    \item per la \textit{home page}: sono raccomandazioni personalizzati per un utente in base ai suoi interessi. Ogni utente vede articoli diversi
+    \item su articoli correlati: sono raccomandazioni simili a un articolo specifico. Per esempio in \textit{Google Play}, gli utenti che visualizzano la pagina di un'app di matematica potrebbero vedere anche un riquadro con app correlate, come altre app di matematica o di scienze
 \end{itemize}
 
-Un sistema di \textit{recommendation} aiuta gli utenti a scoprire contenuti interessanti all'interno di un'enorme quantità di dati. Per esempio su YouTube ci sono miliardi di video, con nuovi contenuti che vengono aggiunti ogni giorno. Come può un utente trovare qualcosa di nuovo che valga la pena guardare o provare? La ricerca manuale è un'opzione. Tuttavia, un motore di raccomandazione è in grado di suggerire contenuti che magari l'utente non avrebbe mai pensato di cercare da solo. Basti sapere che, secondo quanto dice \textit{Google}:
+Un sistema di \textit{recommendation} aiuta gli utenti a scoprire contenuti interessanti all'interno di un'enorme quantità di dati. Per esempio su \textit{YouTube} ci sono miliardi di video, con nuovi contenuti che vengono aggiunti ogni giorno. Come può un utente trovare qualcosa di nuovo che valga la pena guardare o provare? La ricerca manuale è un'opzione. Tuttavia, un motore di raccomandazione è in grado di suggerire contenuti che magari l'utente non avrebbe mai pensato di cercare da solo. Basti sapere che, secondo quanto dice la pagina di \href{https://developers.google.com/machine-learning/recommendation/overview}{Google Developers - Recommendation Systems Overview}:
 
 \begin{itemize}
     \item il 40\% delle app installate dal \textit{Google Play} derivano da raccomandazioni
@@ -21,8 +21,8 @@ Un sistema di \textit{recommendation} aiuta gli utenti a scoprire contenuti inte
 Ci sono alcuni termini da introdurre:
 
 \begin{itemize}
-    \item \textit{item}: sono gli elementi/entità consigliate dal sistema. Su \textit{Spotify} sono le canzoni, su \textit{Amazon} sono i prodotti, su \textit{Intragram} sono i \textit{post}
-    \item \textit{query}: sono le informazioni utilizzate da un sistema per fornire consigli. Le \textit{query} possono essere una combinazione di informazioni dell'utente (e.g. ID, elementi con i quali ha interagito in passato etc.) e contesto aggiuntivo (e.g. ora del giorno, per quanto tempo ha osservato quel prodotto o quell'episodio etc.)
+    \item \textit{item}: sono gli elementi/entità raccomandate dal sistema. Su \textit{Spotify} sono le canzoni, su \textit{Amazon} sono i prodotti, su \textit{Intragram} sono i \textit{post}
+    \item \textit{query}: sono le informazioni utilizzate da un sistema per fornire raccomandazioni. Le \textit{query} possono essere una combinazione di informazioni dell'utente (e.g. ID, elementi con i quali ha interagito in passato etc.) e contesto aggiuntivo (e.g. ora del giorno, per quanto tempo ha osservato quel prodotto o quell'episodio etc.)
 \end{itemize}
 
 I passaggi tipici che ti utilizzano sono: 
@@ -30,13 +30,14 @@ I passaggi tipici che ti utilizzano sono:
 \begin{enumerate}
     \item generazione dei candidati: il sistema parte da un corpus di \textit{item}, potenzialmente enorme, e ne estrae un sottoinsieme molto più piccolo di candidati
     \item calcolo dello \textit{score}: un altro modello, più preciso del primo dato che lavora su una quantità molto minore di dati, assegna un punteggio ai candidati
-    \item \textit{re-ranking}: i candidati vengono ordinati per lo score ricevuto considerando eventuali ulteriori vincoli (e.g. rimuovendo contenuti che l'utente ha segnalato come non graditi, oppure aumentare il punteggio di contenuti più recenti). Il riordinamento può garantire maggiore varietà, attualità e imparzialità.
+    \item \textit{re-ranking}: i candidati vengono ordinati per lo score ricevuto considerando eventuali ulteriori vincoli (e.g. rimuovendo contenuti che l'utente ha segnalato come non graditi, oppure aumentare il punteggio di contenuti più recenti). Il riordinamento può garantire maggiore varietà, attualità e imparzialità
 \end{enumerate}
 
 \section{Generazione dei candidati}\label{generazione_dei_candidati}
 
-\subsubsection{Embedding}
+La descrizione che segue riguarda soprattutto i metodi più moderni: alcuni algoritmi come \textit{KNN}~\ref{knn} o \textit{SlopeOne}~\ref{slopeone} utilizzano metodi più semplici ma comunque efficaci per il calcolo delle raccomandazioni.
 
+\subsubsection{Embedding}
 Gli \textit{item} e le \textit{query} vengono mappati su  vettore di \textit{embedding} in uno spazio comune $E = \mathbb{R}^k$. Normalmente lo spazio di \textit{embedding} ha una dimensione molto più piccola rispetto alla grandezza del corpus e cattura alcune strutture latenti dell'insieme di \textit{item} o \textit{query}. Gli elementi tra loro simili finiscono per essere vicini nello spazio di \textit{embedding}. Il concetto di ``vicinanza" è definito da una misura di similarità.
  
 \subsubsection{Calcolo della similarità}
@@ -55,7 +56,7 @@ Per determinare il grado di similarità, la maggior parte dei sistemi di \textit
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.8]{figures/embedding.PNG}
-    \caption{Il vettore nero illustra l'\textit{embedding} della query. Gli altri tre vettori di \textit{embedding} (\textit{Item A}, \textit{Item B}, \textit{Item C}) rappresentano gli \text{item} candidati. A seconda della misura di similarità utilizzata, la classifica degli elementi può essere diversa}
+    \caption{Il vettore nero illustra l'\textit{embedding} della \textit{query}. Gli altri tre vettori di \textit{embedding} (\textit{Item A}, \textit{Item B}, \textit{Item C}) rappresentano gli \textit{item} candidati. A seconda della misura di similarità utilizzata, la classifica degli elementi può essere diversa}
     \label{fig:embedding}
 \end{figure}
 
@@ -81,11 +82,11 @@ L'idea è che se ad un utente è piaciuto un certo \textit{item} con certe carat
 
 Per prima cosa si crea un profilo degli \textit{item}, cioè viene rappresentato tramite un insieme di caratteristiche (\textit{feature}). Per un film, per esempio, si possono utilizzare il/i generi, gli attori principali, l'anno di uscita, la durata etc.
 
-Dopodiché si costruisce un profilo dell'utente analizzando gli oggetti che ha valutato positivamente. Il profilo rappresenta una media delle caratteristiche degli oggetti preferiti.
+Dopodiché si costruisce un profilo dell'utente analizzando gli \textit{item} che ha valutato positivamente. Il profilo rappresenta una media delle caratteristiche degli {item} preferiti.
 
 Si confronta il profilo dell'utente con gli \textit{item} non ancora visti usando una metrica di similarità (es. coseno, distanza euclidea~\ref{generazione_dei_candidati}).
 
-vengono raccomandati gli \textit{item} più simili al profilo dell'utente.
+Vengono raccomandati gli \textit{item} più simili al profilo dell'utente.
 
 \subsubsection{Esempio}
 
@@ -125,7 +126,7 @@ Si creano vettori per i film considerando tutti i generi analizzati fino ad ora 
 
 I vantaggi di quest'approccio sono:
 \begin{itemize}
-    \item il modello non ha bisogno di dati su altri utenti, poiché le raccomandazioni sono specifiche per questo utente. questo lo rende più facile da scalare a un grande numero di utenti
+    \item il modello non ha bisogno di dati su altri utenti, poiché le raccomandazioni sono specifiche per questo utente. Questo lo rende più facile da scalare a un grande numero di utenti
     \item il modello può catturare gli interessi specifici di un utente e può raccomandare \textit{item} di nicchia che interessano a pochissimi altri utenti
 \end{itemize}
 
@@ -142,12 +143,12 @@ Per affrontare alcune delle limitazioni del \textit{content-base filtering}, il 
 Si consideri un sistema di raccomandazione di film in cui i dati di addestramento consistono in una matrice di feedback in cui:
 
 \begin{itemize}
-    \item Ogni riga rappresenta un utente.
-    \item Ogni colonna rappresenta un \textit{item} (un film).
+    \item Ogni riga rappresenta un utente
+    \item Ogni colonna rappresenta un \textit{item} (un film)
     \item Il feedback sui film rientra in una delle due categorie:
     \begin{itemize}
-        \item esplicito: gli utenti specificano quanto gli è piaciuto un determinato film fornendo una valutazione numerica.
-        \item implicito: se un utente guarda un film, il sistema deduce che l'utente è interessato.
+        \item esplicito: gli utenti specificano quanto gli è piaciuto un determinato film fornendo una valutazione numerica
+        \item implicito: se un utente guarda un film, il sistema deduce che l'utente è interessato
     \end{itemize}
 \end{itemize}
 
@@ -226,13 +227,13 @@ Gli svantaggi di quest'approccio sono:
     \min_x \sum_{i}(r_{ui} - x^T u_i)^2
     \]
 
-    Gli \textit{embedding} dell'utente vengono mantenuti fissi, e il sistema risolve per ottenere l'\textit{embedding} dell'\textit{item}. Lo stesso approccio può essere utilizzato per un nuovo utente.
+    Gli \textit{embedding} dell'utente vengono mantenuti fissi, e il sistema risolve per ottenere l'\textit{embedding} dell'\textit{item}. Lo stesso approccio può essere utilizzato per un nuovo utente
     \item euristiche: se il sistema non ha interazioni, può approssimare l'\textit{embedding} di un \textit{item} facendo la media degli \textit{embedding} di \textit{item} appartenenti alla stessa categoria
   \end{itemize}
 
   \item difficoltà nell'includere caratteristiche aggiuntive per \textit{query}/\textit{item}: le caratteristiche aggiuntive (\textit{side features}) sono tutte quelle informazioni oltre all'ID della query o dell'\text{item}. Per esempio, per i film, le caratteristiche possono includere il paese o l'età. Includere queste caratteristiche migliora la qualità del modello
 
-  Per generalizzare WALS, si può estendere la matrice di input includendo le caratteristiche, definendo una matrice a blocchi $\tilde{R}$:
+  Per generalizzare alcuni algoritmi, ad esempio \textit{WALS}~\ref{als} (\textit{Weighted Alternating Least Squares}, metodo di \textit{Matrix Factorization}~\ref{matrix_factorization}), si può estendere la matrice di input includendo le caratteristiche, definendo una matrice a blocchi $\tilde{R}$:
 
   \[
   \tilde{R} = \begin{bmatrix}
@@ -244,9 +245,9 @@ Gli svantaggi di quest'approccio sono:
   dove:
   \begin{itemize}
     \item $R$ è la matrice di feedback tra utenti e \textit{item};
-    \item $U_f$ è una codifica multi-hot delle feature degli utenti (per esempio età, paese, genere);
-    \item $I_f$ è una codifica multi-hot delle feature degli \textit{item} (per esempio categoria, lingua, creatore);
-    \item $0$ è una matrice di zeri, che rappresenta l'assenza di interazioni dirette tra le feature utente e quelle degli \textit{item}.
+    \item $U_f$ è una codifica multi-hot delle feature degli utenti (per esempio età, paese, genere)
+    \item $I_f$ è una codifica multi-hot delle feature degli \textit{item} (per esempio categoria, lingua, creatore)
+    \item $0$ è una matrice di zeri, che rappresenta l'assenza di interazioni dirette tra le feature utente e quelle degli \textit{item}
   \end{itemize}
 \end{itemize}
 
@@ -256,11 +257,11 @@ Gli svantaggi di quest'approccio sono:
 Esistono due approcci principali per facilitare tale confronto, che costituiscono le due tecniche fondamentali del \textit{collaborative filtering}: 
 
 \begin{itemize}
-    \item approcci \textit{neighborhood}: si concentrano sulle relazioni tra item oppure, alternativamente, tra utenti. Un approccio \textit{item}-\textit{item} modella la preferenza di un utente per un \textit{item} sulla base delle valutazioni di \textit{item} simili da parte dello stesso utente
+    \item approcci \textit{neighborhood}: si concentrano sulle relazioni tra \textit{item} oppure, alternativamente, tra utenti. Un approccio \textit{item}-\textit{item} modella la preferenza di un utente per un \textit{item} sulla base delle valutazioni di \textit{item} simili da parte dello stesso utente
     \item modelli basati sulla \textit{Matrix Factorization}: un approccio in cui sia gli \textit{item} che gli utenti vengono proiettati in uno stesso spazio latente, cercando di spiegare le valutazioni osservate attraverso fattori latenti inferiti automaticamente dai feedback
 \end{itemize}
 
-\section{Matrix Factorization}
+\section{Matrix Factorization}\label{matrix_factorization}
 
 La \textit{Matrix Factorization} è una tecnica utilizzata per rappresentare una matrice come prodotto di due o più matrici. Consente di estrarre strutture latenti dai dati, rendendo possibile la scoperta di relazioni implicite tra entità \cite{MC}.
 
@@ -288,7 +289,7 @@ Questa approssimazione riduce la dimensionalità dei dati, semplifica il modello
 
 Un celebre esempio dell'efficacia di questa tecnica nei sistemi di \textit{recommendation} è il \textit{Netflix Prize} del 2006. Il team vincente la utilizzò per migliorare le previsioni di rating del 10\% rispetto al sistema originario di Netflix \cite{TheNP}.
 
-I principali vantaggi nel suo utilizzo sono la scalabilità, poiché i modelli sono efficienti da memorizzare e computare, e la capacità di generalizzazione, in quanto riescono a catturare relazioni latenti non esplicitamente osservate. Tuttavia, esistono anche alcuni limiti, tra cui il problema della \textit{cold start}, che rende difficile raccomandare per nuovi utenti o nuovi item, e la sparsità, che può portare a una una bassa qualità delle raccomandazioni\cite{SVD_analysis}.
+I principali vantaggi nel suo utilizzo sono la scalabilità, poiché i modelli sono efficienti da memorizzare e computare, e la capacità di generalizzazione, in quanto riescono a catturare relazioni latenti non esplicitamente osservate. Tuttavia, esistono anche alcuni limiti, tra cui il problema della \textit{cold start}, che rende difficile raccomandare per nuovi utenti o nuovi \textit{item}, e la sparsità, che può portare a una una bassa qualità delle raccomandazioni\cite{SVD_analysis}.
 
 Pur con alcune limitazioni, essa costituisce la base per molti degli algoritmi di \textit{recommendation} più efficaci oggi in uso, ed è spesso integrata con approcci più complessi, come i modelli Deep Learning o i grafi.
 
@@ -327,9 +328,9 @@ Il feedback implicito, al contrario, non è fornito direttamente dall'utente, ma
     \item acquisto o meno di un prodotto
 \end{itemize}
 
-I feedback impliciti possono essere raccolti facilmente in modo automatico e passivo senza che l'utente debba interagire intenzionalmente. Inoltre, sono molto più abbondando rispetto alla controparte esplicita. Forniscono una rappresentazione più completa del comportamento degli utenti, specialmente in contesti in cui il feedback esplicito è assente o insufficiente.
+I feedback impliciti possono essere raccolti facilmente in modo automatico e passivo senza che l'utente debba interagire intenzionalmente. Inoltre, sono molto più abbondanti rispetto alla controparte esplicita. Forniscono una rappresentazione più completa del comportamento degli utenti, specialmente in contesti in cui il feedback esplicito è assente o insufficiente.
 
-I modelli che utilizzano feedback impliciti non forniscono un \textit{rating} ma uno \textit{score} numerico per la coppia utente-\textit{item}. Questo numero da solo non ha alcun significato, ma messo in relazioni con altri \textit{score}, calcolati per lo stesso utente con \textit{item} diversi, permette di ordinare gli \textit{item} in base alla preferenza predetta dell'utente.
+I modelli che utilizzano feedback impliciti non forniscono un \textit{rating} ma uno \textit{score} numerico per la coppia utente-\textit{item}. Questo numero da solo non ha alcun significato, ma messo in relazioni con altri \textit{score}, calcolati per lo stesso utente con \textit{item} diversi, permette di ordinare gli \textit{item} in base alla preferenza predetta per l'utente.
 
 L'utilizzo di dati impliciti può creare complicazioni:
 

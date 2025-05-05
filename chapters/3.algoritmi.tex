@@ -1,5 +1,7 @@
 \chapter{Algoritmi}\label{algoritmi}
 
+In questo capitolo vengono presentati alcuni degli algoritmi più utilizzati in letteratura per feedback impliciti ed espliciti.
+
 \section{Notazione}\label{notazione}
 
 La notazione utilizzata è la seguente:
@@ -10,42 +12,45 @@ La notazione utilizzata è la seguente:
     \item \textit{rating}: valutazione/i
     \item $m$: numero di \textit{user}
     \item $n$: numero di \textit{item}
-    \item $R$: l'insieme di tutti i \textit{rating}/interazioni.
-    \item $R_{train}$, $R_{test}$ e $\hat{R}$ indicano il \textit{training set}, il \textit{test set} e l'insieme dei \textit{rating} previsti.
-    \item $U$ : l'insieme di tutti gli \textit{user}. $u$ e $v$ indicano gli \textit{user}.
-    \item $I$ : l'insieme di tutti gli \textit{item}. $i$ e $j$ indicano gli \textit{item}.
-    \item $U_i$ : l'insieme di tutti gli \textit{user} che hanno valutato l'\textit{item} $i$.
-    \item $U_{ij}$ : l'insieme di tutti gli \textit{user} che hanno valutato sia l'\textit{item} $i$ che l'\textit{item} $j$.
-    \item $I_u$ : l'insieme di tutti gli \textit{item} valutati dallo \textit{user} $u$.
-    \item $I_{uv}$ : l'insieme di tutti gli \textit{item} valutati sia dallo \textit{user} $u$ che dallo \textit{user} $v$.
-    \item $r_{ui}$ : il \textit{rating} \textit{vero} dello \textit{user} $u$ per l'\textit{item} $i$.
-    \item $\hat{r}_{ui}$ : il \textit{rating} \textit{stimato} dello \textit{user} $u$ per l'\textit{item} $i$.
-    \item $b_{ui}$ : il \textit{rating} di base dello \textit{user} $u$ per l'\textit{item} $i$.
-    \item $\mu$ : la media di tutti i \textit{rating}.
-    \item $\mu_u$ : la media di tutti i \textit{rating} dati dallo \textit{user} $u$.
-    \item $\mu_i$ : la media di tutti i \textit{rating} date all'\textit{item} $i$.
-    \item $\sigma_u$ : la deviazione standard di tutti i \textit{rating} dati dallo \textit{user} $u$.
-    \item $\sigma_i$ : la deviazione standard di tutte le valutazioni date all'\textit{item} $i$.
-    \item $N_i^k(u)$ : i $k$ vicini più prossimi dello \textit{user} $u$ che hanno valutato l'\textit{item} $i$. Questo insieme è calcolato utilizzando una metrica di similarità.
-    \item $N_u^k(i)$ : i $k$ vicini più prossimi dell'\textit{item} $i$ che sono valutati dallo \textit{user} $u$. Questo insieme è calcolato utilizzando una metrica di similarità.
-    \item $\gamma$: iperparametro, il \textit{learning rate} utilizzato per l'algoritmo SGD.
+    \item $R$: matrice che contiene l'insieme di tutti i \textit{rating}/interazioni (per i feedback impliciti)
+    \item $R_{train}$, $R_{test}$ e $\hat{R}$ indicano il \textit{training set}, il \textit{test set} e l'insieme dei \textit{rating} previsti
+    \item $U$ : l'insieme di tutti gli \textit{user} $u$ e $v$ indicano gli \textit{user}
+    \item $I$ : l'insieme di tutti gli \textit{item} $i$ e $j$ indicano gli \textit{item}
+    \item $U_i$ : l'insieme di tutti gli \textit{user} che hanno valutato l'\textit{item} $i$
+    \item $U_{ij}$ : l'insieme di tutti gli \textit{user} che hanno valutato sia l'\textit{item} $i$ che l'\textit{item} $j$
+    \item $I_u$ : l'insieme di tutti gli \textit{item} valutati dallo \textit{user} $u$
+    \item $I_{uv}$ : l'insieme di tutti gli \textit{item} valutati sia dallo \textit{user} $u$ che dallo \textit{user} $v$
+    \item $r_{ui}$ : il \textit{rating} \textit{vero} dello \textit{user} $u$ per l'\textit{item} $i$
+    \item $\hat{r}_{ui}$ : il \textit{rating} \textit{stimato} dello \textit{user} $u$ per l'\textit{item} $i$
+    \item $b_u$: \textit{bias} dello \textit{user} $u$, misura quanto in media lo \textit{user} tende a dare valutazioni più alte o più basse rispetto alla media generale. Se tende sempre a dare voti più alti della media $b_u$ sarà positivo; se tende a dare voti più bassi, sarà negativo
+    \item $b_u$: \textit{bias} dell'\textit{item} $i$, misura quanto un \textit{item} tende a ricevere valutazioni più alte o più basse rispetto alla media, indipendentemente dallo \textit{user}. Per esempio, un \textit{item} molto popolare potrebbe avere un $b_u$ positivo perché riceve in media voti più alti rispetto alla media generale
+    \item $b_{ui}$ : il \textit{rating} di base dello \textit{user} $u$ per l'\textit{item} $i$, viene definito \textit{baseline estimate}: $b_{ui} = \mu + b_u + b_i$
+    \item $\mu$ : la media di tutti i \textit{rating}
+    \item $\mu_u$ : la media di tutti i \textit{rating} dati dallo \textit{user} $u$
+    \item $\mu_i$ : la media di tutti i \textit{rating} date all'\textit{item} $i$
+    \item $\sigma_u$ : la deviazione standard di tutti i \textit{rating} dati dallo \textit{user} $u$
+    \item $\sigma_i$ : la deviazione standard di tutte le valutazioni date all'\textit{item} $i$
+    \item $N_i^k(u)$ : i $k$ vicini più prossimi dello \textit{user} $u$ che hanno valutato l'\textit{item} $i$. Questo insieme è calcolato utilizzando una metrica di similarità
+    \item $N_u^k(i)$ : i $k$ vicini più prossimi dell'\textit{item} $i$ che sono valutati dallo \textit{user} $u$. Questo insieme è calcolato utilizzando una metrica di similarità
+    \item $\gamma$: iperparametro, il \textit{learning rate} utilizzato per l'algoritmo \textit{Stocastic Gradient Descent}
     \item $\lambda$: iperparametro, corrisponde al fattore di regolarizzazione nella funzione obbiettivo
-    \item $\hat{x}_{uij}$: score che rappresenta la preferenza dello \textit{user} \textit{i} per l'\textit{item} \textit{i} rispetto all'\textit{item} \textit{j}
-    \item $N$: numero di epoche per l'algoritmo \textit{Gradient Descent}.
+    \item $\hat{x}_{uij}$: \textit{score} che rappresenta la preferenza dello \textit{user} \textit{i} per l'\textit{item} \textit{i} rispetto all'\textit{item} \textit{j}
+    \item $N$: numero di epoche per l'algoritmo \textit{Stocastic Gradient Descent}
+    \item $k$: dimensione dello spazio latente negli algoritmi di \textit{Matrix Factorization} o il numero dei \textit{neighbors} negli algoritmi della famiglia \textit{KNN}
 \end{itemize}
 
 \section{Algoritmi per il feedback esplicito}\label{algoritmi-per-feedback-esplicito}
 
-\subsection{SVD}\label{svd}
+\subsection{SVD (Singular Value Decomposition)}\label{svd}
 
-L'algoritmo SVD (\textit{singular value decomposition}), è stato reso popolare da Simon Funk durante la competizione \textit{the Netflix Prize} dimostrando come modelli di fattorizzazione matriciale sono superiori alle tecniche classiche basate su \textit{nearest neighbor}\ref{knn} per
+L'algoritmo SVD (\textit{Singular Value Decomposition}), è stato reso popolare da Simon Funk durante la competizione \textit{the Netflix Prize} dimostrando come modelli di fattorizzazione matriciale sono superiori alle tecniche classiche basate su \textit{nearest neighbor}\ref{knn} per
 la produzione di raccomandazioni.
 
-I modelli di \textit{matrix factorization} mappano gli \textit{user} e gli \textit{item} in uno spazio latente comune di dimensione $k$, che rappresenta il numero di caratteristiche latenti. Ogni \textit{item} $i$ è associato a un vettore $q_i$ di dimensione $k$, che misura quanto l'\textit{item} possieda ciascuna di queste caratteristiche latenti. Per ogni \textit{user} $u$, invece, il vettore $p_u$ misura l'interesse dello \textit{user} per gli \textit{item}. Il numero di fattori è un iperparametro dell'algoritmo.
+I modelli di \textit{Matrix Factorization} mappano gli \textit{user} e gli \textit{item} in uno spazio latente comune di dimensione $k$, che rappresenta il numero di caratteristiche latenti. Ogni \textit{item} $i$ è associato a un vettore $q_i$ di dimensione $k$, che misura quanto l'\textit{item} possieda ciascuna di queste caratteristiche latenti. Per ogni \textit{user} $u$, invece, il vettore $p_u$ misura l'interesse dello \textit{user} per gli \textit{item}. Il numero di fattori è un iperparametro dell'algoritmo.
 
-In questo spazio, le interazioni tra \textit{user} e \textit{item} vengono modellate come prodotti scalari tra i rispettivi vettori. Lo spazio latente cerca di spiegare i \textit{rating} caratterizzando sia gli \textit{item} che gli textit{user} in base a fattori che vengono automaticamente dedotti. Ad esempio, se gli \textit{item} sono film, i fattori potrebbero appresentare il genere piuttosto che un altro (e.g. Azione contro Drama), profondità della trama o il concetto di ``adatto ai bambini".
+In questo spazio, le interazioni tra \textit{user} e \textit{item} vengono modellate come prodotti scalari tra i rispettivi vettori. Lo spazio latente cerca di spiegare i \textit{rating} caratterizzando sia gli \textit{item} che gli \textit{user} in base a fattori che vengono automaticamente dedotti. Ad esempio, se gli \textit{item} sono film, i fattori potrebbero rappresentare il genere piuttosto che un altro (e.g. Azione piuttosto che Drama), profondità della trama o il concetto di ``adatto ai bambini".
 
-Il prodotto scalare risultante cattura l'interazione tra lo \textit{user} $u$ e l'\textit{item} $i$, che corrisponde all'interesse complessivo dello \textit{user} per le caratteristiche dell'\textit{item}. Il \textit{rating} finale viene ottenuto aggiungendo anche i predittori di base sopra menzionati, che dipendono solo dallo \textit{user} o dall'\textit{item}. Pertanto, un \textit{rating} viene predetto dalla regola~\cite{SVD_analysis}~\cite{Recommendation_book}:
+Il prodotto scalare risultante cattura l'interazione tra lo \textit{user} $u$ e l'\textit{item} $i$, che corrisponde all'interesse complessivo dello \textit{user} per le caratteristiche dell'\textit{item}. Il \textit{rating} finale viene ottenuto aggiungendo anche i predittori di base, che dipendono solo dallo \textit{user} o dall'\textit{item}. Pertanto, un \textit{rating} viene predetto dalla regola~\cite{SVD_analysis}~\cite{Recommendation_book}:
 
 \[
 \hat{r}_{ui} = \mu + b_u + b_i + q_i^T p_u
@@ -60,16 +65,16 @@ Dove:
 Se lo \textit{user} $u$ è sconosciuto, allora il bias $b_u$ e i fattori $p_u$ vengono considerati uguali a zero. Lo stesso vale per
 l'\textit{item} $i$, con $b_i$ e $q_i$ anch'essi assunti uguali a zero.
 
-Per apprendere i parametri del modello ($b_u$, $b_i$, $p_u$, $q_i$), si minimizza l'errore quadratico regolarizzato tra le \textit{rating} reali e quelle previste. L'errore quadratico è dato da:
+Per apprendere i parametri del modello ($b_u$, $b_i$, $p_u$, $q_i$), si minimizza l'errore quadratico regolarizzato tra i \textit{rating} reali e quelle previste. L'errore quadratico è dato da:
 
 \[
 \min \sum\limits_{(u,i) \in K} \left( (r_{ui} - \hat{r}_{ui})^2 + \lambda (\|q_i\|^2 + \|p_u\|^2 + b_u^2 + b_i^2) \right)
 \]
 
 
-Dove il primo termine è l'errore quadratico tra le \textit{rating} previste e reali e il secondo termine è la regolarizzazione, che penalizza valori troppo grandi per i parametri $b_u$, $b_i$, $p_u$, $q_i$ per evitare l'overfitting.
+Dove il primo termine è l'errore quadratico tra i \textit{rating} previste e reali e il secondo termine è la regolarizzazione, che penalizza valori troppo grandi per i parametri $b_u$, $b_i$, $p_u$, $q_i$ per evitare l'overfitting.
 
-Per ottimizzare questi parametri, viene usata la \textit{Stochastic Gradient Descent} (SGD), che aggiorna i parametri dopo ogni  esempio di training (ad esempio, per ogni \textit{rating} di un \textit{user}).
+Per ottimizzare questi parametri, viene utilizzato \textit{Stochastic Gradient Descent} (SGD), che aggiorna i parametri dopo ogni  esempio di training (ad esempio, per ogni \textit{rating} di un \textit{user}).
 
 Per ogni \textit{rating} ($r_{ui}$) data, viene fatta una previsione ($\hat{r}_{ui}$), e l'errore di previsione associato ($e_{ui} = r_{ui} - \hat{r}_{ui}$) viene calcolato. Per un dato caso di \textit{addestramento} ($r_{ui}$), modifichiamo i parametri spostandoci nella
 direzione opposta al gradiente, ottenendo:
@@ -90,21 +95,21 @@ Per ottenere un ulteriore miglioramento, si possono applicare $\gamma$ e $\lambd
 I punti di forza dell'algoritmo sono:
 
 \begin{itemize}
-    \item semplicità: l'algoritmo SVD è relativamente semplice da comprendere e implementare.
-    \item riduzione della dimensionalità: l'algoritmo permette di ridurre la dimensione del problema mappando sia gli \textit{user} che gli \textit{item} in uno spazio latente di dimensione inferiore, gestendo la sparsità delle matrici. Funziona molto bene quando la matrice delle valutazioni è abbastanza completa. 
-    \item caratteristiche latenti: identifica strutture sottostanti che non sono immediatamente evidenti.
+    \item semplicità: l'algoritmo SVD è relativamente semplice da comprendere e implementare
+    \item riduzione della dimensionalità: l'algoritmo permette di ridurre la dimensione del problema mappando sia gli \textit{user} che gli \textit{item} in uno spazio latente di dimensione inferiore, gestendo la sparsità delle matrici. Funziona molto bene quando la matrice delle valutazioni è abbastanza completa
+    \item caratteristiche latenti: identifica strutture sottostanti che non sono immediatamente evidenti
 \end{itemize}
 
 L'algoritmo soffre anche di diverse problematiche:
 
 \begin{itemize}
-    \item problemi con la sparsità: può produrre raccomandazioni imprecise quando la matrice delle valutazioni è troppo sparsa, perché la decomposizione non riesce a estrarre informazioni significative. 
-    \item non tiene conto di informazioni aggiuntive: non considera altri fattori come informazioni temporali, contenuti aggiuntivi sugli \textit{item} o preferenze esplicite/implicite dello \textit{user} che non sono registrati nella matrice.
-    \item computazionalmente costosa: la decomposizione di una matrice grande è costosa in termini di tempo e risorse.
-    \item overfitting: se non adeguatamente regolarizzato si rischia l'overfitting.
+    \item problemi con la sparsità: può produrre raccomandazioni imprecise quando la matrice delle valutazioni è troppo sparsa, perché la decomposizione non riesce a estrarre informazioni significative
+    \item non tiene conto di informazioni aggiuntive: non considera altri fattori come informazioni temporali, contenuti aggiuntivi sugli \textit{item} o preferenze esplicite/implicite dello \textit{user} che non sono registrati nella matrice
+    \item computazionalmente costosa: la decomposizione di una matrice grande è costosa in termini di tempo e risorse
+    \item overfitting: se non adeguatamente regolarizzato si rischia l'overfitting
 \end{itemize}
 
-\subsection{SVD\protect++}
+\subsection{SVD++}
 
 La precisione delle previsioni può essere migliorata considerando anche il feedback implicito, che fornisce un'indicazione aggiuntiva delle preferenze degli \textit{user}. Questo è particolarmente utile per gli \textit{user} che hanno fornito molto più feedback implicito che esplicito. Anche nei casi in cui il feedback implicito indipendente è assente, è possibile catturare un segnale significativo tenendo conto degli \textit{item} che gli \textit{user} hanno valutato, indipendentemente dal valore del \textit{rating}. Ciò ha portato a diversi metodi (\textit{Asymmetric-SVD}, \textit{SVD++}, \textit{SVD\_KNN}, ecc.~\cite{SVD++, SVD_KNN}) che modellano il fattore \textit{user} in base agli \textit{item} valutati. Il metodo \textit{SVD++} ha dimostrato di offrire una precisione superiore rispetto a \textit{SVD}.
 
@@ -116,7 +121,7 @@ Viene aggiunto un secondo set di fattori degli \textit{item}, che collega ogni \
 
 Ora, un \textit{user} $u$ viene modellato come $p_u + |I_u|^{\frac{1}{2}} \sum\limits_{j \in I_u} y_j$, mentre la parte $\sum\limits_{j \in I_u} y_j$ rappresenta i feedback impliciti. Poiché i vettori $y_j$ sono centrati intorno a zero grazie alla regolarizzazione $|I_u|^{\frac{1}{2}}$, la varianza rispetto all'intervallo di valori osservati $|I_u|$ viene stabilizzata.
 
-I parametri del modello vengono determinati minimizzando la funzione di errore quadratico regolarizzato, utilizzando sempre \textit{stochastic gradient descent}. Si itera su tutti i \textit{rating}:
+I parametri del modello vengono determinati minimizzando la funzione di errore quadratico regolarizzato, utilizzando sempre \textit{Stochastic Gradient Descent}. Si itera su tutti i \textit{rating}:
 
 \begin{itemize}
   \item $b_u \leftarrow b_u + \gamma \cdot (e_{ui} - \lambda \cdot b_u)$
@@ -131,22 +136,22 @@ I parametri del modello vengono determinati minimizzando la funzione di errore q
 I punti di forza dell'algoritmo sono:
 
 \begin{itemize}
-    \item miglioramento della personalizzazione: SVD++ è un miglioramento significativo rispetto a SVD, poiché prende in considerazione anche l'influenza degli \textit{item} che lo \textit{user} ha già valutato nel termine $\sum\limits_{j \in I_u} y_j$, il che lo rende molto più sensibile alle preferenze individuali dello \textit{user}.
-    \item migliore gestione della sparsità: poiché SVD++ tiene conto dei feedback impliciti, riesce a fare previsioni migliori anche quando la matrice delle valutazioni è sparsa.
-    \item previsioni più accurate: i feedback impliciti aiutano a produrre previsioni più accurate, soprattutto in scenari dove gli \textit{user} hanno interagito con più \textit{item}.
+    \item miglioramento della personalizzazione: SVD++ è un miglioramento significativo rispetto a SVD, poiché prende in considerazione anche l'influenza degli \textit{item} che lo \textit{user} ha già valutato nel termine $\sum\limits_{j \in I_u} y_j$, il che lo rende molto più sensibile alle preferenze individuali dello \textit{user}
+    \item migliore gestione della sparsità: poiché SVD++ tiene conto dei feedback impliciti, riesce a fare previsioni migliori anche quando la matrice delle valutazioni è sparsa
+    \item previsioni più accurate: i feedback impliciti aiutano a produrre previsioni più accurate, soprattutto in scenari dove gli \textit{user} hanno interagito con più \textit{item}
 \end{itemize}
 
 L'algoritmo soffre anche di diverse problematiche:
 
 \begin{itemize}
-    \item complessità computazionale maggiore: la necessità di aggiornare $y_i$ aumenta il carico computazionale.
-    \item richiede più dati: poiché prende in considerazione anche i feedback impliciti, ha bisogno di un numero maggiore di dati per generare previsioni precise.
-    \item overfitting: SVD++ è più propenso a overfitting su dataset piccoli.
+    \item complessità computazionale maggiore: la necessità di aggiornare $y_i$ aumenta il carico computazionale
+    \item richiede più dati: poiché prende in considerazione anche i feedback impliciti, ha bisogno di un numero maggiore di dati per generare previsioni precise
+    \item overfitting: SVD++ è più propenso a overfitting su dataset piccoli
 \end{itemize}
 
-\subsection{NMF}\label{nmf}
+\subsection{NMF (Non-Negative Matrix Factorization)}\label{nmf}
 
-Un algoritmo di \textit{collaborative filtering} basato sulla \textit{fattorizzazione matriciale non negativa}.  
+\textit{NMF} (\textit{Non-Negative Matrix Factorization}) è un algoritmo di \textit{collaborative filtering} basato sulla \textit{fattorizzazione matriciale non negativa}.  
 
 Questo algoritmo è molto simile a SVD\ref{svd} ma con una restrizione che tutti gli elementi devono essere non negativi. Questo ha senso, ad esempio, quando si tratta di rating o quantità (che non possono essere negativi).
 
@@ -185,7 +190,7 @@ In forma matriciale, questo si può esprimere come:
 
 dove $\| \cdot \|_F$ è la norma di Frobenius.
 
-La procedura di ottimizzazione è una SGD regolarizzata~\cite{NMF} con una scelta specifica della dimensione del passo che garantisce la non negatività dei fattori, a condizione che anche i loro valori iniziali siano positivi.
+La procedura di ottimizzazione è una \textit{SGD} regolarizzata~\cite{NMF} con una scelta specifica della dimensione del passo che garantisce la non negatività dei fattori, a condizione che anche i loro valori iniziali siano positivi.
 
 A ogni iterazione i fattori vengono aggiornati come segue:
 
@@ -198,31 +203,30 @@ A ogni iterazione i fattori vengono aggiornati come segue:
 
 Questo algoritmo è altamente dipendente dai valori iniziali con cui vengono inizializzate le matrici $H$ e $W$. I fattori latenti degli \textit{user} e degli \textit{item} vengono inizializzati casualmente in modo uniforme tra un minimo e un massimo, solitamente nell'intervallo $[0, 1]$.
 
-Gli iper-parametri $\lambda_u$ e $\lambda_i$ corrispondono alla regolarizzazione rispettivamente per \textit{user} e \textit{item}.
+Gli iperparametri $\lambda_u$ e $\lambda_i$ corrispondono alla regolarizzazione rispettivamente per \textit{user} e \textit{item}.
 
-Anche in questo caso si può utilizzare la predizione con l'utilizzo di baseline\ref{svd}.
+Anche in questo caso si può utilizzare la predizione con l'utilizzo di bias\ref{svd}.
 
 \[
 \hat{r}_{ui} = \mu + b_u + b_i + q_i^T p_u
 \]
 
-garantendo comunque fattori positivi. Le baselines sono ottimizzate nello stesso modo dell'algoritmo SVD. Pur producendo una migliore accuratezza, la versione che utilizza baseline sembra molto incline all'overfitting, che può essere ridotto diminuendo $k$ o aumentando la regolarizzazione.
+garantendo comunque fattori positivi. I bias sono ottimizzati nello stesso modo dell'algoritmo \textit{SVD}. Pur producendo una migliore accuratezza, la versione che utilizza i bias sembra molto incline all'overfitting, che può essere ridotto diminuendo $k$ o aumentando la regolarizzazione.
 
-NFM, grazie al vincolo della non negatività, è più interpretabile di SVD: i valori nelle matrici fattorizzate $W$ e $H$ sono tutti $\geq 0$, quindi possono essere interpretati come pesi o intensità (es. quanto uno \textit{user} apprezza un certo genere, quanto un \textit{item} rappresenta un tema).
+\textit{NFM}, grazie al vincolo della non negatività, è più interpretabile di \textit{SVD}: i valori nelle matrici fattorizzate $W$ e $H$ sono tutti $\geq 0$, quindi possono essere interpretati come pesi o intensità (es. quanto uno \textit{user} apprezza un certo genere, quanto un \textit{item} rappresenta un tema).
 
 L'algoritmo soffre anche di diverse problematiche:
 
 \begin{itemize}
     \item dipendenza dall'inizializzazione: l'algoritmo può convergere a minimi locali diversi a seconda dei valori iniziali, e non garantisce una soluzione unica o ottima
     
-    \item non adatta per dati con valori negativi: NMF non può gestire valori negativi nei dati di input, a differenza di SVD
-    
+    \item non adatta per dati con valori negativi: \textit{NMF} non può gestire valori negativi nei dati di input, a differenza di \textit{SVD}
     \item convergenza più lenta: rispetto ad altri metodi la convergenza può essere più lenta e richiede tuning di più parametri
-    \item mancanza di soluzione chiusa: SVD può gestire valori negativi e ha una soluzione ottima in termini di errore quadratico minimo
+    \item mancanza di soluzione chiusa: \textit{SVD} può gestire valori negativi e ha una soluzione ottima in termini di errore quadratico minimo
 \end{itemize}
 
 \subsection{KNN (K-Nearest Neighbors)}\label{knn}
-Si tratta di algoritmi derivati direttamente da un approccio di base basato sui \textit{nearest neighbors}.
+Si tratta di algoritmi derivati direttamente da un approccio di base basato sui \textit{Nearest Neighbors}.
 
 Gli algoritmi ispirati al KNN (\textit{K Nearest Neighbors}) sono una classe di algoritmi di \textit{recommendation} che si basano sull'idea che gli \textit{user} simili tendono a valutare gli stessi \textit{item} in modo simile. Questi algoritmi sono semplici da implementare e possono essere molto efficaci per problemi a piccola scala.
 
@@ -236,7 +240,7 @@ Alcune misure di similarità, sia per \textit{user} che per \textit{item}, sono:
         \[
         \text{cosine sim}(u, v) = \frac{\sum\limits_{i \in I_{uv}} r_{ui} \cdot r_{vi}}{\sqrt{\sum\limits_{i \in I_{uv}} r_{ui}^2} \cdot \sqrt{\sum\limits_{i \in I_{uv}} r_{vi}^2}}
         \]
-        oppure
+        oppure, per \textit{item}
         \[
         \text{cosine sim}(i, j) = \frac{\sum\limits_{u \in U_{ij}} r_{ui} \cdot r_{uj}}{\sqrt{\sum\limits_{u \in U_{ij}} r_{ui}^2} \cdot \sqrt{\sum\limits_{u \in U_{ij}} r_{uj}^2}}
         \]
@@ -244,7 +248,7 @@ Alcune misure di similarità, sia per \textit{user} che per \textit{item}, sono:
         \[
         \text{msd}(u, v) = \frac{1}{|I_{uv}|} \cdot \sum\limits_{i \in I_{uv}} (r_{ui} - r_{vi})^2
         \]
-        oppure
+        oppure, per \textit{item}
         \[
         \text{msd}(i, j) = \frac{1}{|U_{ij}|} \cdot \sum\limits_{u \in U_{ij}} (r_{ui} - r_{uj})^2
         \]
@@ -258,7 +262,7 @@ Alcune misure di similarità, sia per \textit{user} che per \textit{item}, sono:
         \[
         \text{pearson sim}(u, v) = \frac{\sum\limits_{i \in I_{uv}} (r_{ui} - \mu_u) \cdot (r_{vi} - \mu_v)}{\sqrt{\sum\limits_{i \in I_{uv}} (r_{ui} - \mu_u)^2} \cdot \sqrt{\sum\limits_{i \in I_{uv}} (r_{vi} - \mu_v)^2}}
         \]
-        oppure
+        oppure, per \textit{item}
         \[
         \text{pearson sim}(i, j) = \frac{\sum\limits_{u \in U_{ij}} (r_{ui} - \mu_i) \cdot (r_{uj} - \mu_j)}{\sqrt{\sum\limits_{u \in U_{ij}} (r_{ui} - \mu_i)^2} \cdot \sqrt{\sum\limits_{u \in U_{ij}} (r_{uj} - \mu_j)^2}}
         \]
@@ -266,7 +270,7 @@ Alcune misure di similarità, sia per \textit{user} che per \textit{item}, sono:
         \[
         \text{pearson baseline sim}(u, v) = \hat{\rho}_{uv} = \frac{\sum\limits_{i \in I_{uv}} (r_{ui} - b_{ui}) \cdot (r_{vi} - b_{vi})}{\sqrt{\sum\limits_{i \in I_{uv}} (r_{ui} - b_{ui})^2} \cdot \sqrt{\sum\limits_{i \in I_{uv}} (r_{vi} - b_{vi})^2}}
         \]
-        oppure
+        oppure, per \textit{item}
         \[
         \text{pearson baseline sim}(i, j) = \hat{\rho}_{ij} = \frac{\sum\limits_{u \in U_{ij}} (r_{ui} - b_{ui}) \cdot (r_{uj} - b_{uj})}{\sqrt{\sum\limits_{u \in U_{ij}} (r_{ui} - b_{ui})^2} \cdot \sqrt{\sum\limits_{u \in U_{ij}} (r_{uj} - b_{uj})^2}}
         \]
@@ -290,7 +294,7 @@ La predizione viene calcolata come:
 \hat{r}_{ui} = \frac{\sum\limits_{v \in N^k_i(u)} \text{sim}(u, v) \cdot r_{vi}}{\sum\limits_{v \in N^k_i(u)} \text{sim}(u, v)}
 \]
 
-oppure
+oppure, per \textit{item}
 
 \[
 \hat{r}_{ui} = \frac{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j) \cdot r_{uj}}{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j)}
@@ -299,9 +303,8 @@ oppure
 dipendentemente dall'approccio utilizzato.
 
 \subsubsection{KNN con la media}
-\label{algoritmo-knn-con-la-media}
 
-L'algoritmo è una variante dell'algoritmo KNN base che tiene conto della media dei \textit{rating} degli \textit{user} o degli \textit{item}.
+L'algoritmo è una variante dell'algoritmo \textit{KNN} base che tiene conto della media dei \textit{rating} degli \textit{user} o degli \textit{item}.
 
 La predizione viene calcolata come:
 
@@ -309,7 +312,7 @@ La predizione viene calcolata come:
 \hat{r}_{ui} = \mu_u + \frac{\sum\limits_{v \in N_k(u)} \text{sim}(u, v) \cdot (r_{vi} - \mu_v)}{\sum\limits_{v \in N_k(u)} \text{sim}(u, v)}
 \]
 
-oppure
+oppure, per \textit{item}
 
 \[
 \hat{r}_{ui} = \mu_i + \frac{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j) \cdot (r_{uj} - \mu_j)}{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j)}
@@ -318,7 +321,6 @@ oppure
 dipendentemente dall'approccio utilizzato.
 
 \subsubsection{KNN normalizzato}
-\label{algoritmo-knn-normalizzato}
 
 L'algoritmo è una variante dell'algoritmo che utilizza la media con l'aggiunta della normalizzazione \textit{z-score}, con la deviazione standard dello \textit{user} o dell'\textit{item}, dei \textit{rating} corrispondenti prima di calcolare la similarità.
 
@@ -328,7 +330,7 @@ La predizione viene calcolata come:
 \hat{r}_{ui} = \mu_u + \sigma_u \frac{\sum\limits_{v \in N^k_i(u)} \text{sim}(u, v) \cdot (r_{vi} - \mu_v) / \sigma_v}{\sum\limits_{v \in N^k_i(u)} \text{sim}(u, v)}
 \]
 
-oppure
+oppure, per \textit{item}
 
 \[
 \hat{r}_{ui} = \mu_i + \sigma_i \frac{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j) \cdot (r_{uj} - \mu_j) / \sigma_j}{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j)}
@@ -337,9 +339,8 @@ oppure
 dipendentemente dall'approccio utilizzato.
 
 \subsubsection{KNN con baseline}\label{knn_baseline}
-\label{knn-con-baseline}
 
-L'algoritmo KNN con baseline \cite{KNN_baseline} è una variante dell'algoritmo base che tiene conto degli effetti di bias degli \textit{user} o degli \textit{item}.
+L'algoritmo KNN con baseline~\cite{KNN_baseline} è una variante dell'algoritmo base che tiene conto degli effetti dei bias degli \textit{user} o degli \textit{item}.
 
 La predizione viene calcolata come:
 
@@ -347,7 +348,7 @@ La predizione viene calcolata come:
 \hat{r}_{ui} = b_{ui} + \frac{\sum\limits_{v \in N^k_i(u)} \text{sim}(u, v) \cdot (r_{vi} - b_{vi})}{\sum\limits_{v \in N^k_i(u)} \text{sim}(u, v)}
 \]
 
-oppure
+oppure, per \textit{item}
 
 \[
 \hat{r}_{ui} = b_{ui} + \frac{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j) \cdot (r_{uj} - b_{uj})}{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j)}
@@ -383,27 +384,27 @@ e
 b_u = \frac{\sum\limits_{r_{ui} \in R_{train}} (r_{ui} - \mu - b_i)}{\lambda_3 + |I_u|}
 \]
 
-I punti di forza della famiglia di algoritmi KNN sono:
+I punti di forza della famiglia di algoritmi \textit{KNN} sono:
 \begin{itemize}
-    \item semplicità: Gli algoritmi KNN sono facili da capire e implementare. L'idea di base di trovare ``vicini" simili è intuitiva e facilmente comprensibile.
-    \item nessuna assunzione sui dati: l'algoritmo non fa assunzioni sulla distribuzione dei dati. Questo lo rende flessibile e adatto a una varietà di dataset.
-    \item aggiornamento: l'aggiunta di nuovi dati non richiede una fase di addestramento esplicita. Questo lo rende utile in ambienti in cui i dati cambiano frequentemente o per previsioni online.
-    \item flessibilità: KNN può essere utilizzato sia per problemi di \textit{recommendation} basati su \textit{user} che basati su \textit{item}.
+    \item semplicità: Gli algoritmi \textit{KNN} sono facili da capire e implementare. L'idea di base di trovare ``vicini" simili è intuitiva e facilmente comprensibile
+    \item nessuna assunzione sui dati: l'algoritmo non fa assunzioni sulla distribuzione dei dati. Questo lo rende flessibile e adatto a una varietà di dataset
+    \item aggiornamento: l'aggiunta di nuovi dati non richiede una fase di addestramento esplicita. Questo lo rende utile in ambienti in cui i dati cambiano frequentemente o per previsioni online
+    \item flessibilità: \textit{KNN} può essere utilizzato sia per problemi di \textit{recommendation} basati su \textit{user} che basati su \textit{item}
 \end{itemize}
 
 Gli algoritmi soffrono anche di diverse problematiche:
 \begin{itemize}
-    \item costo computazionale: KNN può essere computazionalmente costoso, soprattutto con set di dati di grandi dimensioni.
-    \item requisiti di memoria: KNN richiede la memorizzazione dell'intero set di dati, il che può essere problematico per set di dati molto grandi.
-    \item sensibilità alla scelta di $k$: La scelta del valore di k può avere un impatto significativo sulle prestazioni di KNN. Un valore di k troppo piccolo può portare a un overfitting, mentre un valore di k troppo grande può portare a un underfitting. Inoltre, la ricerca dei $k$ vicini più prossimi richiede il calcolo delle distanze tra tutti i punti dati.
-    \item gestione della sparsità dei dati: la sparsità può rendere difficile trovare vicini significativi e quindi portare a raccomandazioni di bassa qualità.
+    \item costo computazionale: \textit{KNN} può essere computazionalmente costoso, soprattutto con set di dati di grandi dimensioni
+    \item requisiti di memoria: \textit{KNN} richiede la memorizzazione dell'intero set di dati, il che può essere problematico per set di dati molto grandi
+    \item sensibilità alla scelta di $k$: La scelta del valore di $k$ può avere un impatto significativo sulle prestazioni di \textit{KNN}. Un valore di $k$ troppo piccolo può portare a un overfitting, mentre un valore di $k$ troppo grande può portare a un underfitting. Inoltre, la ricerca dei $k$ vicini più prossimi richiede il calcolo delle distanze tra tutti i punti dati
+    \item gestione della sparsità dei dati: la sparsità può rendere difficile trovare vicini significativi e quindi portare a raccomandazioni di bassa qualità
 \end{itemize}
 
 \subsection{CoClustering}\label{coclustering}
 
-La soluzione proposta da Thomas George e Srujana Merugu~\cite{Co-Clustering} utilizza il \textit{co-clustering}. Questa tecnica viene utilizzata per raggruppare simultaneamente due entità in un dataset. Nel caso di un sistema di \textit{recommendation} basato su \textit{collaborative filtering}, l'obiettivo è trovare gruppi di \textit{user} simili e gruppi di \textit{item} simili. Il co-clustering cerca di partizionare simultaneamente le righe (\textit{user}) e le colonne (\textit{item}) della matrice dei \textit{rating} in modo tale che gli \textit{user} all'interno dello stesso co-cluster abbiano comportamenti di valutazione simili e \textit{item} all'interno dello stesso co-cluster siano valutati in modo simile dagli \textit{user} del co-cluster. Il numero di cluster è da definire a priori sia per gli \textit{user} che per gli \textit{item}. Il processo di co-clustering è simile al clustering tradizionale, ma mentre nel clustering classico si raggruppa solo per righe o colonne, nel co-clustering si raggruppano contemporaneamente. 
-
-L'algoritmo, nella fase di inizializzazione, assegna casualmente i co-cluster a \textit{user} e \textit{item}. Durante l'esecuzione i co-cluster vengono aggiornati iterativamente, per cercare di migliorare la qualità del raggruppamento, alternando tra il raggruppamento degli \textit{user} e degli \textit{item} fino a convergenza. Una volta che i co-cluster sono definiti si può calcolare la media dei \textit{rating} all'interno di ciascun co-cluster. $ \overline{C_{ui}} $ rappresenta la media dei \textit{rating} all'interno del co-cluster che contiene lo \textit{user} $ u $ e l'\textit{item} $ i $. In altre parole, è il \textit{rating} medio tra gli \textit{user} e gli \textit{item} che appartengono allo stesso co-cluster.
+La soluzione proposta da Thomas George e Srujana Merugu~\cite{Co-Clustering} utilizza il \textit{Co-Clustering}. Questa tecnica viene utilizzata per raggruppare simultaneamente due entità in un dataset. Nel caso di un sistema di \textit{recommendation} basato su \textit{collaborative filtering}, L'obiettivo è individuare gruppi di \textit{user} simili e gruppi di \textit{item} simili. Il \textit{Co-Clustering} si propone di partizionare simultaneamente le righe (\textit{user}) e le colonne (\textit{item}) della matrice $R$, in modo tale che gli \textit{user} appartenenti allo stesso \textit{co-cluster} presentino comportamenti di valutazione analoghi, e che gli \textit{item} all'interno dello stesso \textit{co-cluster} ricevano valutazioni simili da parte degli \textit{user} del medesimo gruppo. Il numero di cluster deve essere definito a priori sia per gli \textit{user} sia per gli \textit{item}. Il processo di \textit{Co-Clustering} si distingue dal clustering tradizionale in quanto quest'ultimo si limita a raggruppare lungo un'unica dimensione (righe oppure colonne), mentre il \textit{Co-Clustering} effettua la suddivisione simultaneamente su entrambe le dimensioni della matrice.
+ 
+L'algoritmo, nella fase di inizializzazione, assegna casualmente i \textit{co-cluster} a \textit{user} e \textit{item}. Durante l'esecuzione i \textit{co-cluster} vengono aggiornati iterativamente, per cercare di migliorare la qualità del raggruppamento, alternando tra il raggruppamento degli \textit{user} e degli \textit{item} fino a convergenza. Una volta che i \textit{co-cluster} sono definiti si può calcolare la media dei \textit{rating} all'interno di ciascun \textit{co-cluster}. $ \overline{C_{ui}} $ rappresenta la media dei \textit{rating} all'interno del \textit{co-cluster} che contiene lo \textit{user} $u$ e l'\textit{item} $i$. In altre parole, è il \textit{rating} medio tra gli \textit{user} e gli \textit{item} che appartengono allo stesso \textit{co-cluster}.
 
 Si può quindi definire la predizione come
 
@@ -415,44 +416,44 @@ dove $\overline{C_u}$ è la media dei \textit{rating} del cluster di $u$ e $\ove
 \begin{itemize}
   \item \textit{user} mancante: la previsione è $ \overline{C_i} $
   \item \textit{item} mancante: la previsione è $ \overline{C_u} $
-  \item se sia \textit{user} che \textit{item} sono mancanti: la previsione è $ \mu $, la media generale dei rating.
+  \item se sia \textit{user} che \textit{item} sono mancanti: la previsione è $ \mu $, la media generale dei rating
 \end{itemize}
 
 I punti di forza dell'algoritmo sono:
 
 \begin{itemize}
-  \item Scalabilità: l'algoritmo di co-clustering può essere facilmente parallelizzato, il che lo rende adatto per sistemi di \textit{recommendation} con grandi quantità di dati.
-  \item Gestione dei comportamenti complessi: la previsione tiene conto sia del co-cluster, che considera simultaneamente i raggruppamenti di \textit{user} e \textit{item}, sia dei cluster singoli per \textit{user} e \textit{item}. Questo permette di considerare diversità e similarità sia individualmente che insieme, migliorando le previsioni.
-  \item Gestione semplice degli aggiornamenti: quando nuovi dati sono aggiunti al sistema, è possibile aggiornare solo i co-cluster rilevanti senza dover ricalcolare tutto da zero. Questo è particolarmente utile per scenari dinamici e sistemi in tempo reale.
-  \item Gestione della sparsità: poiché l'algoritmo raggruppa \textit{user} e \textit{item} simili, riduce l'effetto della sparsità permettendo di migliorare la qualità delle previsioni anche quando i dati disponibili sono pochi o incompleti.
+  \item scalabilità: l'algoritmo di \textit{Co-Clustering} può essere facilmente parallelizzato, il che lo rende adatto per sistemi di \textit{recommendation} con grandi quantità di dati
+  \item gestione dei comportamenti complessi: la previsione tiene conto sia del \textit{co-cluster}, che considera simultaneamente i raggruppamenti di \textit{user} e \textit{item}, sia dei cluster singoli per \textit{user} e \textit{item}. Questo permette di considerare diversità e similarità sia individualmente che insieme, migliorando le previsioni
+  \item gestione semplice degli aggiornamenti: quando nuovi dati sono aggiunti al sistema, è possibile aggiornare solo i \textit{co-cluster} rilevanti senza dover ricalcolare tutto da zero. Questo è particolarmente utile per scenari dinamici e sistemi in tempo reale
+  \item gestione della sparsità: poiché l'algoritmo raggruppa \textit{user} e \textit{item} simili, riduce l'effetto della sparsità permettendo di migliorare la qualità delle previsioni anche quando i dati disponibili sono pochi o incompleti
 \end{itemize}
 
 L'algoritmo soffre anche di diverse problematiche:
 
 \begin{itemize}
-  \item Sensibilità ai co-cluster: la qualità delle previsioni dipende molto dal numero di co-cluster scelto e dalla loro qualità. Se il numero di co-cluster è troppo basso, il modello potrebbe non riuscire a catturare le complessità dei dati e fare previsioni imprecise. Se il numero è troppo alto, il modello potrebbe overfittare il \textit{training set}, riducendo la sua generalizzazione. Inoltre, se i co-cluster non sono ben definiti, il modello potrebbe produrre previsioni inaccurate. La scelta iniziale dei co-cluster è fondamentale. Una soluzione è quella di utilizzare l'algoritmo \textit{K-means} per definire la posizione iniziale dei cluster.
-  \item Bias del co-cluster: $ \mu_u - \overline{C_u} $ e $ \mu_i - \overline{C_i} $ potrebbero non essere sempre utili in tutte le situazioni. Alcuni \textit{user} o \textit{item} potrebbero avere comportamenti che non sono ben rappresentati dai co-cluster e il modello potrebbe non adattarsi bene a queste situazioni. Ad esempio, \textit{user} che tendono a esprimere \textit{rating} bassi potrebbero non essere gestiti correttamente.
-  \item Alto costo computazionale iniziale: l'algoritmo ha un alto costo computazionale durante la fase di addestramento, soprattutto con set di dati molto grandi. Anche se è scalabile, l'ottimizzazione del processo di clustering e la ricerca del numero ottimale di co-cluster richiedono parecchia computazione.
+  \item sensibilità ai \textit{co-cluster}: la qualità delle previsioni dipende molto dal numero di \textit{co-cluster} scelto e dalla loro qualità. Se il numero di \textit{co-cluster} è troppo basso, il modello potrebbe non riuscire a catturare le complessità dei dati e fare previsioni imprecise. Se il numero è troppo alto, il modello potrebbe overfittare il \textit{training set}, riducendo la sua generalizzazione. Inoltre, se i \textit{co-cluster} non sono ben definiti, il modello potrebbe produrre previsioni inaccurate. La scelta iniziale dei \textit{co-cluster} è fondamentale. Una soluzione è quella di utilizzare l'algoritmo \textit{K-Means} per definire la posizione iniziale dei cluster
+  \item bias del \textit{co-cluster}: $\mu_u - \overline{C_u} $ e $ \mu_i - \overline{C_i}$ potrebbero non essere sempre utili in tutte le situazioni. Alcuni \textit{user} o \textit{item} potrebbero avere comportamenti che non sono ben rappresentati dai \textit{co-cluster} e il modello potrebbe non adattarsi bene a queste situazioni. Ad esempio, \textit{user} che tendono a esprimere \textit{rating} bassi potrebbero non essere gestiti correttamente
+  \item alto costo computazionale iniziale: l'algoritmo ha un alto costo computazionale durante la fase di addestramento, soprattutto con set di dati molto grandi. Anche se è scalabile, l'ottimizzazione del processo di clustering e la ricerca del numero ottimale di \textit{co-cluster} richiedono parecchia computazione
   \item Difficoltà di interpretazione: il co-clustering fornisce gruppi di \textit{user} e \textit{item} che potrebbero non essere sempre facili da interpretare o da analizzare in modo intuitivo.
 \end{itemize}
 
-Il costo computazionale per l'addestramento è $ O(W^{\text{glob}} + mkl + nkl) $ dove $ W^{\text{glob}} $ corrisponde al numero di valori diversi da 0 nella matrice in input , $l$ corrisponde al numero di cluster per gli \textit{user} e $k$ corrisponde al numero di cluster per gli \textit{item}.
+Il costo computazionale per l'addestramento è $ \mathcal{O}(W^{\text{glob}} + mkl + nkl) $ dove $ W^{\text{glob}} $ corrisponde al numero di valori diversi da $0$ nella matrice in input , $l$ corrisponde al numero di cluster per gli \textit{user} e $k$ corrisponde al numero di cluster per gli \textit{item}.
 
-Per il calcolo della predizione, il costo è $O(1)$, in quanto si tratta di operazioni media e il calcolo dei bias.
+Per il calcolo della predizione, il costo è $\mathcal{O}(1)$, in quanto si tratta di operazioni media e il calcolo dei bias.
 
 Per l'aggiornamento quando un nuovo \textit{rating} viene aggiunto o un nuovo \textit{user}/\textit{item} entra nel sistema, l'algoritmo non ricalcola tutto da zero. Invece, utilizza un aggiornamento incrementale parziale, che si basa sull'aggiornamento delle medie delle matrici:
 
 \begin{itemize}
-  \item Se il nuovo \textit{rating} riguarda un \textit{user} e un \textit{item} esistenti si aggiornano direttamente le medie.
-  \item Se l'\textit{user} o l'\textit{item} è nuovo, viene assegnato temporaneamente a un co-cluster globale di transizione. Le medie vengono aggiornate e, durante la successiva esecuzione dell'algoritmo, il nuovo \textit{user}/\textit{item} viene riassegnato ai co-cluster regolari.
+  \item Se il nuovo \textit{rating} riguarda un \textit{user} e un \textit{item} esistenti si aggiornano direttamente le medie
+  \item Se l'\textit{user} o l'\textit{item} è nuovo, viene assegnato temporaneamente a un \textit{co-cluster} globale di transizione. Le medie vengono aggiornate e, durante la successiva esecuzione dell'algoritmo, il nuovo \textit{user}/\textit{item} viene riassegnato ai \textit{co-cluster} regolari
 \end{itemize}
 
-L'aggiornamento ha quindi costo pari a $O(1)$.
+L'aggiornamento ha quindi costo pari a $\mathcal{O}(1)$.
 
 \subsection{Slope One}\label{slopeone}
 
-L'algoritmo Slope One, introdotto da Daniel Lemire e Anna Maclachlan~\cite{SlopeOne}, è una delle soluzioni più semplici ed efficienti di collaborative filtering.
-%
+L'algoritmo \textit{Slope One}, introdotto da Daniel Lemire e Anna Maclachlan~\cite{SlopeOne}, è una delle soluzioni più semplici ed efficienti di \textit{collaborative filtering}.
+
 Le caratteristiche che lo rendono un ottimo algoritmo per la \textit{recommendation} sono:
 \begin{itemize}
     \item la semplicità e facilità di implementazione
@@ -460,8 +461,8 @@ Le caratteristiche che lo rendono un ottimo algoritmo per la \textit{recommendat
     \item scalabilità: l'algoritmo può essere abbastanza efficace su dataset di dimensioni moderate, soprattutto se si utilizzano tecniche di compressione dei dati
     \item facilità di interpretazione
 \end{itemize}
-%
-Viene proposto un predittore basato su differenze di \textit{rating} lineari che ha un'efficienza $O(nm)$ per predizione e $O(mn^2)$ per addestramento.
+
+Viene proposto un predittore basato su differenze di \textit{rating} lineari che ha un'efficienza $\mathcal{O}(nm)$ per predizione e $\mathcal{O}(mn^2)$ per addestramento.
 
 L'algoritmo si basa sulla differenza media tra le valutazioni di due \textit{item} per predire il \textit{rating} mancante. La differenza media dei \textit{rating} di due \textit{item} $i$ e $j$ viene calcolata come:
 
@@ -469,7 +470,7 @@ L'algoritmo si basa sulla differenza media tra le valutazioni di due \textit{ite
     \text{dev}(i, j) = \frac{1}{|U_{i,j}|} \sum\limits_{u \in U_{i,j}} (r_{u,i} - r_{u,j})
 \]
 
-La matrice simmetrica definita da $\text{dev}(i, j)$ può essere computata una volta e aggiornata velocemente quando vengono aggiunti nuovi dati.
+La matrice simmetrica, definita da $\text{dev}(i, j)$, può essere computata una volta e aggiornata velocemente quando vengono aggiunti nuovi dati.
 
 La predizione viene dunque calcolata come:
 
@@ -496,13 +497,13 @@ L'algoritmo soffre anche di diverse problematiche:
 \begin{itemize}
     \item sparsità dei dati: le formule presentate prima sono approssimate considerando un dataset non sparso. Nel caso di matrici molto sparse l'algoritmo non sarà in grado di fare previsioni accurate
     \item scalabilità limitata su dataset molto grandi: la memoria necessaria per memorizzare le differenze medie dei \textit{rating} può aumentare rapidamente
-    \item non tiene conto nè di personalizzazioni per \textit{user} 
+    \item non tiene conto nè di personalizzazioni per \textit{user} nè di \textit{item}
     \item difficoltà a gestire grandi variazioni nelle valutazioni degli utenti
 \end{itemize}
 
 L'approccio può essere esteso a modelli ponderati e versioni più avanzate, come per esempio \textit{Weighted Slope One}, che pesa le differenze di \textit{rating} in base alla frequenza di coppie di \textit{item} valutati, e \textit{Regression-based Slope One}, che introduce funzioni non lineari per migliorare la precisione delle previsioni.
 
-\section{Algoritmi per il feedback implicito}\label{algoritmi-per-feedback-implicito}
+\section{Algoritmi per il feedback implicito}
 
 \subsection{ALS (Alternating Least Squares)}\label{als}
 
@@ -553,7 +554,7 @@ dove:
     \item $h_i$: vettore dei fattori latenti per l' \textit{item} $i$,
 \end{itemize}
 
-Il primo termine rappresenta l'\textit{errore quadratico pesato} tra la preferenza osservata e la previsione del modello. Il secondo termine è una \textit{regolarizzazione} di tipo L2 per evitare overfitting.
+Il primo termine rappresenta l'\textit{errore quadratico pesato} tra la preferenza osservata e la previsione del modello. Il secondo termine è una \textit{regolarizzazione} di tipo \textit{L2} per evitare overfitting.
 
 Il problema in $(W,H)$ non è convesso (cioè potrebbe avere più minimi locali e non è facile trovare il minimo assoluto) ma lo diventa se si fissa una delle due variabili. Questo significa che si può trovare il minimo facilmente rispetto a $W$ tenendo $H$ fisso e viceversa. Per questo motivo, si usa un metodo iterativo finché non si arriva a una soluzione stabile:
 
@@ -604,7 +605,7 @@ utilizzando il \textit{metodo del gradiente coniugato (CG)}~\cite{ALS_opt}. Ques
         \If{$\|r_{k+1}\| < \epsilon$}
             \State \textbf{break}
         \EndIf
-        \State $\beta_k \gets \dfrac{r_{k+1}^\top r_{r+1}}{r_k^\top r_k}$
+        \State $\beta_k \gets \dfrac{r_{k+1}^\top r_{k+1}}{r_k^\top r_k}$
         \State $p_{k+1} \gets r_{k+1} + \beta_k p_k$
         \State $k \gets k + 1$
     \EndWhile
@@ -614,7 +615,7 @@ utilizzando il \textit{metodo del gradiente coniugato (CG)}~\cite{ALS_opt}. Ques
     
 Il numero di iterazioni di \textit{GC} è un iperparametro.
 
-Infine, lo score viene calcolato come
+Infine, lo \textit{score} viene calcolato come
 
 \[
 \hat{x}_{ui} = w_u^T h_i
@@ -622,26 +623,26 @@ Infine, lo score viene calcolato come
 
 I punti di forza dell'algoritmo sono:
 \begin{itemize}
-    \item efficienza computazionale: il metodo del gradiente coniugato riduce il costo computazionale rispetto all'inversione esplicita delle matrici.
-    \item scalabilità: permette di gestire dataset di grandi dimensioni, grazie alla natura iterativa e alla possibilità di eseguire il calcolo in parallelo.
-    \item minore uso di memoria rispetto all'inversione diretta: non è necessario costruire esplicitamente la matrice intera da invertire.
-    \item velocità di convergenza: in molti casi, bastano poche iterazioni per ottenere una buona approssimazione della soluzione.
-    \item supporto gpu: il calcolo iterativo si adatta bene all'accelerazione hardware, migliorando ulteriormente i tempi di addestramento.
+    \item efficienza computazionale: il metodo del gradiente coniugato riduce il costo computazionale rispetto all'inversione esplicita delle matrici
+    \item scalabilità: permette di gestire dataset di grandi dimensioni, grazie alla natura iterativa e alla possibilità di eseguire il calcolo in parallelo
+    \item minore uso di memoria rispetto all'inversione diretta: non è necessario costruire esplicitamente la matrice intera da invertire
+    \item velocità di convergenza: in molti casi, bastano poche iterazioni per ottenere una buona approssimazione della soluzione
+    \item supporto gpu: il calcolo iterativo si adatta bene all'accelerazione hardware, migliorando ulteriormente i tempi di addestramento
 \end{itemize}
 
 L'algoritmo soffre anche di diverse problematiche:
 
 \begin{itemize}
-    \item approssimazione: il metodo \textit{GC} fornisce una soluzione approssimata, la cui precisione dipende dal numero di iterazioni utilizzate.
-    \item sensibilità ai parametri: il numero di iterazioni (\textit{GC steps}) è un iperparametro che va scelto con attenzione per bilanciare accuratezza e prestazioni.
+    \item approssimazione: il metodo \textit{GC} fornisce una soluzione approssimata, la cui precisione dipende dal numero di iterazioni utilizzate
+    \item sensibilità ai parametri: il numero di iterazioni (\textit{GC steps}) è un iperparametro che va scelto con attenzione per bilanciare accuratezza e prestazioni
     \item stabilità numerica: se la matrice del sistema è mal condizionata, la convergenza del metodo \textit{GC} può essere lenta o instabile.
-    \item maggiore complessità implementativa: integrare \textit{GC} richiede strutture dati e operazioni più sofisticate rispetto all'inversione diretta.
-    \item overhead per piccoli dataset: su dataset piccoli, l'uso di \textit{GC} può risultare meno vantaggioso rispetto ad una soluzione esatta diretta.
+    \item maggiore complessità implementativa: integrare \textit{GC} richiede strutture dati e operazioni più sofisticate rispetto all'inversione diretta
+    \item overhead per piccoli dataset: su dataset piccoli, l'uso di \textit{GC} può risultare meno vantaggioso rispetto ad una soluzione esatta diretta
 \end{itemize}
 
 \subsection{BPR (Bayesian Personalized Ranking)}\label{bpr}
 
-Nei sistemi basati su \textit{feedback impliciti}, la mancanza di interazione tra un \textit{user} e un \textit{item} non implica necessariamente una preferenza negativa. Per affrontare tale ambiguità, BPR~\cite{BPR} adotta le seguenti ipotesi:
+Nei sistemi basati su \textit{feedback impliciti}, la mancanza di interazione tra un \textit{user} e un \textit{item} non implica necessariamente una preferenza negativa. Per affrontare tale ambiguità, \textit{BPR} (\textit{Bayesian Personalized Ranking})~\cite{BPR} adotta le seguenti ipotesi:
 
 \begin{itemize}
     \item Se $(u, i) \in R$, cioè lo \textit{user} $u$ ha interagito con l'\textit{item} $i$, allora $u$ preferisce $i$ a tutti gli \textit{item} $j$ con cui non ha interagito.
@@ -663,9 +664,9 @@ dove:
     \item $\lambda_\Theta$ è il parametro di regolarizzazione.
 \end{itemize}
 
-Questo criterio è strettamente legato all'ottimizzazione dell'AUC (Area Under the ROC Curve), che misura la qualità del ranking.
+Questo criterio è strettamente legato all'ottimizzazione dell'\textit{AUC} (\textit{Area Under the ROC Curve}), che misura la qualità del \textit{ranking}.
 
-Per prima cosa si calcola il gradiente di BPR-Opt come:
+Per prima cosa si calcola il gradiente di \textit{BPR-Opt} come:
 
 \[
 \frac{\partial \text{BPR-Opt}}{\partial \Theta} =
@@ -682,7 +683,7 @@ Per prima cosa si calcola il gradiente di BPR-Opt come:
 - \lambda \Theta
 \]
 
-L'ottimizzazione di BPR-Opt viene effettuata tramite \textit{stochastic gradient descent}. I parametri del modello sono aggirnati con:
+L'ottimizzazione di \textit{BPR-Opt} viene effettuata tramite \textit{SGD}. I parametri del modello sono aggiornati con:
 
 \[
 \Theta \gets \Theta - \gamma \frac{\partial \text{BPR-Opt}}{\partial \Theta}
@@ -707,7 +708,7 @@ L'algoritmo effettua un campionamento \textit{bootstrap}:
 
 Questo approccio consente una rapida convergenza e un buon bilanciamento tra classi positive e negative.
 
-BPR può essere applicato a diverse famiglie di modelli. Di seguito viene presentata la versione con \textit{matrix factorization} (BPR-MF):
+\textit{BPR} può essere applicato a diverse famiglie di modelli. Di seguito viene presentata la versione con \textit{Matrix Factorization} (BPR-MF):
 
 Ogni \textit{user} \( u \in U \) e ogni \textit{item} \( i \in I \) sono rappresentati da un vettore latente in \( \mathbb{R}^k \):
 
@@ -756,26 +757,26 @@ Gli aggiornamenti dei parametri sono:
 I punti di forza dell'algoritmo sono:
 
 \begin{itemize}
-    \item ottimizzazione diretta: massimizza la probabilità che un \textit{item} positivo sia sopra uno negativo.
-    \item scalabilità: efficiente con \textit{SGD} e \textit{negative sampling}, anche su grandi dataset.
-    \item flessibilità: compatibile con \textit{matrix factorization}, \textit{Neural Collaborative Filtering} e modelli più avanzati (CNN, RNN, GNN).
-    \item empiricamente superiore: spesso batte metodi classici come \textit{Weighted Regularized Matrix Factorization} e \textit{SVD}\ref{svd}.
-    \item indipendente da valutazioni esplicite: non richiede rating numerici.
+    \item ottimizzazione diretta: massimizza la probabilità che un \textit{item} positivo sia sopra uno negativo
+    \item scalabilità: efficiente con \textit{SGD} e \textit{negative sampling}, anche su grandi dataset
+    \item flessibilità: compatibile con \textit{Matrix Factorization}, \textit{Neural Collaborative Filtering} e modelli più avanzati (\textit{CNN}, \textit{RNN}, \textit{GNN})
+    \item empiricamente superiore: spesso batte metodi classici come \textit{Weighted Regularized Matrix Factorization} e \textit{SVD}\ref{svd}
+    \item indipendente da valutazioni esplicite: non richiede rating numerici
 \end{itemize}
 
 L'algoritmo soffre anche di diverse problematiche:
 
 \begin{itemize}
-    \item negative sampling critico: la scelta degli \textit{item} negativi influisce molto sull'apprendimento.
+    \item negative sampling critico: la scelta degli \textit{item} negativi influisce molto sull'apprendimento
     \item convergenza lenta: su dati sparsi può avere una convergenza lenta
-    \item rischio overfitting: sensibile alla mancanza di regolarizzazione.
-    \item limiti nelle relazioni globali: non cattura bene la struttura complessiva degli item.
-    \item poca interpretabilità: difficile capire il motivo dietro una raccomandazione.
+    \item rischio overfitting: sensibile alla mancanza di regolarizzazione
+    \item limiti nelle relazioni globali: non cattura bene la struttura complessiva degli item
+    \item poca interpretabilità: difficile capire il motivo dietro una raccomandazione
 \end{itemize}
 
 \subsection{LMF (Logistic Matrix Factorization)}\label{lmf-logistic-matrix-factorization}
 
-Il modello di \textit{Logistic Matrix Factorization (LMF)}~\cite{LMF} descrive un approccio probabilistico per la fattorizzazione di matrici nel caso di feedback implicito. La probabilità che uno \textit{user} $u$ interagisca con un \textit{item} $i$ è modellata tramite una funzione logistica.
+Il modello \textit{LMF} (\textit{Logistic Matrix Factorization})~\cite{LMF} descrive un approccio probabilistico per la fattorizzazione di matrici nel caso di feedback implicito. La probabilità che uno \textit{user} $u$ interagisca con un \textit{item} $i$ è modellata tramite una funzione logistica.
 
 L'idea è approssimare la matrice $R$ come prodotto di due matrici più piccole:
 
@@ -793,22 +794,22 @@ dove:
 La probabilità che uno \textit{user} $u$ preferisca un \textit{item} $i$ è data dalla funzione logistica applicata al prodotto scalare dei fattori latenti dello \textit{user} e dell'\textit{item}, più i rispettivi bias:
 
 \[
-p(l_{ui} | w_u, h_i, \beta_u, \beta_i) = \frac{\exp(w_u^T h_i + \beta_u + \beta_i)}{1 + \exp(w_u^T h_i + \beta_u + \beta_i)}
+p(l_{ui} | w_u, h_i, b_u, b_i) = \frac{\exp(w_u^T h_i + b_u + b_i)}{1 + \exp(w_u^T h_i + b_u + b_i)}
 \]
 
 Dove:
 \begin{itemize}
     \item $w_u$ è il vettore dei fattori latenti dell'\textit{user} $u$
     \item $h_i$ è il vettore dei fattori latenti dell'\textit{item} $i$
-    \item $\beta_u$ è il bias dello \textit{user}
-    \item $\beta_i$ è il bias dell'\textit{item}
+    \item $b_u$ è il bias dello \textit{user}
+    \item $b_i$ è il bias dell'\textit{item}
 \end{itemize}
 
-La verosimiglianza dei dati osservati $R$ data dai parametri $W$, $H$, e $\beta$ è espressa come segue:
+La verosimiglianza dei dati osservati $R$ data dai parametri $W$, $H$, e $b$ è espressa come segue:
 
 \[
-L(R \mid W, H, \beta) = \prod_{u, i} p(l_{ui} \mid w_u, h_i, \beta_u, \beta_i)^{\alpha r_{ui}} 
-\left( 1 - p(l_{ui} \mid w_u, h_i, \beta_u, \beta_i) \right)^{(1 - \alpha r_{ui})}
+L(R \mid W, H, b) = \prod_{u, i} p(l_{ui} \mid w_u, h_i, b_u, b_i)^{\alpha r_{ui}} 
+\left( 1 - p(l_{ui} \mid w_u, h_i, b_u, b_i) \right)^{(1 - \alpha r_{ui})}
 \]
 
 Dove $\alpha$ è un iperparametro che bilancia il peso tra le osservazioni positive e negative.
@@ -827,27 +828,27 @@ Dove $\sigma_u^2$ e $\sigma_i^2$ sono i parametri di varianza per le distribuzio
 L'obiettivo del modello è massimizzare il logaritmo della funzione di verosimiglianza (log-likelihood), che è dato da:
 
 \[
-\log p(W, H, \beta \mid R) = \sum_{u,i} \alpha r_{ui} (w_u^T h_i + \beta_u + \beta_i) 
-- (1 + \alpha r_{ui}) \log(1 + \exp(w_u^T h_i + \beta_u + \beta_i)) 
+\log p(W, H, b \mid R) = \sum_{u,i} \alpha r_{ui} (w_u^T h_i + b_u + b_i) 
+- (1 + \alpha r_{ui}) \log(1 + \exp(w_u^T h_i + b_u + b_i)) 
 - \lambda \|w_u\|^2 - \lambda \|h_i\|^2
 \]
 
 
 Il termine di regolarizzazione $\lambda$ aiuta a prevenire l'overfitting, penalizzando la grandezza dei vettori latenti.
 
-Per ottimizzare la funzione obiettivo, vengono calcolati i gradienti parziali rispetto ai fattori latenti $w_u$ e $h_i$ e ai bias $\beta_u$ e $\beta_i$, come segue:
+Per ottimizzare la funzione obiettivo, vengono calcolati i gradienti parziali rispetto ai fattori latenti $w_u$ e $h_i$ e ai bias $b_u$ e $b_i$, come segue:
 
 \[
-\frac{\partial}{\partial w_u} \log p(W, H, \beta \mid R) = 
+\frac{\partial}{\partial w_u} \log p(W, H, b \mid R) = 
 \sum_i \alpha r_{ui} h_i 
-- \frac{h_i (1 + \alpha r_{ui}) \exp(w_u^T h_i + \beta_u + \beta_i)}{1 + \exp(w_u^T h_i + \beta_u + \beta_i)} 
+- \frac{h_i (1 + \alpha r_{ui}) \exp(w_u^T h_i + b_u + b_i)}{1 + \exp(w_u^T h_i + b_u + b_i)} 
 - \lambda w_u
 \]
 
 \[
-\frac{\partial}{\partial \beta_u} \log p(W, H, \beta \mid R) = 
+\frac{\partial}{\partial b_u} \log p(W, H, b \mid R) = 
 \sum_i \alpha r_{ui} 
-- \frac{(1 + \alpha r_{ui}) \exp(w_u^T h_i + \beta_u + \beta_i)}{1 + \exp(w_u^T h_i + \beta_u + \beta_i)}
+- \frac{(1 + \alpha r_{ui}) \exp(w_u^T h_i + b_u + b_i)}{1 + \exp(w_u^T h_i + b_u + b_i)}
 \]
 
 L'ottimizzazione avviene alternando l'ottimizzazione dei fattori latenti prima per gli \textit{user} e poi degli \textit{item}. 
@@ -861,10 +862,10 @@ w_u^t = w_u^{t-1} + \gamma \frac{g_u^{t-1}}{\sqrt{\sum_{t'=1}^t (g_u^{t'})^2}}
 
 Dove $g_u^{t-1}$ è il gradiente calcolato all'iterazione precedente e $\gamma$ è il passo di apprendimento.
 
-Infine lo score per la coppia \textit{user} $u$ e \textit{item} $i$ si calcola come:
+Infine lo \textit{score} per la coppia \textit{user} $u$ e \textit{item} $i$ si calcola come:
 
 \[
-\hat{x}_{ui} = \sigma(w_u^T h_i + \beta_u + \beta_i)
+\hat{x}_{ui} = \sigma(w_u^T h_i + b_u + b_i)
 \]
 
 I punti di forza dell'algoritmo sono:
@@ -872,13 +873,13 @@ I punti di forza dell'algoritmo sono:
 \begin{itemize}
     \item migliore qualità e velocità di convergenza: l'utilizzo di \textit{AdaGrad} permette di migliorare e velocizzare la convergenza grazie ad una regolazione automatica dei \textit{learning rate} per ogni parametro
     \item scalabilità e semplicità: il metodo è adatto per grandi dataset e facilmente implementabile, senza la necessità di configurare iperparametri complessi
-    \item modello probabilistico: LMF prevede le preferenze degli \textit{user} in modo probabilistico, il che lo rende interpretabile e facile da usare
+    \item modello probabilistico: \textit{LMF} prevede le preferenze degli \textit{user} in modo probabilistico, il che lo rende interpretabile e facile da usare
 \end{itemize}
 
 L'algoritmo soffre anche di diverse problematiche:
 
 \begin{itemize}
-    \item complessità computazionale: nonostante sia scalabile, l'allenamento del modello su grandi dataset può richiedere una notevole potenza computazionale, specialmente con un alto numero di fattori latenti.
+    \item complessità computazionale: nonostante sia scalabile, l'allenamento del modello su grandi dataset può richiedere una notevole potenza computazionale, specialmente con un alto numero di fattori latenti
     \item sensibilità alla scelta dei parametri: il modello è molto dipendente dagli iperparametri, come il \textit{learning rate} e la regolarizzazione
 \end{itemize}
 
@@ -886,7 +887,7 @@ L'algoritmo soffre anche di diverse problematiche:
 
 \subsection{LightFM}\label{lightfm}
 
-I sistemi di raccomandazione basati su \textit{matrix factorization} si sono dimostrati estremamente efficaci quando la matrice delle interazioni tra \textit{user} e \textit{item} è sufficientemente densa. Tuttavia, tali metodi risultano inefficaci in scenari di \textit{cold-start}, in cui nuovi \textit{user} o nuovi \textit{item} non hanno ancora prodotto interazioni significative.
+I sistemi di raccomandazione basati su \textit{Matrix Factorization} si sono dimostrati estremamente efficaci quando la matrice delle interazioni tra \textit{user} e \textit{item} è sufficientemente densa. Tuttavia, tali metodi risultano inefficaci in scenari di \textit{cold-start}, in cui nuovi \textit{user} o nuovi \textit{item} non hanno ancora prodotto interazioni significative.
 
 I modelli \textit{content-based filtering}, che utilizzano le feature conosciute degli \textit{item} (ad esempio genere, attori, descrizioni) per generare raccomandazioni, superano questo limite, ma mancano della capacità di apprendere dalle interazioni collettive.
 
@@ -897,8 +898,8 @@ Utilizziamo la seguente notazione:
     \item $U$: insieme di tutti gli \textit{user}, con $u \in U$.
     \item $I$: insieme di tutti gli \textit{item}, con $i \in I$.
     \item $R$: insieme di tutte le interazioni (\textit{rating}) osservate.
-    \item Ogni \textit{user} $u$ è descritto da un insieme di feature $f_u$.
-    \item Ogni \textit{item} $i$ è descritto da un insieme di feature $f_i$.
+    \item ogni \textit{user} $u$ è descritto da un insieme di feature $f_u$.
+    \item ogni \textit{item} $i$ è descritto da un insieme di feature $f_i$.
 \end{itemize}
 
 Ad ogni feature $f$ associata a uno \textit{user} o a un \textit{item} viene assegnato:
@@ -949,7 +950,7 @@ L'ottimizzazione si effettua mediante \textit{stochastic gradient Descent}, con 
 
 Sebbene LightFM non fattorizzi direttamente la matrice $R \in \mathbb{R}^{m \times n}$, dove $m$ è il numero di \textit{user} e $n$ è il numero di \textit{item}, essa viene utilizzata per costruire i set $S^+$ e $S^-$, su cui si basa l'allenamento.
 
-L'informazione di $R$ serve quindi a guidare l'apprendimento degli \textit{embedding} delle feature, anche se non compare esplicitamente nella formulazione come in \textit{matrix factorization} classico.
+L'informazione di $R$ serve quindi a guidare l'apprendimento degli \textit{embedding} delle feature, anche se non compare esplicitamente nella formulazione come in \textit{Matrix Factorization} classico.
 
 I punti di forza dell'algoritmo sono:
 
@@ -1030,7 +1031,7 @@ Le seguenti metriche valgono sia per feedback impliciti che espliciti:
     \]
     
     \item Area Under the ROC Curve (AUC).\\
-    Probabilità che un \textit{item} rilevante riceva uno score più alto rispetto a un \textit{item} non rilevante.
+    Probabilità che un \textit{item} rilevante riceva uno \textit{score} più alto rispetto a un \textit{item} non rilevante.
     \[
     \text{AUC}(u) = \frac{1}{|I_u^{rel}| \cdot |I_u^{non-rel}|} \sum_{i \in I_u^{rel}} \sum_{j \in I_u^{non-rel}} \mathbf{1}\{\hat{r}_{ui} > \hat{r}_{uj}\}
     \]
