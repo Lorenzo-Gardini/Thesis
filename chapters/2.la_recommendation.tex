@@ -37,10 +37,31 @@ I passaggi tipici che ti utilizzano sono:
 
 La descrizione che segue riguarda soprattutto i metodi più moderni: alcuni algoritmi come \textit{KNN}~\ref{knn} o \textit{SlopeOne}~\ref{slopeone} utilizzano metodi più semplici ma comunque efficaci per il calcolo delle raccomandazioni.
 
-\subsubsection{Embedding}
+\subsection{Recommendation Tasks}
+
+Numerosi compiti di raccomandazione sono stati studiati negli ultimi decenni. Alcuni esempi di applicazioni:
+
+\begin{itemize}
+    \item raccomandazioni di film
+    \item raccomandazioni di notizie
+    \item raccomandazioni di punti di interesse (\textit{Point-of-Interest}~\cite{Ye})
+    \item etc
+\end{itemize}
+
+È anche possibile classificare i compiti in base al tipo di feedback e ai dati in input. Alcuni esempi:
+
+\begin{itemize}
+    \item predizione del \textit{rating}: predizione delle valutazioni esplicite fornite dagli utenti    
+    \item \textit{top-N recommendation} (\textit{ranking}): ordinamento personalizzato di tutti gli oggetti per ciascun utente, basato su feedback implicito    
+    \item \textit{sequence-aware recommendation}: se sono disponibili informazioni temporali (\textit{timestamp}), è possibile costruire raccomandazioni che tengano conto dell’ordine delle interazioni~\cite{Quadrana}.
+    \item \textit{click-through rate prediction} (\textit{CTR}): previsione della probabilità che un utente clicchi su un oggetto, utilizzando feedback implicito e molte caratteristiche categoriali
+    \item \textit{cold-start recommendation}: raccomandazioni in scenari con nuovi utenti o nuovi oggetti, per cui mancano dati storici sufficienti~\cite{Schein}
+\end{itemize}
+
+\subsection{Embedding}
 Gli \textit{item} e le \textit{query} vengono mappati su  vettore di \textit{embedding} in uno spazio comune $E = \mathbb{R}^k$. Normalmente lo spazio di \textit{embedding} ha una dimensione molto più piccola rispetto alla grandezza del corpus e cattura alcune strutture latenti dell'insieme di \textit{item} o \textit{query}. Gli elementi tra loro simili finiscono per essere vicini nello spazio di \textit{embedding}. Il concetto di ``vicinanza" è definito da una misura di similarità.
  
-\subsubsection{Calcolo della similarità}
+\subsection{Calcolo della similarità}
 
 Una misura di similarità è una funzione $s: E \times E \to \mathbb{R}$ che prende in input una coppia di vettori di \textit{embedding} e restituisce un valore scalare che ne misura la similarità. Gli \textit{embedding} possono essere utilizzati per la generazione dei candidati come segue: dato un vettore di \textit{embedding} per una query $q \in E$, il sistema cerca gli \textit{embedding} degli elementi $x \in E$ che sono vicini a $q$, ossia, gli \textit{embedding} con una similarità elevata.
 
@@ -137,8 +158,11 @@ Gli svantaggi di quest'approccio sono:
 \end{itemize}
 
 \section{Collaborative filtering}
+Il \textit{collaborative filtering} (\textit{CF}) viene introdotto per la prima volta dal sistema \textit{Tapestry}~\cite{Tapestry} e si riferiva al fatto che ``people collaborate to help one another perform the filtering process in order to handle the large amounts of email and messages posted to newsgroups". Questo termine ha poi assunto significati più ampi. In senso generale, indica il processo di filtraggio di informazioni o pattern tramite tecniche che coinvolgono la collaborazione tra più utenti, agenti e fonti di dati. Il \textit{CF} esiste in molte forme e, sin dalla sua introduzione, sono stati proposti numerosi metodi basati su di esso.
 
-Per affrontare alcune delle limitazioni del \textit{content-base filtering}, il \textit{collaborative filtering} utilizza simultaneamente le somiglianze tra utenti e \textit{item} per fornire raccomandazioni. I modelli possono raccomandare un \textit{item} all'utente $A$ in base agli interessi di un utente simile $B$ anche se $A$ non ha mai visto \textit{item} simili. Inoltre, gli \textit{embedding} possono essere appresi automaticamente, senza dover progettare manualmente le caratteristiche.
+Per affrontare alcune delle limitazioni del \textit{content-base filtering}, il \textit{collaborative filtering} utilizza simultaneamente le somiglianze tra utenti e \textit{item} per fornire raccomandazioni. I modelli possono raccomandare un \textit{item} all'utente $A$ in base agli interessi di un utente simile $B$ anche se $A$ non ha mai visto \textit{item} simili. Inoltre, gli \textit{embedding}, se presenti, possono essere appresi automaticamente senza dover progettare manualmente le caratteristiche.
+
+In generale, le tecniche di \textit{CF} possono essere suddivise in tre categorie: \textit{CF} basato sulla memoria, \textit{CF} basato su modelli e i modelli ibridi~\cite{Su}. Tra le tecniche rappresentative basate sulla memoria ci sono i metodi \textit{nearest neighbor-based}~\ref{knn}, come il \textit{CF} basato sugli utenti (\textit{user-based}) e quello basato sugli oggetti (\textit{item-based})~\cite{Sarwar}. I modelli a fattori latenti, come la \textit{Matrix Factorization}~\ref{matrix_factorization}, sono esempi di \textit{CF} basato su modelli. Il \textit{CF} basato sulla memoria presenta delle limitazioni nella gestione di dati sparsi e su larga scala, poiché calcola la similarità basandosi sugli oggetti in comune. I metodi basati su modelli sono diventati più popolari grazie alla loro maggiore efficacia nel gestire la sparsità e la scalabilità. Molti approcci \textit{CF} basati su modelli possono essere estesi con reti neurali, permettendo modelli più flessibili e scalabili grazie all’accelerazione computazionale offerta dal \textit{Deep Learning}~\cite{Zhang}. In generale, il \textit{CF} utilizza solo i dati di interazione tra utenti e oggetti per fare previsioni e raccomandazioni. Oltre al \textit{CF}, anche i sistemi di raccomandazione \textit{content-based} e \textit{context-based} sono utili per includere descrizioni dei contenuti degli oggetti/utenti e segnali contestuali come timestamp e localizzazione. Ovviamente, è necessario adattare i tipi o le strutture dei modelli in base ai dati in input disponibili.
 
 Si consideri un sistema di raccomandazione di film in cui i dati di addestramento consistono in una matrice di feedback in cui:
 
@@ -161,7 +185,7 @@ Quando un utente visita la homepage, il sistema dovrebbe raccomandare film basat
     \item film che utenti simili hanno apprezzato
 \end{enumerate}
 
-\subsubsection{1D embedding}
+\subsection{1D embedding}
 
 Si assegna a ciascun film uno scalare in $[-1, 1]$ che descriva se il film è destinato a bambini (valori negativi) o ad adulti (valori positivi). Allo stesso modo, per ciascun utente si assegna uno scalare in $[-1, 1]$ che descriva il suo interesse per i film per bambini o per adulti. Il prodotto dell'\textit{embedding} del film e dell'\textit{embedding} dell'utente dovrebbe essere più alto (vicino a 1) per i film che dovrebbero piacere all'utente.
 
@@ -295,7 +319,7 @@ Pur con alcune limitazioni, essa costituisce la base per molti degli algoritmi d
 
 \section{Tipologie di feedback}
 
-I sistemi di raccomandazione si basano sull'analisi delle preferenze degli utenti, espresse attraverso due principali modalità: feedback esplicito e feedback implicito. Ogni modalità presenta vantaggi, limitazioni e diverse tipologie di approcci. 
+I sistemi di raccomandazione si basano sull'analisi delle preferenze degli utenti, espresse attraverso due principali modalità: feedback esplicito e feedback implicito~\cite{ALS}. Ogni modalità presenta vantaggi, limitazioni e diverse tipologie di approcci. 
 
 Poiché ciascuna forma di feedback fornisce informazioni diverse, un approccio ibrido è spesso preferibile. Ad esempio, nei sistemi che dispongono di valutazioni esplicite, il feedback implicito può essere utilizzato per arricchire il contesto dell'utente, migliorando le prestazioni del modello nei casi in cui i dati espliciti siano scarsi. I modelli basati sul Deep Learning possono essere progettati per combinare diverse fonti, sfruttando il feedback implicito arricchito da attributi contestuali (tempo, luogo, dispositivo, ecc.) per ottimizzare la previsione.
 
@@ -328,7 +352,7 @@ Il feedback implicito, al contrario, non è fornito direttamente dall'utente, ma
     \item acquisto o meno di un prodotto
 \end{itemize}
 
-I feedback impliciti possono essere raccolti facilmente in modo automatico e passivo senza che l'utente debba interagire intenzionalmente. Inoltre, sono molto più abbondanti rispetto alla controparte esplicita. Forniscono una rappresentazione più completa del comportamento degli utenti, specialmente in contesti in cui il feedback esplicito è assente o insufficiente.
+I feedback impliciti possono essere raccolti facilmente in modo automatico e passivo senza che l'utente debba interagire intenzionalmente. Inoltre, sono molto più abbondanti rispetto alla controparte esplicita. Forniscono una rappresentazione più completa del comportamento degli utenti, specialmente in contesti in cui il feedback esplicito è assente o insufficiente. Allo stato attuale, i modelli di \textit{Deep Learning} moderni utilizzano grandi quantità di feedback impliciti. 
 
 I modelli che utilizzano feedback impliciti non forniscono un \textit{rating} ma uno \textit{score} numerico per la coppia utente-\textit{item}. Questo numero da solo non ha alcun significato, ma messo in relazioni con altri \textit{score}, calcolati per lo stesso utente con \textit{item} diversi, permette di ordinare gli \textit{item} in base alla preferenza predetta per l'utente.
 
