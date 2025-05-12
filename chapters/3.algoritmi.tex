@@ -34,7 +34,7 @@ La notazione utilizzata è la seguente:
     \item $N_u^k(i)$ : i $k$ vicini più prossimi dell'\textit{item} $i$ che sono valutati dallo \textit{user} $u$. Questo insieme è calcolato utilizzando una metrica di similarità
     \item $\gamma$: iperparametro, il \textit{learning rate} utilizzato per l'algoritmo \textit{Stocastic Gradient Descent}
     \item $\lambda$: iperparametro, corrisponde al fattore di regolarizzazione nella funzione obbiettivo
-    \item $\hat{x}_{uij}$: \textit{score} che rappresenta la preferenza dello \textit{user} \textit{i} per l'\textit{item} \textit{i} rispetto all'\textit{item} \textit{j}
+    \item $\hat{y}_{uij}$: \textit{score} che rappresenta la preferenza dello \textit{user} \textit{i} per l'\textit{item} \textit{i} rispetto all'\textit{item} \textit{j}
     \item $N$: numero di epoche per l'algoritmo \textit{Stocastic Gradient Descent}
     \item $k$: dimensione dello spazio latente negli algoritmi di \textit{Matrix Factorization} o il numero dei \textit{neighbors} negli algoritmi della famiglia \textit{KNN}
 \end{itemize}
@@ -618,7 +618,7 @@ Il numero di iterazioni di \textit{GC} è un iperparametro.
 Infine, lo \textit{score} viene calcolato come
 
 \[
-\hat{x}_{ui} = w_u^T h_i
+\hat{y}_{ui} = w_u^T h_i
 \]
 
 I punti di forza dell'algoritmo sono:
@@ -655,11 +655,11 @@ Nei sistemi basati su \textit{feedback impliciti}, la mancanza di interazione tr
 
 L'obiettivo di BPR è massimizzare la probabilità a posteriori dei parametri del modello $\Theta$, dati i dati osservati:
 \[
-\text{BPR-Opt} = \sum_{(u, i, j) \in D_S} \ln \sigma(\hat{x}_{uij}) - \lambda_\Theta ||\Theta||^2
+\text{BPR-Opt} = \sum_{(u, i, j) \in D_S} \ln \sigma(\hat{y}_{uij}) - \lambda_\Theta ||\Theta||^2
 \]
 dove:
 \begin{itemize}
-    \item $\hat{x}_{uij} = \hat{x}_{ui} - \hat{x}_{uj}$ è la differenza tra le valutazioni stimate per $i$ e $j$;
+    \item $\hat{y}_{uij} = \hat{y}_{ui} - \hat{y}_{uj}$ è la differenza tra le valutazioni stimate per $i$ e $j$;
     \item $\sigma(x) = \frac{1}{1 + e^{-x}}$ è la funzione sigmoide;
     \item $\lambda_\Theta$ è il parametro di regolarizzazione.
 \end{itemize}
@@ -671,15 +671,15 @@ Per prima cosa si calcola il gradiente di \textit{BPR-Opt} come:
 \[
 \frac{\partial \text{BPR-Opt}}{\partial \Theta} =
 \sum_{(u,i,j) \in D_S} 
-\frac{\partial}{\partial \Theta} \ln \sigma(\hat{x}_{uij}) - 
+\frac{\partial}{\partial \Theta} \ln \sigma(\hat{y}_{uij}) - 
 \lambda \frac{\partial}{\partial \Theta} ||\Theta||^2
 \]
 
 \[
 \propto 
 \sum_{(u,i,j) \in D_S} 
-\frac{-e^{-\hat{x}_{uij}}}{1 + e^{-\hat{x}_{uij}}} 
-\cdot \frac{\partial}{\partial \Theta} \hat{x}_{uij} 
+\frac{-e^{-\hat{y}_{uij}}}{1 + e^{-\hat{y}_{uij}}} 
+\cdot \frac{\partial}{\partial \Theta} \hat{y}_{uij} 
 - \lambda \Theta
 \]
 
@@ -699,7 +699,7 @@ L'algoritmo effettua un campionamento \textit{bootstrap}:
     \State Inizializza $\Theta$
     \Repeat
         \State Campiona $(u, i, j)$ da $D_S$
-        \State $\Theta \gets \Theta + \gamma \cdot \left( \frac{e^{-\hat{x}_{uij}}}{1 + e^{-\hat{x}_{uij}}} \cdot \frac{\partial \hat{x}_{uij}}{\partial \Theta} - \lambda_\Theta \cdot \Theta \right)$
+        \State $\Theta \gets \Theta + \gamma \cdot \left( \frac{e^{-\hat{y}_{uij}}}{1 + e^{-\hat{y}_{uij}}} \cdot \frac{\partial \hat{y}_{uij}}{\partial \Theta} - \lambda_\Theta \cdot \Theta \right)$
     \Until{convergenza}
     \State \Return $\Theta$
 \EndProcedure
@@ -710,7 +710,7 @@ Questo approccio consente una rapida convergenza e un buon bilanciamento tra cla
 
 \textit{BPR} può essere applicato a diverse famiglie di modelli. Di seguito viene presentata la versione con \textit{Matrix Factorization} (BPR-MF):
 
-Ogni \textit{user} \( u \in U \) e ogni \textit{item} \( i \in I \) sono rappresentati da un vettore latente in \( \mathbb{R}^k \):
+Ogni \textit{user} $u \in U$ e ogni \textit{item} $i \in I$ sono rappresentati da un vettore latente in $\mathbb{R}^k$:
 
 \[
 \mathbf{w}_u \in \mathbb{R}^k \quad \text{(user)} \qquad
@@ -718,32 +718,32 @@ Ogni \textit{user} \( u \in U \) e ogni \textit{item} \( i \in I \) sono rappres
 \]
 
 
-Per ogni tripla \( (u, i, j) \), il modello calcola:
+Per ogni tripla $(u, i, j)$, il modello calcola:
 
 \[
-\hat{x}_{ui} = \langle \mathbf{w}_u, \mathbf{h}_i \rangle = \sum_{f=1}^{k} w_{uf} \cdot h_{if}
+\hat{y}_{ui} = \langle \mathbf{w}_u, \mathbf{h}_i \rangle = \sum_{f=1}^{k} w_{uf} \cdot h_{if}
 \]
 
 \[
-\hat{x}_{uj} = \langle \mathbf{w}_u, \mathbf{h}_j \rangle = \sum_{f=1}^{k} w_{uf} \cdot h_{jf}
+\hat{y}_{uj} = \langle \mathbf{w}_u, \mathbf{h}_j \rangle = \sum_{f=1}^{k} w_{uf} \cdot h_{jf}
 \]
 
 \[
-\hat{x}_{uij} = \hat{x}_{ui} - \hat{x}_{uj} = \langle \mathbf{w}_u, \mathbf{h}_i - \mathbf{h}_j \rangle
+\hat{y}_{uij} = \hat{y}_{ui} - \hat{y}_{uj} = \langle \mathbf{w}_u, \mathbf{h}_i - \mathbf{h}_j \rangle
 \]
 
 
 La funzione obiettivo da massimizzare è:
 
 \[
-\text{BPR-Opt} = \sum_{(u,i,j) \in D_S} \log \sigma(\hat{x}_{uij}) 
+\text{BPR-Opt} = \sum_{(u,i,j) \in D_S} \log \sigma(\hat{y}_{uij}) 
 - \lambda \left( \|\mathbf{w}_u\|^2 + \|\mathbf{h}_i\|^2 + \|\mathbf{h}_j\|^2 \right)
 \]
 
 Definiamo:
 
 \[
-z = -\frac{\partial}{\partial \Theta} \ln \sigma(\hat{x}_{uij}) = \frac{e^{-\hat{x}_{uij}}}{1 + e^{-\hat{x}_{uij}}}
+z = -\frac{\partial}{\partial \Theta} \ln \sigma(\hat{y}_{uij}) = \frac{e^{-\hat{y}_{uij}}}{1 + e^{-\hat{y}_{uij}}}
 \]
 
 Gli aggiornamenti dei parametri sono:
@@ -865,7 +865,7 @@ Dove $g_u^{t-1}$ è il gradiente calcolato all'iterazione precedente e $\gamma$ 
 Infine lo \textit{score} per la coppia \textit{user} $u$ e \textit{item} $i$ si calcola come:
 
 \[
-\hat{x}_{ui} = \sigma(w_u^T h_i + b_u + b_i)
+\hat{y}_{ui} = \sigma(w_u^T h_i + b_u + b_i)
 \]
 
 I punti di forza dell'algoritmo sono:
@@ -883,7 +883,7 @@ L'algoritmo soffre anche di diverse problematiche:
     \item sensibilità alla scelta dei parametri: il modello è molto dipendente dagli iperparametri, come il \textit{learning rate} e la regolarizzazione
 \end{itemize}
 
-\section{Algoritmi ibridi}\label{algoritmi-ibridi}
+\section{Algoritmi ibridi}
 
 \subsection{LightFM}\label{lightfm}
 
@@ -925,7 +925,7 @@ b_u = \sum_{f \in f_u} b_f, \quad b_i = \sum_{f \in f_i} b_f
 
 Lo \textit{score} stimato $\hat{r}_{ui}$ per lo \textit{user} $u$ sull'\textit{item} $i$ è dato da:
 \[
-\hat{x}_{ui} = f\left( \mathbf{q}_u \cdot \mathbf{p}_i + b_u + b_i \right)
+\hat{y}_{ui} = f\left( \mathbf{q}_u \cdot \mathbf{p}_i + b_u + b_i \right)
 \]
 dove $f(x)$ è una funzione di attivazione. Per problemi di classificazione binaria (ad esempio click o no click), si utilizza la funzione sigmoide:
 \[
@@ -943,7 +943,7 @@ Il modello viene allenato massimizzando la probabilità di predire correttamente
 
 La funzione di verosimiglianza da massimizzare è:
 \[
-\mathcal{L} = \prod_{(u,i) \in S^+} \hat{x}_{ui} \cdot \prod_{(u,i) \in S^-} (1 - \hat{x}_{ui})
+\mathcal{L} = \prod_{(u,i) \in S^+} \hat{y}_{ui} \cdot \prod_{(u,i) \in S^-} (1 - \hat{y}_{ui})
 \]
 
 L'ottimizzazione si effettua mediante \textit{stochastic gradient Descent}, con un learning rate adattivo controllato da $\gamma$ (ad esempio tramite \textit{Adagrad}), e regolarizzazione tramite $\lambda$.
@@ -967,15 +967,113 @@ L'algoritmo soffre anche di diverse problematiche:
     \item staticità: non incorpora l'evoluzione temporale delle preferenze degli \textit{user}
 \end{itemize}
 
-\section{Introduzione a modelli di Deep Learning}\label{introduzione-a-modelli-di-deep-learning}
+\section{Deep Learning}
 
-\section{Evaluation}
+\subsection{AutoRec}\label{autorec}
+Sebbene la \textit{Matrix Factorization} ottenga prestazioni decenti rimane un modello lineare. Pertanto, tali modelli non sono in grado di catturare relazioni complesse, non lineari e intricate che potrebbero essere predittive delle preferenze degli \textit{user}. \textit{AutoRec} (Sedhain et al., 2015) interpreta il \textit{collaborative filtering} tramite un'architettura di autoencoder e mira a integrare trasformazioni non lineari basandosi su feedback espliciti. Le reti neurali si sono dimostrate capaci di approssimare qualsiasi funzione continua, rendendole adatte a superare le limitazioni della \textit{Matrix Factorization} e ad arricchirne la capacità espressiva.
+
+Da un lato, \textit{AutoRec} ha la stessa struttura di un autoencoder, composta da uno strato di input, uno strato nascosto e uno strato di ricostruzione (output). Un autoencoder è una rete neurale che impara a copiare il proprio input sull'output al fine di codificare gli input in rappresentazioni nascoste (solitamente a bassa dimensionalità). In \textit{AutoRec}, invece di incorporare esplicitamente \textit{user} o \textit{item} in uno spazio a bassa dimensionalità, viene utilizzata la colonna o riga della matrice di interazioni come input, per poi ricostruire la matrice stessa nello strato di output.
+
+Dall'altro lato, \textit{AutoRec} si differenzia da un autoencoder tradizionale: invece di concentrarsi sull'apprendimento delle rappresentazioni nascoste, \textit{AutoRec} si focalizza sull'apprendimento e ricostruzione dello strato di output. Utilizza una matrice di interazioni parzialmente osservata come input, con l'obiettivo di ricostruire una matrice di valutazioni completa. Nel frattempo, i valori mancanti dell'input vengono riempiti nello strato di output tramite la ricostruzione, a fini di raccomandazione.
+
+Esistono due varianti di \textit{AutoRec}: una basata sugli \textit{user} (\textit{user-based}) e una sugli \textit{item} (\textit{item-based}). Verrà introdotta solamente la versione \textit{item-based} di \textit{AutoRec}. La versione \textit{user-based} può essere derivata in modo analogo.
+
+
+Sia $R^*_i$ la $i$-esima colonna della matrice delle valutazioni (\textit{rating matrix}), dove le valutazioni sconosciute sono impostate a zero di default.
+
+L'architettura è definita come:
+
+\[
+h(R^*_i) = f\left( W \cdot g\left( VR^*_i + \mu \right) + b \right)
+\]
+
+dove $f(\cdot)$ e $g(\cdot)$ sono funzioni di attivazione non lineari, $W$ e $V$ sono matrici di pesi, $\mu$ è un termine di bias nel livello nascosto, e $b$ è il bias del livello di output. Indichiamo con $h(\cdot)$ l'intera rete di AutoRec. L'output $h(R*_{i})$ è la ricostruzione della colonna $i$-esima della matrice delle valutazioni.
+
+La seguente funzione obiettivo mira a minimizzare l'errore di ricostruzione:
+
+\[
+\underset{W, V, \mu, b}{\mathrm{argmin}} \sum_{i=1}^M{\parallel R_{*i} - h(R_{*i}) \parallel_{\mathcal{O}}^2} + \lambda(\| W \|_F^2 + \| V \|_F^2)
+\]
+
+Dove $ \| \cdot \|_{\mathcal{O}}$ indica che viene considerato solo il contributo delle valutazioni osservate, ovvero durante la backpropagation vengono aggiornati solo i pesi associati agli input osservati.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[keepaspectratio]{figures/algorithms/auto_rc.PNG}
+    \caption{Modello AutoRec basato sugli \textit{item}. Si utilizza la notazione a piatto per indicare che ci sono $n$ copie della rete neurale (una per ciascun \textit{item}), dove $W$ e $V$ sono condivisi tra tutte le copie.}
+    \label{fig:auto_rec}
+\end{figure}
+
+Un tipico autoencoder è composto da un \textit{encoder} e un \textit{decodificatore}. L'\textit{encoder} proietta l'input verso rappresentazioni nascoste e il \textit{decodificatore} mappa il livello nascosto al livello di ricostruzione. Nessuna funzione di attivazione è applicata al \textit{decodificatore}. Il \textit{dropout} è incluso dopo l'\textit{encoding} per ridurre l'overfitting. I gradienti degli input non osservati vengono mascherati per garantire che solo le valutazioni osservate contribuiscano al processo di apprendimento del modello.
+
+Per l'addestramento si può utilizzare \textit{L2 loss} e come metrica di accuratezza l'\textit{RMSE}.
+
+\subsection{NCF}
+Viene introdotto il framework di \textit{Neural Collaborative Filtering} (\textit{NCF}) per sistemi di raccomandazione basati su feedback implicito.
+
+Il modello, chiamato \textit{Neural Matrix Factorization} (\textit{NeuMF}), proposto da He et al. (2017), mira ad affrontare il compito di ordinamento personalizzato basato su feedback implicito. Questo modello sfrutta la flessibilità e la non-linearità delle reti neurali per sostituire i prodotti scalari della fattorizzazione di matrici, con l'obiettivo di aumentare l'espressività del modello.
+
+In particolare, il modello è composto da due sottoreti: \textit'{Generalized Matrix Factorization} (\textit{GMF}) e una rete \textit{Multi-Layer Perceptron} (\textit{MLP}), e modella le interazioni attraverso due percorsi distinti anziché usare un semplice prodotto scalare. Gli output di queste due reti sono concatenate per calcolare il punteggio finale di predizione.
+
+Diversamente dal compito di previsione dei \textit{rating} (come in \textit{AutoRec}~\ref{autorec}), questo modello genera una lista ordinata di raccomandazioni per ciascun \textit{user} basata su feedback implicito. Si utilizza la \textit{personalized ranking loss} introdotta precedentemente~\ref{bpr}.
+
+\subsection{Il modello NeuMF}
+
+\textit{NeuMF} fonde due sottoreti. La \textit{GMF} è una versione neurale generica della fattorizzazione di matrici, in cui l'input è il prodotto elemento per elemento (\textit{Hadamard}) dei fattori latenti dello \textit{user} e dell'\textit{item}. Essa consiste in due layer neurali:
+
+\[
+\begin{split}
+x &= p_u \odot q_i \\
+\hat{y}_{ui} &= \alpha(h^\top x),
+\end{split}
+\]
+
+dove $\odot$ rappresenta l'\textit{Hadamard product} tra vettori, $P \in \mathbb{R}^{m \times k}$ e $Q \in \mathbb{R}^{n \times k}$ sono rispettivamente la matrice latente degli utenti e quella degli oggetti, $p_u \in \mathbb{R}^{k}$ è la riga $u$-esima di $P$, $q_i \in \mathbb{R}^{ k}$ è la riga $i$-esima di $Q$, $a$ è la funzione di attivazione, e $h$ è il vettore dei pesi dell'output layer.  
+$\hat{y}_{ui}$ è il punteggio predetto che lo \textit{user} $u$ potrebbe assegnare all'\textit{item} $i$.
+
+L'altro componente del modello è la \textit{MLP}. Per aumentare la flessibilità del modello, le embedding di \textit{user} e \textit{item} non sono condivise con la \textit{GMF}. Il \textit{MLP} utilizza la concatenazione delle embedding come input. Grazie a connessioni complesse e trasformazioni non lineari, è in grado di modellare interazioni sofisticate tra utenti e oggetti. Più precisamente:
+
+\[
+\begin{aligned}
+z^{(1)} &= \phi_1(U_u, V_i) = \left[ U_u, V_i \right] \\
+\phi^{(2)}(z^{(1)}) &= \alpha^1(W^{(2)} z^{(1)} + b^{(2)}) \\
+&\dots \\
+\phi^{(L)}(z^{(L-1)}) &= \alpha^L(W^{(L)} z^{(L-1)} + b^{(L)}) \\
+\hat{y}_{ui} &= \alpha(h^\top \phi^L(z^{(L-1)}))
+\end{aligned}
+\]
+
+
+dove $W^*$, $b^*$ e $a^*$ sono rispettivamente la matrice dei pesi, il vettore di bias e la funzione di attivazione. $\phi^*$ denota la funzione del layer corrispondente mentre $z^*$ è l'output del layer corrispondente.
+
+Per combinare i risultati di \textit{GMF} e \textit{MLP}, invece della semplice somma, \textit{NeuMF} concatena i penultimi layer delle due sottoreti per creare un vettore di features che viene passato a un ulteriore layer. Successivamente, gli output vengono proiettate con la matrice $h$ e una funzione di attivazione sigmoide. L'output finale è calcolato come:
+
+\[
+\hat{y}_{ui} = \sigma(h^\top[x, \phi^L(z^{(L-1)})]).
+\]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{../Thesis/figures/algorithms/neu_mf.png}
+    \caption{Modello \textit{NeuMF}}
+    \label{fig:neu_mf}
+\end{figure}
+
+\textit{NeuMF} consiste in un modello di \textit{Generalized Matrix Factorization} (\textit{GMF}) e una rete neurale \textit{Multi-Layer Perceptron} (\textit{MLP}) con vettori di \textit{embedding} distinti per utenti e \textit{item}. La struttura dell'MLP è controllata dal parametro \texttt{nums\_hiddens}. \textit{ReLU} è utilizzata come funzione di attivazione predefinita.
+
+Come \textit{loss} si utilizza la \textit{pairwise ranking loss}, in cui un passaggio importante è il campionamento negativo. Per ogni \textit{user}, gli \textit{item} con cui lo \textit{user} non ha interagito sono considerati \textit{item} candidati (voci non osservate). Durante la fase di addestramento, il modello si assicura che gli \textit{item} che uno \textit{user} gradisce vengano classificati più in alto rispetto agli \textit{item} che lo \textit{user} non gradisce o con cui non ha interagito.
+
+Come metriche di valutazione si possono usare la \textit{AUC}~\ref{evaluation} o \textit{Hit@K}~\ref{evaluation}.
+
+\subsection{DeepFM}
+
+\section{Evaluation}\label{evaluation}
 
 In un sistema di \textit{recommendation}, è fondamentale misurare l'efficacia delle raccomandazioni prodotte in base all'interazione dell'utente con gli \textit{item} proposti. Prima di poter elencare alcune delle metriche più utilizzate occorre specificare la notazione utilizzata:
 
 \begin{itemize}
     \item $I_u^{rel}$ è l'insieme degli \textit{item} rilevanti per $u$, ovvero quelli per cui $r_{ui}$ è maggiore o uguale a una certa soglia di rilevanza (es. $4$ su una scala $1-5$) nel caso di feedback espliciti. Nel caso di feedback impliciti, $I_u^{rel}$ è l'insieme degli \textit{item} con cui l'utente ha \textit{interagito} (es. clic, acquisti, visualizzazioni, ascolti, ecc.). In un contesto di feedback implicito, l'interazione è sufficiente per considerare un \textit{item} come rilevante, senza la necessità di una soglia numerica.
-    \item $\hat{I}_u^K$ è l'insieme dei \textit{top-K item} raccomandati allo \textit{user} $u$, ottenuto ordinando in modo decrescente gli \textit{item} in $I \setminus I_u$ in base allo \textit{rating} $\hat{r}_{ui}$ o \textit{score} $\hat{x}_{ui}$, rispettivamente per feedback espliciti e impliciti, e prendendo i primi $K$.
+    \item $\hat{I}_u^K$ è l'insieme dei \textit{top-K item} raccomandati allo \textit{user} $u$, ottenuto ordinando in modo decrescente gli \textit{item} in $I \setminus I_u$ in base allo \textit{rating} $\hat{r}_{ui}$ o \textit{score} $\hat{y}_{ui}$, rispettivamente per feedback espliciti e impliciti, e prendendo i primi $K$.
     \item L'insieme degli \textit{item} rilevanti tra i top-K per $u$ è dato da:
     \[
     I_u^{rel@K} = \hat{I}_u^K \cap I_u^{rel}
@@ -1029,6 +1127,12 @@ Le seguenti metriche valgono sia per feedback impliciti che espliciti:
     \[
     \text{F1@K}(u) = 2 \cdot \frac{\text{Precision@K}(u) \cdot \text{Recall@K}(u)}{\text{Precision@K}(u) + \text{Recall@K}(u)}
     \]
+    \item Hit@K.\\
+    Metrica binaria che indica se almeno un \textit{item} rilevante per lo \textit{user} compare tra i primi K raccomandati. Se sì, il valore è 1 (hit), altrimenti 0 (miss). Misura la capacità del sistema di \textit{recommendation} di "azzeccare" almeno una preferenza dello \textit{user} nelle top-K proposte.\\
+    \[
+    \text{oppure} \quad 
+    \text{Hit@K}(u) = \mathbf{1}\left\{ |I_u^{rel@K}| > 0 \right\}
+    \]  
     
     \item Area Under the ROC Curve (AUC).\\
     Probabilità che un \textit{item} rilevante riceva uno \textit{score} più alto rispetto a un \textit{item} non rilevante.
