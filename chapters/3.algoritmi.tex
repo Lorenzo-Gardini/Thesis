@@ -970,7 +970,7 @@ L'algoritmo soffre anche di diverse problematiche:
 \section{Deep Learning}
 
 \subsection{AutoRec}\label{autorec}
-Sebbene la \textit{Matrix Factorization} ottenga prestazioni decenti rimane un modello lineare. Pertanto, tali modelli non sono in grado di catturare relazioni complesse, non lineari e intricate che potrebbero essere predittive delle preferenze degli \textit{user}. \textit{AutoRec} (Sedhain et al., 2015) interpreta il \textit{collaborative filtering} tramite un'architettura di autoencoder e mira a integrare trasformazioni non lineari basandosi su feedback espliciti. Le reti neurali si sono dimostrate capaci di approssimare qualsiasi funzione continua, rendendole adatte a superare le limitazioni della \textit{Matrix Factorization} e ad arricchirne la capacità espressiva.
+Sebbene la \textit{Matrix Factorization} ottenga prestazioni decenti rimane un modello lineare. Pertanto, tali modelli non sono in grado di catturare relazioni complesse, non lineari e intricate che potrebbero essere predittive delle preferenze degli \textit{user}. \textit{AutoRec}~\cite{AutoRec} interpreta il \textit{collaborative filtering} tramite un'architettura di autoencoder e mira a integrare trasformazioni non lineari basandosi su feedback espliciti. Le reti neurali si sono dimostrate capaci di approssimare qualsiasi funzione continua, rendendole adatte a superare le limitazioni della \textit{Matrix Factorization} e ad arricchirne la capacità espressiva.
 
 Da un lato, \textit{AutoRec} ha la stessa struttura di un autoencoder, composta da uno strato di input, uno strato nascosto e uno strato di ricostruzione (output). Un autoencoder è una rete neurale che impara a copiare il proprio input sull'output al fine di codificare gli input in rappresentazioni nascoste (solitamente a bassa dimensionalità). In \textit{AutoRec}, invece di incorporare esplicitamente \textit{user} o \textit{item} in uno spazio a bassa dimensionalità, viene utilizzata la colonna o riga della matrice di interazioni come input, per poi ricostruire la matrice stessa nello strato di output.
 
@@ -1008,16 +1008,16 @@ Un tipico autoencoder è composto da un \textit{encoder} e un \textit{decodifica
 
 Per l'addestramento si può utilizzare \textit{L2 loss} e come metrica di accuratezza l'\textit{RMSE}.
 
-\subsection{NCF}
+\subsection{NCF}\label{ncf}
 Viene introdotto il framework di \textit{Neural Collaborative Filtering} (\textit{NCF}) per sistemi di raccomandazione basati su feedback implicito.
 
-Il modello, chiamato \textit{Neural Matrix Factorization} (\textit{NeuMF}), proposto da He et al. (2017), mira ad affrontare il compito di ordinamento personalizzato basato su feedback implicito. Questo modello sfrutta la flessibilità e la non-linearità delle reti neurali per sostituire i prodotti scalari della fattorizzazione di matrici, con l'obiettivo di aumentare l'espressività del modello.
+Il modello, chiamato \textit{Neural Matrix Factorization} (\textit{NeuMF})~\cite{NeuMF} mira ad affrontare il compito di ordinamento personalizzato basato su feedback implicito. Questo modello sfrutta la flessibilità e la non-linearità delle reti neurali per sostituire i prodotti scalari della fattorizzazione di matrici, con l'obiettivo di aumentare l'espressività del modello.
 
 In particolare, il modello è composto da due sottoreti: \textit'{Generalized Matrix Factorization} (\textit{GMF}) e una rete \textit{Multi-Layer Perceptron} (\textit{MLP}), e modella le interazioni attraverso due percorsi distinti anziché usare un semplice prodotto scalare. Gli output di queste due reti sono concatenate per calcolare il punteggio finale di predizione.
 
-Diversamente dal compito di previsione dei \textit{rating} (come in \textit{AutoRec}~\ref{autorec}), questo modello genera una lista ordinata di raccomandazioni per ciascun \textit{user} basata su feedback implicito. Si utilizza la \textit{personalized ranking loss} introdotta precedentemente~\ref{bpr}.
+Diversamente dal compito di previsione dei \textit{rating} (come in \textit{AutoRec}~\ref{autorec}), questo modello genera una lista ordinata di raccomandazioni per ciascun \textit{user} basata su feedback implicito.
 
-\subsection{Il modello NeuMF}
+\subsubsection{Il modello NeuMF}\label{neufm}
 
 \textit{NeuMF} fonde due sottoreti. La \textit{GMF} è una versione neurale generica della fattorizzazione di matrici, in cui l'input è il prodotto elemento per elemento (\textit{Hadamard}) dei fattori latenti dello \textit{user} e dell'\textit{item}. Essa consiste in due layer neurali:
 
@@ -1044,7 +1044,7 @@ z^{(1)} &= \phi_1(U_u, V_i) = \left[ U_u, V_i \right] \\
 \]
 
 
-dove $W^*$, $b^*$ e $a^*$ sono rispettivamente la matrice dei pesi, il vettore di bias e la funzione di attivazione. $\phi^*$ denota la funzione del layer corrispondente mentre $z^*$ è l'output del layer corrispondente.
+dove $W^*$, $b^*$ e $\alpha^*$ sono rispettivamente la matrice dei pesi, il vettore di bias e la funzione di attivazione. $\phi^*$ denota la funzione del layer corrispondente mentre $z^*$ è l'output del layer corrispondente.
 
 Per combinare i risultati di \textit{GMF} e \textit{MLP}, invece della semplice somma, \textit{NeuMF} concatena i penultimi layer delle due sottoreti per creare un vettore di features che viene passato a un ulteriore layer. Successivamente, gli output vengono proiettate con la matrice $h$ e una funzione di attivazione sigmoide. L'output finale è calcolato come:
 
@@ -1061,11 +1061,98 @@ Per combinare i risultati di \textit{GMF} e \textit{MLP}, invece della semplice 
 
 \textit{NeuMF} consiste in un modello di \textit{Generalized Matrix Factorization} (\textit{GMF}) e una rete neurale \textit{Multi-Layer Perceptron} (\textit{MLP}) con vettori di \textit{embedding} distinti per utenti e \textit{item}. La struttura dell'MLP è controllata dal parametro \texttt{nums\_hiddens}. \textit{ReLU} è utilizzata come funzione di attivazione predefinita.
 
-Come \textit{loss} si utilizza la \textit{pairwise ranking loss}, in cui un passaggio importante è il campionamento negativo. Per ogni \textit{user}, gli \textit{item} con cui lo \textit{user} non ha interagito sono considerati \textit{item} candidati (voci non osservate). Durante la fase di addestramento, il modello si assicura che gli \textit{item} che uno \textit{user} gradisce vengano classificati più in alto rispetto agli \textit{item} che lo \textit{user} non gradisce o con cui non ha interagito.
+Come \textit{loss} si utilizza la \textit{binary cross entropy}, conosciuta anche come \textit{log loss}, in cui un passaggio importante è il campionamento negativo. 
+\[
+\mathcal{L} = -\sum_{(u,i) \in Y \cup Y^{-}} \left[ y_{ui} \cdot \log \hat{y}_{ui} + (1 - y_{ui}) \cdot \log(1 - \hat{y}_{ui}) \right]
+\]
 
-Come metriche di valutazione si possono usare la \textit{AUC}~\ref{evaluation} o \textit{Hit@K}~\ref{evaluation}.
+Per ogni \textit{user}, gli \textit{item} con cui lo \textit{user} non ha interagito sono considerati \textit{item} candidati (voci non osservate). Durante la fase di addestramento, il modello si assicura che gli \textit{item} che uno \textit{user} gradisce vengano classificati più in alto rispetto agli \textit{item} che lo \textit{user} non gradisce o con cui non ha interagito.
 
 \subsection{DeepFM}
+
+Le reti neurali profonde sono potenti nell’apprendimento della rappresentazione delle caratteristiche e hanno il potenziale per apprendere interazioni sofisticate. Grazie a livelli di trasformazione non lineare si ottiene la capacità di modellare sia combinazioni di caratteristiche di basso ordine sia di alto ordine. Inoltre, le strutture intrinsecamente non lineari degli input possono essere catturate dalle reti neurali profonde. 
+
+Si introduce un modello rappresentativo chiamato \textit{Deep Factorization Machines} (\textit{DeepFM})~\cite{DeepFM}.
+
+\textit{DeepFM} è composto da una componente di \textit{Factorization Machine} (\textit{FM}) e da una componente deep, integrate in una struttura parallela. La componente \textit{FM} è identica alla \textit{2-Way Factorization Machine}, utilizzata per modellare le interazioni tra caratteristiche di basso ordine. La componente deep è una rete \textit{Multi Layer Perceptron} (MLP), usata per catturare interazioni tra caratteristiche di ordine superiore e non linearità.
+
+Queste due componenti condividono gli stessi input/\textit{embedding}, e i loro output vengono sommati per ottenere la previsione finale.
+
+\subsubsection{2-Way Factorization Machine}
+
+Le \textit{Factorization Machines} (\textit{FM}), proposte da Rendle~\cite{FM}, sono algoritmi supervisionati che possono essere utilizzati per attività di classificazione, regressione e ranking. Hanno rapidamente preso piede e sono diventati un metodo popolare e di impatto per fare previsioni e raccomandazioni. In particolare, rappresentano una generalizzazione del modello di regressione lineare e del modello di fattorizzazione di matrici. Inoltre, ricordano le macchine a vettori di supporto con un kernel polinomiale. I punti di forza delle \textit{Factorization Machines} rispetto alla regressione lineare e alla fattorizzazione di matrici sono: 
+\begin{itemize}
+    \item possono modellare interazioni variabili a $\chi$ vie, dove $\chi$ è il numero di ordine polinomiale ed è solitamente impostato a due
+    \item un algoritmo di ottimizzazione veloce associato alle \textit{Factorization Machines} può ridurre il tempo di calcolo del polinomio a una complessità lineare, rendendolo estremamente efficiente soprattutto per input sparsi di elevata dimensionalità
+\end{itemize}
+
+Per questi motivi, le \textit{Factorization Machines} sono ampiamente utilizzate nella pubblicità moderna e nelle raccomandazioni di prodotto.
+
+
+Formalmente, sia $x \in \mathbb{R}^d$ il vettore delle caratteristiche di un campione, e $y$ l'etichetta corrispondente, che può essere un valore reale o un'etichetta di classe, come ad esempio una classe binaria "click/non-click".  
+Il modello per una factorization machine di grado due è definito come:
+
+\[
+\hat{y}(x) = \mathbf{w}_0 + \sum_{i=1}^d \mathbf{w}_i x_i + \sum_{i=1}^d\sum_{j=i+1}^d \langle\mathbf{v}_i, \mathbf{v}_j\rangle x_i x_j
+\]
+
+dove $w_0 \in \mathbb{R}$ è il bias globale; $w \in \mathbb{R}^d$ denota i pesi della i-esima variabile; $V \in \mathbb{R}^{d\times k}$ rappresenta le embedding delle feature; $v_i$ rappresenta l'$i$-esima riga di $V$; $k$ è la dimensionalità dei fattori latenti; $\langle\cdot, \cdot \rangle$ è il prodotto scalare di due vettori.
+
+$\langle \mathbf{v}_i, \mathbf{v}_j \rangle$ rappresenta l'interazione tra la $i$-esima e la $j$-esima feature. Alcune interazioni tra feature possono essere facilmente comprese, quindi possono essere progettate dagli esperti. Tuttavia, la maggior parte delle altre interazioni tra feature sono nascoste nei dati e difficili da identificare. Pertanto, modellare automaticamente le interazioni tra feature può ridurre notevolmente gli sforzi nell'ingegneria delle feature. È evidente che i primi due termini corrispondono al modello di regressione lineare e l'ultimo termine è un'estensione del modello di fattorizzazione della matrice. Se la feature $i$ rappresenta un articolo e la feature $j$ rappresenta un utente, il terzo termine è esattamente il prodotto scalare tra le embedding dell'utente e dell'articolo.
+
+Da notare che il modello \textit{FM} può anche generalizzarsi a ordini superiori (grado > 2). Tuttavia, la stabilità numerica potrebbe indebolire la generalizzazione.
+
+Ottimizzare le \textit{FM} in un modo diretto porta a una complessità di $\mathcal{O}(kd^2)$ poiché tutte le interazioni a coppie devono essere calcolate. Per risolvere questo problema di inefficienza, si può riorganizzare il terzo termine di \textit{FM}, il che potrebbe ridurre notevolmente il costo computazionale, portando a una complessità temporale lineare $\mathcal{O}(kd)$. La riformulazione del termine di interazione a coppie è la seguente:
+
+\[
+\begin{split}\begin{aligned}
+&\sum_{i=1}^d \sum_{j=i+1}^d \langle\mathbf{v}_i, \mathbf{v}_j\rangle x_i x_j \\
+ &= \frac{1}{2} \sum_{i=1}^d \sum_{j=1}^d\langle\mathbf{v}_i, \mathbf{v}_j\rangle x_i x_j - \frac{1}{2}\sum_{i=1}^d \langle\mathbf{v}_i, \mathbf{v}_i\rangle x_i x_i \\
+ &= \frac{1}{2} \big (\sum_{i=1}^d \sum_{j=1}^d \sum_{l=1}^k\mathbf{v}_{i, l} \mathbf{v}_{j, l} x_i x_j - \sum_{i=1}^d \sum_{l=1}^k \mathbf{v}_{i, l} \mathbf{v}_{i, l} x_i x_i \big)\\
+ &=  \frac{1}{2} \sum_{l=1}^k \big ((\sum_{i=1}^d \mathbf{v}_{i, l} x_i) (\sum_{j=1}^d \mathbf{v}_{j, l}x_j) - \sum_{i=1}^d \mathbf{v}_{i, l}^2 x_i^2 \big ) \\
+ &= \frac{1}{2} \sum_{l=1}^k \big ((\sum_{i=1}^d \mathbf{v}_{i, l} x_i)^2 - \sum_{i=1}^d \mathbf{v}_{i, l}^2 x_i^2)
+ \end{aligned}\end{split}
+\]
+
+Con questa riformulazione, la complessità del modello diminuisce notevolmente. Inoltre, per le feature sparse, è necessario calcolare solo gli elementi non nulli, in modo che la complessità complessiva sia lineare rispetto al numero di feature non nulle.
+La predizione finale diventa:
+
+\[
+\hat{y}(x) = w_0 + \sum_{i=1}^d w_i x_i + \frac{1}{2} \sum_{l=1}^k \left( \left( \sum_{i=1}^d v_{i,l} x_i \right)^2 - \sum_{i=1}^d v_{i,l}^2 x_i^2 \right)
+\]
+
+\subsubsection{Architettura DeepFM}
+Si denota l'output della componente \textit{FM} come $\hat{y}^{(FM)}$. Sia $e_i \in \mathbb{R}^{k}$ il vettore di caratteristiche latenti (\textit{embedding}) dell'$i$-esimo campo. L'input della componente deep è la concatenazione degli \textit{embedding} densi di tutti i campi, ottenuti a partire dalle caratteristiche categoriali sparse in input, ed è denotato come:
+
+\[
+\mathbf{z}^{(0)} = [\mathbf{e}_1, \mathbf{e}_2, \ldots, \mathbf{e}_f]
+\]
+
+dove $f$ è il numero totale di campi. Viene quindi passato alla rete neurale seguente:
+\[
+\mathbf{z}^{(l)}  = \alpha(W^{(l)}z^{(l-1)} + b^{(l)}),
+\]
+
+dove $\alpha$ è la funzione di attivazione. $W_l$ e $b_l$ sono rispettivamente pesi e bias dell'$l^{th}$ layer. I parametri della rete includono pesi e bias specifici per ciascun livello. Sia $y_{DNN}$ l'output della parte \textit{MLP}. Il risultato finale è ottenuto sommando i risultati prodotti sia dalla componente \textit{FM} che dalla rete neurale profonda (\textit{DNN}). Questa somma viene infine elaborata dalla funzione sigmoide per produrre la probabilità finale:
+
+\[
+\hat{y} = \sigma(\hat{y}^{(FM)} + \hat{y}^{(DNN)})
+\]
+
+dove $\sigma$ è la funzione sigmoide.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{figures/algorithms/deepfm.png}
+    \caption{L'architettura di \textit{DeepFM}. In questa immagine $\hat{y}^{(MLP)} = \hat{y}^{(DNN)}$}
+    \label{fig:deepfm}
+\end{figure}
+
+
+
+Importante sottolineare che \textit{DeepFM} non è l'unico modo per combinare reti neurali profonde con \textit{FM}. Si possono aggiungere livelli non lineari sulle interazioni tra le caratteristiche~\cite{NFA_SPA}.
+
+Come per \textit{NeuMF}~\ref{neufm} la \textit{loss} utilizzata è la \textit{binary cross entropy}.
 
 \section{Evaluation}\label{evaluation}
 
