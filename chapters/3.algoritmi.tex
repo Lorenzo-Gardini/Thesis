@@ -1008,6 +1008,20 @@ Un tipico autoencoder è composto da un \textit{encoder} e un \textit{decodifica
 
 Per l'addestramento si può utilizzare \textit{L2 loss} e come metrica di accuratezza l'\textit{RMSE}.
 
+\begin{itemize}
+  \item semplice da implementare: la struttura autoencoder consente una modellazione diretta delle preferenze degli \textit{user} o degli \textit{item}
+  \item compatto: il modello ha pochi parametri e richiede meno risorse computazionali rispetto a modelli più complessi
+  \item efficace per dati sparsi: grazie alla ricostruzione degli input, riesce a gestire bene la mancanza di interazioni esplicite
+\end{itemize}
+
+L'algoritmo soffre anche di diverse problematiche:
+
+\begin{itemize}
+  \item limitato nella modellazione delle interazioni complesse: non riesce a catturare relazioni non lineari sofisticate tra \textit{user} e \textit{item}
+  \item feeedback espliciti: il modello utilizza i feedback espliciti per l'addestramento, più difficili da reperire
+  \item richiede due versioni distinte per \textit{user-based} e \textit{item-based}: non esiste una versione unificata che modelli entrambi simultaneamente
+\end{itemize}
+
 \subsection{NCF}\label{ncf}
 Viene introdotto il framework di \textit{Neural Collaborative Filtering} (\textit{NCF}) per sistemi di raccomandazione basati su feedback implicito.
 
@@ -1054,7 +1068,7 @@ Per combinare i risultati di \textit{GMF} e \textit{MLP}, invece della semplice 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.6]{../Thesis/figures/algorithms/neu_mf.png}
+    \includegraphics[scale=0.6]{figures/algorithms/neu_mf.png}
     \caption{Modello \textit{NeuMF}}
     \label{fig:neu_mf}
 \end{figure}
@@ -1067,6 +1081,22 @@ Come \textit{loss} si utilizza la \textit{binary cross entropy}, conosciuta anch
 \]
 
 Per ogni \textit{user}, gli \textit{item} con cui lo \textit{user} non ha interagito sono considerati \textit{item} candidati (voci non osservate). Durante la fase di addestramento, il modello si assicura che gli \textit{item} che uno \textit{user} gradisce vengano classificati più in alto rispetto agli \textit{item} che lo \textit{user} non gradisce o con cui non ha interagito.
+
+I punti di forza dell'algoritmo sono:
+
+\begin{itemize}
+  \item maggiore capacità espressiva: rispetto ad \textit{AutoRec} usa reti neurali profonde per modellare interazioni non lineari tra \textit{user} e \textit{item}
+  \item flessibile: consente l'integrazione di moduli diversi (\textit{GMF}, \textit{MLP}) in un'unica architettura
+  \item end-to-end: apprende le rappresentazioni e le interazioni simultaneamente durante l'addestramento
+\end{itemize}
+
+L'algoritmo soffre anche di diverse problematiche:
+
+\begin{itemize}
+  \item più costoso computazionalmente: richiede più memoria e potenza di calcolo rispetto ad \textit{AutoRec}
+  \item può soffrire di overfitting: l'alta capacità del modello può portare a una scarsa generalizzazione sui dati di test
+  \item necessita di tuning accurato: le prestazioni dipendono fortemente dall'architettura e dagli iperparametri
+\end{itemize}
 
 \subsection{DeepFM}
 
@@ -1148,11 +1178,25 @@ dove $\sigma$ è la funzione sigmoide.
     \label{fig:deepfm}
 \end{figure}
 
-
-
 Importante sottolineare che \textit{DeepFM} non è l'unico modo per combinare reti neurali profonde con \textit{FM}. Si possono aggiungere livelli non lineari sulle interazioni tra le caratteristiche~\cite{NFA_SPA}.
 
 Come per \textit{NeuMF}~\ref{neufm} la \textit{loss} utilizzata è la \textit{binary cross entropy}.
+
+I punti di forza dell'algoritmo sono:
+
+\begin{itemize}
+  \item estende \textit{NCF} con la componente delle \textit{Factorization Machine}: migliora la modellazione delle interazioni bilineari esplicite tra caratteristiche
+  \item sfrutta sia caratteristiche sparse che dense: efficace anche su dati con numerosi campi categoriali
+  \item end-to-end senza feature engineering: apprende automaticamente le interazioni complesse tra caratteristiche
+\end{itemize}
+
+L'algoritmo soffre anche di diverse problematiche:
+
+\begin{itemize}
+  \item maggiore complessità rispetto a \textit{NCF}: la combinazione di \textit{FM} e \textit{MLP} rende il modello più difficile da addestrare
+  \item richiede una gestione attenta delle feature: la qualità delle embedding iniziali può influenzare fortemente le performance
+  \item può essere meno interpretabile: l'uso congiunto di \textit{FM} e deep learning rende l'analisi dei risultati più opaca
+\end{itemize}
 
 \section{Evaluation}\label{evaluation}
 
