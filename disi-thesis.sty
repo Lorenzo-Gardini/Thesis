@@ -1,13 +1,25 @@
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
 \usepackage[italian]{babel}
-\usepackage{hyperref}
-\usepackage{graphicx}
-\usepackage{amssymb,amsmath}
-\usepackage[italian]{cleveref}
 \usepackage{geometry}
-\usepackage{titling}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{float}
 \usepackage[inline]{enumitem}
 \usepackage{setspace}
+\usepackage{titling}
 \usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage[italian]{cleveref}
+\usepackage{acronym}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{code-lstlistings}
+\usepackage{notes}
+\usepackage{shortcuts}
 
 \fancypagestyle{plain}{
     \fancyhf{}
@@ -48,7 +60,6 @@
 
 \let\oldbibliography\bibliography
 \renewcommand{\bibliography}[1]{
-    \addcontentsline{toc}{part}{}
     \addcontentsline{toc}{chapter}{\bibname}
     \oldbibliography{#1}
 }

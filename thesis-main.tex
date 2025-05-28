@@ -1,18 +1,5 @@
 \documentclass[12pt,a4paper,openright,twoside]{book}
-\usepackage[utf8]{inputenc}
 \usepackage{disi-thesis}
-\usepackage{code-lstlistings}
-\usepackage{notes}
-\usepackage{shortcuts}
-\usepackage{acronym}
-\usepackage{float}
-\usepackage{algorithm}
-\usepackage{algorithmicx}
-\usepackage{algpseudocode}
-\usepackage{amsmath}
-\usepackage{amsfonts}
-
-
 
 \school{\unibo}
 \programme{Corso di Laurea Magistrale in Ingegneria e Scienze Informatiche}
@@ -24,33 +11,28 @@
 \session{2}
 \academicyear{2025-2026}
 
-% DON'T UNCOMMENT
-% Definition of acronyms
-% \acrodef{IoT}{Internet of Thing}
-% \acrodef{vm}[VM]{Virtual Machine}
-
-
-% \mainlinespacing{1.241} % line spacing in mainmatter, comment to default (1)
+\mainlinespacing{1.241}
 
 \begin{document}
+\lstset{language=python}
 
-% \frontmatter\frontispiece
+\frontmatter\frontispiece
 
-% \begin{abstract}	
-%     La tesi esplora i principali approcci ai sistemi di raccomandazione, con focus su feedback espliciti e impliciti. Descrive poi l’attività di tirocinio presso Data Reply, dove è stata sviluppata una libreria Python per semplificare l’uso di modelli come Surprise, LightFM e Implicit. L’obiettivo è rendere i sistemi di raccomandazione più accessibili e integrabili in ambito aziendale.
-% \end{abstract}
+\begin{abstract}	
+    La tesi esplora i principali approcci ai sistemi di raccomandazione, con focus su feedback espliciti e impliciti. Descrive poi l'attività di tirocinio presso l'azienda \textit{Data Reply}, dove è stata sviluppata una libreria Python per semplificare l'uso di modelli come \textit{Surprise}, \textit{LightFM} e \textit{Implicit}. L'obiettivo è rendere i sistemi di raccomandazione più accessibili e integrabili in ambito aziendale.
+\end{abstract}
 
-% \begin{dedication} % this is optional
-% Optional. Max a few lines.
-% \end{dedication}
+\begin{dedication}
+A mia nonna.
+\end{dedication}
 
 %----------------------------------------------------------------------------------------
 \tableofcontents   
-% \listoffigures     % (optional) comment if empty
-% \lstlistoflistings % (optional) comment if empty
+\listoffigures     
+\lstlistoflistings
 %----------------------------------------------------------------------------------------
 
-% \mainmatter
+\mainmatter
 
 %----------------------------------------------------------------------------------------
 \input{chapters/1.introduzione}
@@ -58,21 +40,21 @@
 \input{chapters/3.algoritmi}
 \input{chapters/4.analisi}
 \input{chapters/5.progettazione}
-\input{chapters/6.implementazione}
-\input{chapters/7.valutazione}
-\input{chapters/8.conclusioni_e_lavori_futuri}
+% \input{chapters/6.implementazione}
+% \input{chapters/7.valutazione}
+% \input{chapters/8.conclusioni_e_lavori_futuri}
 
 %----------------------------------------------------------------------------------------
 % BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
 
-% \backmatter
+\backmatter
 
 \bibliographystyle{alpha}
 \bibliography{bibliography}
 
-% \begin{acknowledgements} % this is optional
-% Optional. Max 1 page.
-% \end{acknowledgements}
+\begin{acknowledgements}
+Optional. Max 1 page.
+\end{acknowledgements}
 
 \end{document}

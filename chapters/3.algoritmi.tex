@@ -109,7 +109,7 @@ L'algoritmo soffre anche di diverse problematiche:
     \item overfitting: se non adeguatamente regolarizzato si rischia l'overfitting
 \end{itemize}
 
-\subsection{SVD++}
+\subsection{SVD++}\label{svdpp}
 
 La precisione delle previsioni può essere migliorata considerando anche il feedback implicito, che fornisce un'indicazione aggiuntiva delle preferenze degli \textit{user}. Questo è particolarmente utile per gli \textit{user} che hanno fornito molto più feedback implicito che esplicito. Anche nei casi in cui il feedback implicito indipendente è assente, è possibile catturare un segnale significativo tenendo conto degli \textit{item} che gli \textit{user} hanno valutato, indipendentemente dal valore del \textit{rating}. Ciò ha portato a diversi metodi (\textit{Asymmetric-SVD}, \textit{SVD++}, \textit{SVD\_KNN}, ecc.~\cite{SVD++, SVD_KNN}) che modellano il fattore \textit{user} in base agli \textit{item} valutati. Il metodo \textit{SVD++} ha dimostrato di offrire una precisione superiore rispetto a \textit{SVD}.
 
@@ -774,7 +774,7 @@ L'algoritmo soffre anche di diverse problematiche:
     \item poca interpretabilità: difficile capire il motivo dietro una raccomandazione
 \end{itemize}
 
-\subsection{LMF (Logistic Matrix Factorization)}\label{lmf-logistic-matrix-factorization}
+\subsection{LMF (Logistic Matrix Factorization)}\label{lmf}
 
 Il modello \textit{LMF} (\textit{Logistic Matrix Factorization})~\cite{LMF} descrive un approccio probabilistico per la fattorizzazione di matrici nel caso di feedback implicito. La probabilità che uno \textit{user} $u$ interagisca con un \textit{item} $i$ è modellata tramite una funzione logistica.
 
