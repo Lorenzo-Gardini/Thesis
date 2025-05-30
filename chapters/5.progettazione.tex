@@ -54,7 +54,7 @@ Per avere compatibilità con \textit{Scikit-learn} ogni funzione di trasformazio
     \item se il \textit{transformer} apprende informazioni con la chiamata al metodo \texttt{fit} allora:
     \begin{itemize}
         \item i parametri appresi devono essere settati come campi pubblici e devono terminare con il carattere "\_" (e.g. \texttt{transformer.min\_} o \\ \texttt{transformer.scale\_} per \texttt{MinMaxScaler})
-        \item nel metodo \texttt{transform} deve essere chiamata la funzione \texttt{check\_is\_fitted}. Questa funzione verifica la presenza di almeno un attributo il cui nome termini con il carattere ``\_'' (convenzionalmente utilizzato da \textit{Scikit-learn} per indicare che l'attributo è stato appreso durante la \texttt{fit}). In caso contrario, viene sollevata un'eccezione di tipo \texttt{NotFittedError}
+        \item se durante la \texttt{fit} vengono appresi dei parametri nel metodo \texttt{transform} deve essere chiamata la funzione \texttt{check\_is\_fitted}. Questa funzione verifica la presenza di almeno un attributo il cui nome termini con il carattere ``\_'' (convenzionalmente utilizzato da \textit{Scikit-learn} per indicare che l'attributo è stato appreso durante la \texttt{fit}). In caso contrario, viene sollevata un'eccezione di tipo \texttt{NotFittedError}
     \end{itemize} 
 \end{itemize}
 
@@ -63,6 +63,7 @@ Alcune considerazioni importanti:
 \begin{itemize}
     \item in questo caso i metodi \texttt{fit}, \texttt{transform} e \texttt{fit\_transform} ricevono in ingresso solamente il tipo di dato \textit{DataFrame}, perché le trasformazioni sono specifiche per questo tipo di dato
     \item ogni \textit{transformer} è caratterizzato da specifici parametri che dipendono dal tipo di trasformazione stessa
+    \item non tutti i \textit{transformers} apprendono parametri durante la \textit{fit} perché sono \textit{stateless}. In quel caso non si aggiunge il controllo con \texttt{check\_is\_fitted} all'interno della \texttt{transform}
 \end{itemize}
 
 \subsection{DataFramePreprocessFunction}
@@ -80,7 +81,7 @@ Tutti i \textit{transformers} della libreria estendono direttamente o indirettam
 Vengono create anche diverse classi per poter raggruppare comportamenti comuni di alcune tipologie di \textit{transformers}:
 
 \begin{itemize}
-    \item \texttt{GroupByFunction}: estende \texttt{DataFramePreprocessFunction} e modella l'applicazione di una trasformazione su dati raggruppati (\textit{group-by}). Viene definito il metodo astratto \texttt{\_build\_transform\_function}, applicando il pattern \textit{Template Method}, il quale viene invocato all'interno del metodo \texttt{fit} e deve restituire a sua volta una funzione che, se invocata sul \textit{DataFrame} durante la \texttt{transform}, applica una trasformazione.
+    \item \texttt{GroupByFunction}: estende \texttt{DataFramePreprocessFunction} e modella l'applicazione di una trasformazione su dati raggruppati (\textit{group-by}). Viene definito il metodo astratto \texttt{\_build\_transform\_function}, applicando il pattern \textit{Template Method}. Questo metodo viene invocato all'interno del metodo \texttt{fit} e restituisce una funzione, che viene salvata come attributo. Questa funzione viene poi utilizzata nel metodo \texttt{transform} sui dati in input trasformandoli.
     
     La classe viene estesa a sua volta da \texttt{Normalizer}, che normalizza vettori per lunghezza unitaria.
 
@@ -100,7 +101,7 @@ Vengono create anche diverse classi per poter raggruppare comportamenti comuni d
         \caption{Gerarchia di \texttt{InverseTransformer}}
     \end{figure}
 
-    \item \texttt{InvertibleGroupByFunction}: estende \texttt{GroupByFunction} e \texttt{InverseTransformer}, permette di invertire le trasformazioni su gruppi. Vengono definiti i metodi astratti \texttt{\_build\_transform\_function} e \texttt{\_build\_inverse\_function}, applicando il pattern \textit{Template Method}, i quali vengono invocati entrambi dentro i metodi \texttt{fit}. Le funzioni risultanti vengono poi utilizzate durante l'invocazione dei metodi \texttt{transform} e di \texttt{inverse\_transform} per applicare la trasformazione corrispondente.
+    \item \texttt{InvertibleGroupByFunction}: estende \texttt{GroupByFunction} e \texttt{InverseTransformer}, permette di invertire le trasformazioni su gruppi. Vengono definiti i metodi astratti \texttt{\_build\_transform\_function} e \texttt{\_build\_inverse\_function}, applicando il pattern \textit{Template Method}, i quali vengono invocati entrambi dentro i metodi \texttt{fit} e restituiscono una funzione ciascuno che vengono salvate come attributi. Queste funzioni vengono poi utilizzate durante l'invocazione dei metodi \texttt{transform} e di \texttt{inverse\_transform} per applicare la trasformazione corrispondente.
     
     La classe viene estesa a sua volta da \texttt{StandardScaler}, che normalizza i dati rendendoli con media $0$ e deviazione standard $1$, e \texttt{MinMaxScaler}, che scala i dati in un intervallo specifico (di solito $[0, 1]$).
     
@@ -110,9 +111,9 @@ Vengono create anche diverse classi per poter raggruppare comportamenti comuni d
         \caption{Gerarchia di \texttt{InvertibleGroupByFunction}}
     \end{figure}
     
-    \item \texttt{BinDensity}: estende \texttt{DataFramePreprocessFunction}, si occupa di binning e densità dei dati. Viene definito il metodo astratto \texttt{\_divide} applicando il pattern \textit{Template Method}, il quale viene invocato dentro il metodo \texttt{fit}. La funzione risultante viene poi utilizzata nel metodo \texttt{transform} per applicare la trasformazione corrispondente.
+    \item \texttt{BinDensity}: estende \texttt{DataFramePreprocessFunction}, si occupa di binning e densità dei dati. Viene definito il metodo astratto \texttt{\_divide} applicando il pattern \textit{Template Method}, il quale viene invocato dentro il metodo \texttt{fit} e restituisce una funzione che viene salvata come attributo. Questa funzione viene poi utilizzata nel metodo \texttt{transform} per applicare la trasformazione corrispondente.
     
-    La classe viene estesa a sua volta da \texttt{BinThreshold}, che effettua \textit{binning} basato su una soglia di frequenza, e \texttt{BinCumulative}, che effettua \textit{binning} basato su cumulativi di distribuzione
+    La classe viene estesa a sua volta da \texttt{BinThreshold}, che effettua \textit{binning} basato su una soglia di frequenza, e \texttt{BinCumulative}, che effettua \textit{binning} basato su cumulativi di distribuzione.
     \begin{figure}[H]
         \centering
         \includegraphics[scale=0.10]{figures/UML/preprocessing/bin_density.png}
@@ -153,7 +154,8 @@ preprocessed_dataset = pipeline.fit_transform(dataset)
 
 \subsection{Tranformers}
 
-Un elenco dei \textit{transformers} che estendono direttamente la classe \texttt{DataFramePreprocessFunction} e una descrizione delle operazioni che svolgono:
+Un elenco dei \textit{transformers} che estendono direttamente la classe \\
+\texttt{DataFramePreprocessFunction} e una descrizione delle operazioni che svolgono:
 
 \begin{itemize}
     \item \texttt{Select}: seleziona specifiche colonne
@@ -182,7 +184,7 @@ Un elenco dei \textit{transformers} che estendono direttamente la classe \texttt
 
 \end{figure}\begin{figure}[H]
     \centering
-    \includegraphics[angle=90, scale=0.12]{figures/UML/preprocessing/direct_2.png}
+    \includegraphics[angle=90, scale=0.13]{figures/UML/preprocessing/direct_2.png}
     \caption{Diagrammi delle classi \texttt{Filter}, \texttt{Update}, \texttt{DropNa}, \texttt{Rename}, \texttt{Drop}, \texttt{ExtractDate}}
 
 \end{figure}\begin{figure}[H]
@@ -246,7 +248,7 @@ Viene definita l'interfaccia \texttt{PersistableModel} che espone il metodo \tex
     \caption{Diagramma del'interfaccia \texttt{PersistableModel}}
 \end{figure}
 
-Per il caricamento ogni modello implementerà autonomamente, senza dover estendere niente, un metodo \texttt{load} per il loro caricamento, che potrà essere tipo \textit{classmethod} oppure un \textit{staticmethod}.
+Per il caricamento da file ogni modello implementerà autonomamente un metodo \texttt{load}, che potrà essere tipo \textit{classmethod} oppure un \textit{staticmethod}.
 
 \subsection{Model fit data}\label{model_fit_data}
 
@@ -279,7 +281,7 @@ Ogni volta che si fa riferimento ad un id, che sia \texttt{user\_id} o \texttt{i
 
 I vari modelli possono predire il \textit{rating} o lo \textit{score} con il metodo \texttt{predict} su diversi formati di dati, purché rispettino i vincoli sopra descritti. Il formato standard deciso è identico a quello utilizzato per l'addestramento~\ref{model_fit_data}. I modelli possono in modo indipendente introdurre eventuali vincoli sui dati in input.
 
-In questo caso però il modello utilizza la singola coppia (\textit{user\_id}, \textit{item\_id}) alla quale viene associato un \textit{rating} o lo \textit{score} in base al tipo di modello utilizzato, rispettivamente per feedback espliciti e per feedback impliciti. Se, per esempio, viene dati in input al modello che gestisce feedback impliciti cinque coppie (\textit{user\_id}, \textit{item\_id}) quest'ultimo restituisce un \textit{NumPy array} di cinque valori, ciascuno corrispondente allo \textit{score} ottenuto da ciascuna coppia. Se si vuole ottenere il \textit{ranking} occorre ordinare gli \textit{score} ottenuti in ordine decrescente. Se si vuole calcolare \textit{rating} o lo \textit{score}, dati un insieme $U$ di \textit{user} e $I$ di \textit{item}, occorre dare in input al metodo \texttt{predict} tutte le combinazioni $\left\{(u, i) \mid u \in U,\; i \in I \right\}$. Eventuali features aggiuntive passate nei dati in input 
+In questo caso però il modello utilizza la singola coppia (\textit{user\_id}, \textit{item\_id}) alla quale viene associato un \textit{rating} o lo \textit{score} in base al tipo di modello utilizzato, rispettivamente per feedback espliciti e per feedback impliciti. Se, per esempio, vengono dati in input al modello, che gestisce feedback impliciti, cinque coppie (\textit{user\_id}, \textit{item\_id}) quest'ultimo restituisce un \textit{NumPy array} di cinque valori, ciascuno corrispondente allo \textit{score} ottenuto da ciascuna coppia. Se si vuole ottenere il \textit{ranking} occorre ordinare gli \textit{score} ottenuti in ordine decrescente. Se si vuole calcolare \textit{rating} o lo \textit{score}, dati un insieme $U$ di \textit{user} e $I$ di \textit{item}, occorre dare in input al metodo \texttt{predict} tutte le combinazioni $\left\{(u, i) \mid u \in U,\; i \in I \right\}$.
 
 Un esempio di input in formato \textit{DataFrame} e di output in formato \textit{NumPy array}:
 
@@ -316,7 +318,7 @@ Un esempio di input in formato \textit{DataFrame} e di output in formato \textit
     \label{tab:ratings_with_score}
 \end{table}
 
-Importante considerare che gli \textit{score} presi singolarmente non hanno alcun significato, vengono utilizzati solamente per definire un ordinamento.
+Importante considerare che gli \textit{score}, generati dai modelli impliciti, singolarmente non hanno alcun significato ma vengono utilizzati solamente per definire un ordinamento.
 
 \subsection{Similarità user-user o item-item}
 
@@ -353,7 +355,7 @@ Importante inserire, all'interno del due metodi, un controllo che verifichi che 
 
 Viene definita la classe astratta \texttt{SurpriseModel} che estende \texttt{BaseEstimator} e \texttt{PersistableModel} e che gestisce il comportamento comune della \texttt{fit} e della \texttt{predict} di tutti i modelli della libreria \textit{Surprise}. Viene definito il metodo astratto \texttt{\_fit\_surprise\_model}, applicando il pattern \textit{Template Method}. Così facendo, l'implementazione di ogni modello deve definire solamente le modalità di addestramento del modello della libreria \textit{Surprise} e quali attributi, il cui nome termina con il carattere "\_", vengono appresi.
 
-`\begin{figure}[H]
+\begin{figure}[H]
     \centering
     \includegraphics[scale=0.17]{figures/UML/models/surprise_model.png}
     \caption{Diagramma della classe astratta \texttt{SurpriseModel}}
