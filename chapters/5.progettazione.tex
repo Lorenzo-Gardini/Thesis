@@ -49,7 +49,7 @@ Per avere compatibilità con \textit{Scikit-learn} ogni funzione di trasformazio
     \begin{itemize}
         \item implementazione automatica di \texttt{get\_params()} e \texttt{set\_params()} che rispettivamente restituiscono e impostano i parametri del \textit{transformer}
         \item supporto alla ricerca di iperparametri con \texttt{GridSearchCV} e \texttt{RandomizedSearchCV}
-        \item una struttura standard per la serializzazione con \texttt{joblib} o \texttt{pickle}
+        \item una struttura standard per la serializzazione con \texttt{pickle} o altro
     \end{itemize}
     \item se il \textit{transformer} apprende informazioni con la chiamata al metodo \texttt{fit} allora:
     \begin{itemize}
