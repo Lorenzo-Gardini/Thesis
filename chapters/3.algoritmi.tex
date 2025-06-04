@@ -891,7 +891,7 @@ I sistemi di raccomandazione basati su \textit{Matrix Factorization} si sono dim
 
 I modelli \textit{content-based filtering}, che utilizzano le feature conosciute degli \textit{item} (ad esempio genere, attori, descrizioni) per generare raccomandazioni, superano questo limite, ma mancano della capacità di apprendere dalle interazioni collettive.
 
-Il modello \textit{LightFM}~\cite{LightFM}, proposto da Maciej Kula, fonde questi due approcci: rappresenta \textit{user} e \textit{item} come combinazioni lineari dei loro metadati, appresi attraverso i dati contenuti in $R$, cioè l'insieme di tutte le interazioni osservate.
+Il modello \textit{LightFM}~\cite{LightFM}, proposto da \textit{Maciej Kula}, fonde questi due approcci: rappresenta \textit{user} e \textit{item} come combinazioni lineari dei loro metadati, appresi attraverso i dati contenuti in $R$, cioè l'insieme di tutte le interazioni osservate.
 
 Utilizziamo la seguente notazione:
 \begin{itemize}
@@ -995,7 +995,7 @@ La seguente funzione obiettivo mira a minimizzare l'errore di ricostruzione:
 \underset{W, V, \mu, b}{\mathrm{argmin}} \sum_{i=1}^M{\parallel R_{*i} - h(R_{*i}) \parallel_{\mathcal{O}}^2} + \lambda(\| W \|_F^2 + \| V \|_F^2)
 \]
 
-Dove $ \| \cdot \|_{\mathcal{O}}$ indica che viene considerato solo il contributo delle valutazioni osservate, ovvero durante la backpropagation vengono aggiornati solo i pesi associati agli input osservati.
+Dove $ \| \cdot \|_{\mathcal{O}}$ indica che viene considerato solo il contributo delle valutazioni osservate, ovvero durante la \textit{backpropagation} vengono aggiornati solo i pesi associati agli input osservati.
 
 \begin{figure}[H]
     \centering
@@ -1073,7 +1073,7 @@ Per combinare i risultati di \textit{GMF} e \textit{MLP}, invece della semplice 
     \label{fig:neu_mf}
 \end{figure}
 
-\textit{NeuMF} consiste in un modello di \textit{Generalized Matrix Factorization} (\textit{GMF}) e una rete neurale \textit{Multi-Layer Perceptron} (\textit{MLP}) con vettori di \textit{embedding} distinti per utenti e \textit{item}. La struttura dell'MLP è controllata dal parametro \texttt{nums\_hiddens}. \textit{ReLU} è utilizzata come funzione di attivazione predefinita.
+\textit{NeuMF} consiste in un modello di \textit{Generalized Matrix Factorization} (\textit{GMF}) e una rete neurale \textit{Multi-Layer Perceptron} (\textit{MLP}) con vettori di \textit{embedding} distinti per utenti e \textit{item}. La struttura dell'MLP è controllata dal parametro \\ \texttt{nums\_hiddens}. \textit{ReLU} è utilizzata come funzione di attivazione predefinita.
 
 Come \textit{loss} si utilizza la \textit{binary cross entropy}, conosciuta anche come \textit{log loss}, in cui un passaggio importante è il campionamento negativo. 
 \[
@@ -1110,7 +1110,7 @@ Queste due componenti condividono gli stessi input/\textit{embedding}, e i loro 
 
 \subsubsection{2-Way Factorization Machine}
 
-Le \textit{Factorization Machines} (\textit{FM}), proposte da Rendle~\cite{FM}, sono algoritmi supervisionati che possono essere utilizzati per attività di classificazione, regressione e ranking. Hanno rapidamente preso piede e sono diventati un metodo popolare e di impatto per fare previsioni e raccomandazioni. In particolare, rappresentano una generalizzazione del modello di regressione lineare e del modello di fattorizzazione di matrici. Inoltre, ricordano le macchine a vettori di supporto con un kernel polinomiale. I punti di forza delle \textit{Factorization Machines} rispetto alla regressione lineare e alla fattorizzazione di matrici sono: 
+Le \textit{Factorization Machines} (\textit{FM}), proposte da \textit{Rendle}~\cite{FM}, sono algoritmi supervisionati che possono essere utilizzati per attività di classificazione, regressione e ranking. Hanno rapidamente preso piede e sono diventati un metodo popolare e di impatto per fare previsioni e raccomandazioni. In particolare, rappresentano una generalizzazione del modello di regressione lineare e del modello di fattorizzazione di matrici. Inoltre, ricordano le macchine a vettori di supporto con un kernel polinomiale. I punti di forza delle \textit{Factorization Machines} rispetto alla regressione lineare e alla fattorizzazione di matrici sono: 
 \begin{itemize}
     \item possono modellare interazioni variabili a $\chi$ vie, dove $\chi$ è il numero di ordine polinomiale ed è solitamente impostato a due
     \item un algoritmo di ottimizzazione veloce associato alle \textit{Factorization Machines} può ridurre il tempo di calcolo del polinomio a una complessità lineare, rendendolo estremamente efficiente soprattutto per input sparsi di elevata dimensionalità

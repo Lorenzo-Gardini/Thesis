@@ -225,7 +225,7 @@ Nel grafico sono rappresentati sia gli elementi che gli utenti nello stesso spaz
     \label{fig:2D_matrix}
 \end{figure}
 
-L'obbiettivo è che per ogni coppia (utente, \textit{item}) il prodotto scalare dell'\textit{embedding} dell'utente e dell'\textit{embedding} dell'\textit{item} fosse vicino a $1$ quando l'utente ha guardato il film e a $0$ in caso contrario.
+L'obbiettivo è che per ogni coppia (utente, \textit{item}) il prodotto scalare \\ dell'\textit{embedding} dell'utente e dell'\textit{embedding} dell'\textit{item} fosse vicino a $1$ quando l'utente ha guardato il film e a $0$ in caso contrario.
 
 I modelli apprendono automaticamente un vettore di \textit{embedding} per ciascun utente che spieghi al meglio le sue preferenze. Di conseguenza, gli \textit{embedding} di utenti con gusti simili risulteranno vicini tra loro. Allo stesso modo il modello apprende gli \textit{embedding} dei film in modo da spiegare al meglio la matrice di feedback. Anche in questo caso, gli \textit{embedding} dei film apprezzati da utenti simili saranno vicini nello spazio degli embedding.
 
@@ -252,7 +252,7 @@ Gli svantaggi di quest'approccio sono:
     \]
 
     Gli \textit{embedding} dell'utente vengono mantenuti fissi, e il sistema risolve per ottenere l'\textit{embedding} dell'\textit{item}. Lo stesso approccio può essere utilizzato per un nuovo utente
-    \item euristiche: se il sistema non ha interazioni, può approssimare l'\textit{embedding} di un \textit{item} facendo la media degli \textit{embedding} di \textit{item} appartenenti alla stessa categoria
+    \item euristiche: se il sistema non ha interazioni, può approssimare \\ l'\textit{embedding} di un \textit{item} facendo la media degli \textit{embedding} di \textit{item} appartenenti alla stessa categoria
   \end{itemize}
 
   \item difficoltà nell'includere caratteristiche aggiuntive per \textit{query}/\textit{item}: le caratteristiche aggiuntive (\textit{side features}) sono tutte quelle informazioni oltre all'ID della query o dell'\text{item}. Per esempio, per i film, le caratteristiche possono includere il paese o l'età. Includere queste caratteristiche migliora la qualità del modello

@@ -34,7 +34,7 @@ I moduli di \texttt{models} e di \texttt{evaluation} sono a sua volta divisi in 
 \section{Preprocessing}
 Il modulo contiene un serie di funzionalità che hanno lo scopo di processare i dati in modo semplice per poterli renderli adatti per i modelli. Vengono definite diverse funzioni di trasformazione che applicano una specifica trasformazione ai dati in input.
 
-\subsection{Compatibilità con Scikit-learn, preprocessing}
+\subsection{Compatibilità con Scikit-learn del preprocessing}
 
 Per avere compatibilità con \textit{Scikit-learn} ogni funzione di trasformazione, chiamata \textit{transformer}, deve soddisfare i seguenti requisiti:
 
@@ -218,7 +218,7 @@ mentre per quelli che gestiscono feedback impliciti:
 
 Per ogni algoritmo, la libreria applica il pattern \textit{Adapter} per rendere compatibili i modelli con la libreria \textit{Scikit-learn}.
 
-\subsection{Compatibilità con Scikit-learn, modelli}\label{compatibilita_sklearn}
+\subsection{Compatibilità con Scikit-learn dei modelli}\label{compatibilita_sklearn}
 
 Per definire un modello custom compatibile con la suite di \textit{Scikit-learn} occorre seguire alcuni requisiti che possono essere variabili. Vengono presentate le scelte effettuate per la libreria e che ogni modello deve rispettare:
 
@@ -359,7 +359,7 @@ Viene definita la classe astratta \texttt{SurpriseModel} che estende \texttt{Bas
     \centering
     \includegraphics[scale=0.17]{figures/UML/models/surprise_model.png}
     \caption{Diagramma della classe astratta \texttt{SurpriseModel}}
-\end{figure}'
+\end{figure}
 
 
 La classe viene estesa creando i vari adapter dei modelli:
@@ -395,6 +395,8 @@ Il metodo \texttt{predict} di questi modelli può riceve due parametri extra:
 \subsection{Modelli Implicit}
 
 Viene definita la classe astratta \texttt{ImplicitModel} che estende \texttt{BaseModel},\\ \texttt{PersistableModel} e \texttt{SimilarityModel} e che gestisce il comportamento comune della \texttt{fit} e della \texttt{predict} di tutti i modelli della libreria \textit{Implicit}. Viene definito il metodo astratto \texttt{\_fit\_implicit\_model}, applicando il pattern \textit{Template Method}. Così facendo, l'implementazione di ogni modello deve definire solamente le modalità di addestramento del modello della libreria \textit{Implicit} e quali attributi, il cui nome termina con il carattere "\_", vengono appresi.
+
+Se il \textit{trainset} contiene una terza colonna, che deve essere numerica, questa viene considerata durante l'addestramento come il peso dell'interazione della coppia (\textit{user}, \textit{item}) (e.g. il numero di click o quante volte quel film è stato visionato). 
 
 \begin{figure}[H]
     \centering
@@ -439,6 +441,8 @@ Il metodo \texttt{fit} di questi modelli può riceve due parametri extra:
 Viene definita la classe \texttt{LightFM}, classe che estende \texttt{BaseModel}, \texttt{PersistableModel} e \texttt{SimilarityModel} e rappresenta l'\textit{Adapter} del modello \texttt{LightFM} dell'omonima libreria \texttt{LightFM}. 
 
 Il modello gestisce feedback impliciti e quindi i valori restituiti dal metodo \textit{predict} corrispondono a \textit{score}.
+
+Se il \textit{trainset} contiene una terza colonna, che deve essere numerica, questa viene considerata durante l'addestramento come il peso dell'interazione della coppia (\textit{user}, \textit{item}) (e.g. il numero di click o quante volte quel film è stato visionato). 
 
 \begin{figure}[H]
     \centering
