@@ -362,12 +362,12 @@ Viene definita la classe astratta \texttt{SurpriseModel} che estende \texttt{Bas
 \end{figure}
 
 
-La classe viene estesa creando i vari adapter dei modelli:
+La classe viene estesa creando i vari adapter dei modelli. Alcuni di essi estendono anche \texttt{SimilarityModel}:
 
 \begin{itemize}
-    \item \texttt{SVD}
-    \item \texttt{SVDpp}
-    \item \texttt{KNNBaseline}
+    \item \texttt{SVD}, che estende anche \texttt{SimilarityModel}
+    \item \texttt{SVDpp}, che estende anche \texttt{SimilarityModel}
+    \item \texttt{KNNBaseline}, che estende anche \texttt{SimilarityModel}
     \item \texttt{SlopeOne}
     \item \texttt{CoClustering}
 \end{itemize}
@@ -394,7 +394,7 @@ Il metodo \texttt{predict} di questi modelli può riceve due parametri extra:
 
 \subsection{Modelli Implicit}
 
-Viene definita la classe astratta \texttt{ImplicitModel} che estende \texttt{BaseModel},\\ \texttt{PersistableModel} e \texttt{SimilarityModel} e che gestisce il comportamento comune della \texttt{fit} e della \texttt{predict} di tutti i modelli della libreria \textit{Implicit}. Viene definito il metodo astratto \texttt{\_fit\_implicit\_model}, applicando il pattern \textit{Template Method}. Così facendo, l'implementazione di ogni modello deve definire solamente le modalità di addestramento del modello della libreria \textit{Implicit} e quali attributi, il cui nome termina con il carattere "\_", vengono appresi.
+Viene definita la classe astratta \texttt{ImplicitModel} che estende \texttt{BaseModel} e \\ \texttt{PersistableModel} e che gestisce il comportamento comune della \texttt{fit} e della \texttt{predict} di tutti i modelli della libreria \textit{Implicit}. Viene definito il metodo astratto \texttt{\_fit\_implicit\_model}, applicando il pattern \textit{Template Method}. Così facendo, l'implementazione di ogni modello deve definire solamente le modalità di addestramento del modello della libreria \textit{Implicit} e quali attributi, il cui nome termina con il carattere "\_", vengono appresi.
 
 Se il \textit{trainset} contiene una terza colonna, che deve essere numerica, questa viene considerata durante l'addestramento come il peso dell'interazione della coppia (\textit{user}, \textit{item}) (e.g. il numero di click o quante volte quel film è stato visionato). 
 
@@ -404,12 +404,12 @@ Se il \textit{trainset} contiene una terza colonna, che deve essere numerica, qu
     \caption{Diagramma della classe astratta \texttt{ImplicitModel}}
 \end{figure}
 
-La classe viene estesa creando i vari adapter dei modelli:
+La classe è stata estesa creando diversi adapter per i modelli, ognuno dei quali estende sia \texttt{ImplicitModel} che \texttt{SimilarityModel}. Si è scelto di non far estendere direttamente \texttt{SimilarityModel} da \texttt{ImplicitModel}, poiché non tutti i modelli forniti dalla libreria Implicit supportano il calcolo delle similarità \textit{user-user} e \textit{item-item}:
 
 \begin{itemize}
-    \item \texttt{ALS}
-    \item \texttt{BRP}
-    \item \texttt{LMF}
+    \item \texttt{ALS}, che estende anche \texttt{SimilarityModel}
+    \item \texttt{BRP}, che estende anche \texttt{SimilarityModel}
+    \item \texttt{LMF}, che estende anche \texttt{SimilarityModel}
 \end{itemize}
 
 Ogni modello riceve nel costruttore gli stessi parametri del modello originale della libreria \textit{Implicit}.
