@@ -76,15 +76,14 @@ Dove il primo termine è l'errore quadratico tra i \textit{rating} previste e re
 
 Per ottimizzare questi parametri, viene utilizzato \textit{Stochastic Gradient Descent} (SGD), che aggiorna i parametri dopo ogni  esempio di training (ad esempio, per ogni \textit{rating} di un \textit{user}).
 
-Per ogni \textit{rating} ($r_{ui}$) data, viene fatta una previsione ($\hat{r}_{ui}$), e l'errore di previsione associato ($e_{ui} = r_{ui} - \hat{r}_{ui}$) viene calcolato. Per un dato caso di \textit{addestramento} ($r_{ui}$), modifichiamo i parametri spostandoci nella
-direzione opposta al gradiente, ottenendo:
+Per ogni \textit{rating} ($r_{ui}$) data, viene fatta una previsione ($\hat{r}_{ui}$), e l'errore di previsione associato ($e_{ui} = r_{ui} - \hat{r}_{ui}$) viene calcolato. Per un dato caso di \textit{addestramento} ($r_{ui}$), si modificano i parametri spostandoci nella direzione opposta al gradiente, ottenendo:
 
-\begin{itemize}
-    \item $b_u \leftarrow b_u + \gamma \cdot e_{ui}$
-    \item $b_i \leftarrow b_i + \gamma \cdot e_{ui}$
-    \item $q_i \leftarrow q_i + \gamma \cdot e_{ui} \cdot p_u$
-    \item $p_u \leftarrow p_u + \gamma \cdot e_{ui} \cdot q_i$
-\end{itemize}
+\begin{flalign*}
+& b_u \leftarrow b_u + \gamma \cdot e_{ui} \\
+& b_i \leftarrow b_i + \gamma \cdot e_{ui} \\
+& q_i \leftarrow q_i + \gamma \cdot e_{ui} \cdot p_u \\
+& p_u \leftarrow p_u + \gamma \cdot e_{ui} \cdot q_i
+\end{flalign*}
 
 Queste formule vengono utilizzate per aggiornare i parametri durante l'addestramento del modello, in modo da ridurre l'errore tra le
 \textit{rating} reali e quelle previste.
@@ -123,13 +122,15 @@ Ora, un \textit{user} $u$ viene modellato come $p_u + |I_u|^{\frac{1}{2}} \sum\l
 
 I parametri del modello vengono determinati minimizzando la funzione di errore quadratico regolarizzato, utilizzando sempre \textit{Stochastic Gradient Descent}. Si itera su tutti i \textit{rating}:
 
-\begin{itemize}
-  \item $b_u \leftarrow b_u + \gamma \cdot (e_{ui} - \lambda \cdot b_u)$
-  \item $b_i \leftarrow b_i + \gamma \cdot (e_{ui} - \lambda \cdot b_i)$
-  \item $q_i \leftarrow q_i + \gamma \cdot \left( e_{ui} \cdot \left( p_u + |I_u|^{-\frac{1}{2}} \sum\limits_{j \in I_u} y_j \right) - \lambda \cdot q_i \right)$
-  \item $p_u \leftarrow p_u + \gamma \cdot (e_{ui} \cdot q_i - \lambda \cdot p_u)$
-  \item $\forall j \in I_u: \quad y_j \leftarrow y_j + \gamma \cdot \left( e_{ui} \cdot |I_u|^{-\frac{1}{2}} \cdot q_i - \lambda \cdot y_j \right)$
-\end{itemize}
+\begin{flalign*}
+& b_u \leftarrow b_u + \gamma \cdot (e_{ui} - \lambda \cdot b_u) \\
+& b_i \leftarrow b_i + \gamma \cdot (e_{ui} - \lambda \cdot b_i) \\
+& q_i \leftarrow q_i + \gamma \cdot \left( e_{ui} \cdot \left( p_u + |I_u|^{-\frac{1}{2}} \sum\limits_{j \in I_u} y_j \right) - \lambda \cdot q_i \right) \\
+& p_u \leftarrow p_u + \gamma \cdot (e_{ui} \cdot q_i - \lambda \cdot p_u) \\
+& \forall j \in I_u: \quad y_j \leftarrow y_j + \gamma \cdot \left( e_{ui} \cdot |I_u|^{-\frac{1}{2}} \cdot q_i - \lambda \cdot y_j \right) 
+\end{flalign*}
+
+
 
 È possibile introdurre diversi tipi di feedback implicito nel modello simultaneamente, utilizzando set aggiuntivi di fattori degli \textit{item}.
 
@@ -194,12 +195,12 @@ La procedura di ottimizzazione è una \textit{SGD} regolarizzata~\cite{NMF} con 
 
 A ogni iterazione i fattori vengono aggiornati come segue:
 
-\begin{equation}
-    \begin{split}
-        p_{uf} &\leftarrow p_{uf} \cdot \frac{\sum\limits_{i \in I_u} q_{if} \cdot r_{ui}}{\sum\limits_{i \in I_u} q_{if} \cdot \hat{r}_{ui} + \lambda_u |I_u| p_{uf}}\\
-        q_{if} &\leftarrow q_{if} \cdot \frac{\sum\limits_{u \in U_i} p_{uf} \cdot r_{ui}}{\sum\limits_{u \in U_i} p_{uf} \cdot \hat{r}_{ui} + \lambda_i |U_i| q_{if}}
-    \end{split}
-\end{equation}
+\[
+\begin{aligned}
+p_{uf} &\leftarrow p_{uf} \cdot \frac{\sum\limits_{i \in I_u} q_{if} \cdot r_{ui}}{\sum\limits_{i \in I_u} q_{if} \cdot \hat{r}_{ui} + \lambda_u |I_u| p_{uf}} \\
+q_{if} &\leftarrow q_{if} \cdot \frac{\sum\limits_{u \in U_i} p_{uf} \cdot r_{ui}}{\sum\limits_{u \in U_i} p_{uf} \cdot \hat{r}_{ui} + \lambda_i |U_i| q_{if}}
+\end{aligned}
+\]
 
 Questo algoritmo è altamente dipendente dai valori iniziali con cui vengono inizializzate le matrici $H$ e $W$. I fattori latenti degli \textit{user} e degli \textit{item} vengono inizializzati casualmente in modo uniforme tra un minimo e un massimo, solitamente nell'intervallo $[0, 1]$.
 
@@ -462,7 +463,7 @@ Le caratteristiche che lo rendono un ottimo algoritmo per la \textit{recommendat
     \item facilità di interpretazione
 \end{itemize}
 
-Viene proposto un predittore basato su differenze di \textit{rating} lineari che ha un'efficienza $\mathcal{O}(nm)$ per predizione e $\mathcal{O}(mn^2)$ per addestramento.
+Viene proposto un predittore basato su differenze di \textit{rating} lineari che ha un costo computazionale $\mathcal{O}(nm)$ per predizione e $\mathcal{O}(mn^2)$ per addestramento.
 
 L'algoritmo si basa sulla differenza media tra le valutazioni di due \textit{item} per predire il \textit{rating} mancante. La differenza media dei \textit{rating} di due \textit{item} $i$ e $j$ viene calcolata come:
 
@@ -970,7 +971,7 @@ L'algoritmo soffre anche di diverse problematiche:
 \section{Deep Learning}
 
 \subsection{AutoRec}\label{autorec}
-Sebbene la \textit{Matrix Factorization} ottenga prestazioni decenti rimane un modello lineare. Pertanto, tali modelli non sono in grado di catturare relazioni complesse, non lineari e intricate che potrebbero essere predittive delle preferenze degli \textit{user}. \textit{AutoRec}~\cite{AutoRec} interpreta il \textit{collaborative filtering} tramite un'architettura di autoencoder e mira a integrare trasformazioni non lineari basandosi su feedback espliciti. Le reti neurali si sono dimostrate capaci di approssimare qualsiasi funzione continua, rendendole adatte a superare le limitazioni della \textit{Matrix Factorization} e ad arricchirne la capacità espressiva.
+Sebbene la \textit{Matrix Factorization} ottenga prestazioni decenti rimane un modello lineare. Questo significa che la relazione tra le caratteristiche latenti di \textit{user} e \textit{item} è modellata come un prodotto scalare, cioè una combinazione lineare: le preferenze stimate sono ottenute moltiplicando (o combinando linearmente) i vettori degli spazi latenti. In altre parole, non ci sono trasformazioni o combinazioni non lineari che possano catturare interazioni più complesse. Pertanto, tali modelli non sono in grado di catturare relazioni complesse, non lineari e intricate che potrebbero essere predittive delle preferenze degli \textit{user}. \textit{AutoRec}~\cite{AutoRec} interpreta il \textit{collaborative filtering} tramite un'architettura di autoencoder e mira a integrare trasformazioni non lineari basandosi su feedback espliciti. Le reti neurali si sono dimostrate capaci di approssimare qualsiasi funzione continua, rendendole adatte a superare le limitazioni della \textit{Matrix Factorization} e ad arricchirne la capacità espressiva.
 
 Da un lato, \textit{AutoRec} ha la stessa struttura di un autoencoder, composta da uno strato di input, uno strato nascosto e uno strato di ricostruzione (output). Un autoencoder è una rete neurale che impara a copiare il proprio input sull'output al fine di codificare gli input in rappresentazioni nascoste (solitamente a bassa dimensionalità). In \textit{AutoRec}, invece di incorporare esplicitamente \textit{user} o \textit{item} in uno spazio a bassa dimensionalità, viene utilizzata la colonna o riga della matrice di interazioni come input, per poi ricostruire la matrice stessa nello strato di output.
 

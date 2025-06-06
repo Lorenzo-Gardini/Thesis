@@ -48,7 +48,7 @@ Per avere compatibilità con \textit{Scikit-learn} ogni funzione di trasformazio
     \item estendere la classe \texttt{BaseEstimator}: fornisce funzionalità di base comuni a tutti gli \textit{estimator}
     \begin{itemize}
         \item implementazione automatica di \texttt{get\_params()} e \texttt{set\_params()} che rispettivamente restituiscono e impostano i parametri del \textit{transformer}
-        \item supporto alla ricerca di iperparametri con \texttt{GridSearchCV} e \texttt{RandomizedSearchCV}
+        \item supporto alla ricerca di iperparametri con \texttt{GridSearchCV} e \\ \texttt{RandomizedSearchCV}
         \item una struttura standard per la serializzazione con \texttt{pickle} o altro
     \end{itemize}
     \item se il \textit{transformer} apprende informazioni con la chiamata al metodo \texttt{fit} allora:
@@ -91,7 +91,7 @@ Vengono create anche diverse classi per poter raggruppare comportamenti comuni d
         \caption{Gerarchia di \texttt{GroupByFunction}}
     \end{figure}
 
-    \item \texttt{InverseTransformer}: classe base per trasformazioni invertibili (che permettono di tornare ai dati originali) grazie alla invocazione al metodo \texttt{inverse\_transform}.
+    \item \texttt{InverseTransformer}: classe base per trasformazioni invertibili (che permettono di tornare ai dati originali) grazie alla invocazione al metodo \\ \texttt{inverse\_transform}.
     
     La classe viene estesa a sua volta da \texttt{LabelEncoder}, che codifica etichette categoriali in valori numerici e permette l'inversione.
     
@@ -101,13 +101,15 @@ Vengono create anche diverse classi per poter raggruppare comportamenti comuni d
         \caption{Gerarchia di \texttt{InverseTransformer}}
     \end{figure}
 
-    \item \texttt{InvertibleGroupByFunction}: estende \texttt{GroupByFunction} e \texttt{InverseTransformer}, permette di invertire le trasformazioni su gruppi. Vengono definiti i metodi astratti \texttt{\_build\_transform\_function} e \texttt{\_build\_inverse\_function}, applicando il pattern \textit{Template Method}, i quali vengono invocati entrambi dentro i metodi \texttt{fit} e restituiscono una funzione ciascuno che vengono salvate come attributi. Queste funzioni vengono poi utilizzate durante l'invocazione dei metodi \texttt{transform} e di \texttt{inverse\_transform} per applicare la trasformazione corrispondente.
+    \item \texttt{InvertibleGroupByFunction}: estende \texttt{GroupByFunction} e \\ \texttt{InverseTransformer}, permette di invertire le trasformazioni su gruppi.
+    Vengono definiti i metodi astratti \texttt{\_build\_transform\_function} e \\ \texttt{\_build\_inverse\_function}, applicando il pattern \textit{Template Method}, i quali vengono invocati entrambi dentro i metodi \texttt{fit} e restituiscono una funzione ciascuno che vengono salvate come attributi.
+    Queste funzioni vengono poi utilizzate durante l'invocazione dei metodi \texttt{transform} e di\\\texttt{inverse\_transform} per applicare la trasformazione corrispondente.
     
     La classe viene estesa a sua volta da \texttt{StandardScaler}, che normalizza i dati rendendoli con media $0$ e deviazione standard $1$, e \texttt{MinMaxScaler}, che scala i dati in un intervallo specifico (di solito $[0, 1]$).
     
     \begin{figure}[H]
         \centering
-        \includegraphics[scale=0.1]{figures/UML/preprocessing/invertible_group_by.png}
+        \includegraphics[scale=0.14]{figures/UML/preprocessing/invertible_group_by.png}
         \caption{Gerarchia di \texttt{InvertibleGroupByFunction}}
     \end{figure}
     
@@ -116,7 +118,7 @@ Vengono create anche diverse classi per poter raggruppare comportamenti comuni d
     La classe viene estesa a sua volta da \texttt{BinThreshold}, che effettua \textit{binning} basato su una soglia di frequenza, e \texttt{BinCumulative}, che effettua \textit{binning} basato su cumulativi di distribuzione.
     \begin{figure}[H]
         \centering
-        \includegraphics[scale=0.10]{figures/UML/preprocessing/bin_density.png}
+        \includegraphics[scale=0.17]{figures/UML/preprocessing/bin_density.png}
         \caption{Gerarchia di \texttt{BinDensity}}
     \end{figure}
 \end{itemize}
@@ -179,7 +181,7 @@ Un elenco dei \textit{transformers} che estendono direttamente la classe \\
 
 \begin{figure}[H]
     \centering
-    \includegraphics[angle=90, scale=0.14]{figures/UML/preprocessing/direct_1.png}
+    \includegraphics[angle=90, scale=0.15]{figures/UML/preprocessing/direct_1.png}
     \caption{Diagrammi delle classi \texttt{Map}, \texttt{Condense}, \texttt{Cycle}, \\ \texttt{OneHotEncode}, \texttt{ToCOOMatrix}}
 
 \end{figure}\begin{figure}[H]
@@ -236,7 +238,7 @@ Per definire un modello custom compatibile con la suite di \textit{Scikit-learn}
     \item inserire, all'interno del metodo \texttt{predict}, un controllo che verifichi che il modello sia stato addestrato, utilizzando la funzione \texttt{check\_is\_fitted}. Questa funzione verifica la presenza di almeno un attributo il cui nome termini con il carattere ``\_'' (convenzionalmente utilizzato da \textit{Scikit-learn} per indicare che l'attributo è stato appreso durante il training). In caso contrario, viene sollevata un'eccezione di tipo \texttt{NotFittedError}
 \end{itemize}
 
-I modelli possono, in base alle necessità, aggiungere parametri aggiuntivi alle funzioni di \texttt{fit} e di \texttt{predict}, per esempio eventuali \texttt{user\_features} o \texttt{item\_features}.
+I modelli possono, in base alle necessità, aggiungere parametri aggiuntivi alle funzioni di \texttt{fit} e di \texttt{predict}, per esempio eventuali \texttt{user\_features} o \\ \texttt{item\_features}.
 
 \subsection{Salvataggio modelli}
 
@@ -379,8 +381,14 @@ Tutti i modelli sopra elencati gestiscono feedback espliciti e quindi i valori r
 
 \begin{figure}[H]
     \centering
-    \includegraphics[angle=90, scale=0.09]{figures/UML/models/surprise_models.png}
+    \includegraphics[angle=90, scale=0.14]{figures/UML/models/surprise_models.png}
     \caption{Diagrammi dei modelli di \textit{Surprise}}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[angle=90, scale=0.095]{figures/UML/models/surprise_similarity_models.png}
+    \caption{Diagrammi dei modelli di \textit{Surprise} che estendono anche \texttt{SimilarityModel}}
 \end{figure}
 
 \subsubsection{Modifiche ai metodi}
@@ -418,7 +426,7 @@ Tutti i modelli sopra elencati gestiscono feedback impliciti e quindi i valori r
 
 \begin{figure}[H]
     \centering
-    \includegraphics[angle=90, scale=0.1]{figures/UML/models/implicit_models.png}
+    \includegraphics[angle=90, scale=0.1]{figures/UML/models/implicit_similarity_models.png}
     \caption{Diagrammi dei modelli di \textit{Implicit}}
 \end{figure}
 
@@ -447,7 +455,7 @@ Se il \textit{trainset} contiene una terza colonna, che deve essere numerica, qu
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.2]{figures/UML/models/light_fm.png}
-    \caption{Diagrammi della classe \textit{LightFM}}
+    \caption{Diagramma della classe \textit{LightFM}}
 \end{figure}
 
 \subsubsection{Costruttore}
