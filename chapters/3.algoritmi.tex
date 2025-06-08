@@ -41,6 +41,234 @@ La notazione utilizzata è la seguente:
 
 \section{Algoritmi per il feedback esplicito}\label{algoritmi-per-feedback-esplicito}
 
+\subsection{KNN (K-Nearest Neighbors)}\label{knn}
+Si tratta di algoritmi derivati direttamente da un approccio di base basato sui \textit{Nearest Neighbors}.
+
+Gli algoritmi ispirati al KNN (\textit{K Nearest Neighbors}) sono una classe di algoritmi di \textit{recommendation} che si basano sull'idea che gli \textit{user} simili tendono a valutare gli stessi \textit{item} in modo simile. Questi algoritmi sono semplici da implementare e possono essere molto efficaci per problemi a piccola scala.
+
+Il numero effettivo di vicini che vengono considerati per calcolare la predizione è minore o uguale a $k$: potrebbero non esserci abbastanza vicini e/o gli insiemi $N_i^k(u)$ e $N_u^k(i)$ includono solo vicini per i quali la misura di similarità è positiva (non avrebbe senso considerare \textit{user} o \textit{item} correlati negativamente).
+
+$k$ è un iperparametro di ciascun algoritmo.
+
+Alcune misure di similarità, sia per \textit{user} che per \textit{item}, sono:
+\begin{itemize}
+    \item Coseno:
+        \[
+        \text{cosine sim}(u, v) = \frac{\sum\limits_{i \in I_{uv}} r_{ui} \cdot r_{vi}}{\sqrt{\sum\limits_{i \in I_{uv}} r_{ui}^2} \cdot \sqrt{\sum\limits_{i \in I_{uv}} r_{vi}^2}}
+        \]
+        oppure, per \textit{item}
+        \[
+        \text{cosine sim}(i, j) = \frac{\sum\limits_{u \in U_{ij}} r_{ui} \cdot r_{uj}}{\sqrt{\sum\limits_{u \in U_{ij}} r_{ui}^2} \cdot \sqrt{\sum\limits_{u \in U_{ij}} r_{uj}^2}}
+        \]
+    \item \textit{Mean Square Difference} (MSD):
+        \[
+        \text{msd}(u, v) = \frac{1}{|I_{uv}|} \cdot \sum\limits_{i \in I_{uv}} (r_{ui} - r_{vi})^2
+        \]
+        oppure, per \textit{item}
+        \[
+        \text{msd}(i, j) = \frac{1}{|U_{ij}|} \cdot \sum\limits_{u \in U_{ij}} (r_{ui} - r_{uj})^2
+        \]
+        La similarità è calcolata come:
+        \begin{align*}
+            \text{msd sim}(u, v) &= \frac{1}{\text{msd}(u, v) + 1} \\
+            \text{msd sim}(i, j) &= \frac{1}{\text{msd}(i, j) + 1}
+        \end{align*}
+        Il termine $+1$ viene aggiunto per evitare divisioni per zero.
+    \item Pearson: Il coefficiente di correlazione di Pearson può essere visto come una similarità del coseno centrato sulla media. Se non ci sono \textit{item} comuni, la similarità è 0 (non -1).
+        \[
+        \text{pearson sim}(u, v) = \frac{\sum\limits_{i \in I_{uv}} (r_{ui} - \mu_u) \cdot (r_{vi} - \mu_v)}{\sqrt{\sum\limits_{i \in I_{uv}} (r_{ui} - \mu_u)^2} \cdot \sqrt{\sum\limits_{i \in I_{uv}} (r_{vi} - \mu_v)^2}}
+        \]
+        oppure, per \textit{item}
+        \[
+        \text{pearson sim}(i, j) = \frac{\sum\limits_{u \in U_{ij}} (r_{ui} - \mu_i) \cdot (r_{uj} - \mu_j)}{\sqrt{\sum\limits_{u \in U_{ij}} (r_{ui} - \mu_i)^2} \cdot \sqrt{\sum\limits_{u \in U_{ij}} (r_{uj} - \mu_j)^2}}
+        \]
+    \item Pearson con baseline \cite{Recommendation_book}: calcola il coefficiente di correlazione di Pearson (ridotto) tra tutte le coppie di \textit{user} (o \textit{item}) utilizzando le baseline anziché le medie. Il parametro di riduzione aiuta a evitare l'overfitting quando sono disponibili solo poche valutazioni. Se non ci sono \textit{item} comuni, la similarità è 0 (non -1). Introduce un nuovo iperparametro che corrisponde alla riduzione (o \textit{``shrinkage''}). Se impostato uguale a 0, non viene applicata nessuna riduzione.
+        \[
+        \text{pearson baseline sim}(u, v) = \hat{\rho}_{uv} = \frac{\sum\limits_{i \in I_{uv}} (r_{ui} - b_{ui}) \cdot (r_{vi} - b_{vi})}{\sqrt{\sum\limits_{i \in I_{uv}} (r_{ui} - b_{ui})^2} \cdot \sqrt{\sum\limits_{i \in I_{uv}} (r_{vi} - b_{vi})^2}}
+        \]
+        oppure, per \textit{item}
+        \[
+        \text{pearson baseline sim}(i, j) = \hat{\rho}_{ij} = \frac{\sum\limits_{u \in U_{ij}} (r_{ui} - b_{ui}) \cdot (r_{uj} - b_{uj})}{\sqrt{\sum\limits_{u \in U_{ij}} (r_{ui} - b_{ui})^2} \cdot \sqrt{\sum\limits_{u \in U_{ij}} (r_{uj} - b_{uj})^2}}
+        \]
+        Il coefficiente ridotto si calcola come:
+        \begin{align*}
+            \text{pearson baseline shrunk sim}(u, v) &= \frac{|I_{uv}| - 1}{|I_{uv}| - 1 + \text{shrinkage}} \cdot \hat{\rho}_{uv} \\
+            \text{pearson baseline shrunk sim}(i, j) &= \frac{|U_{ij}| - 1}{|U_{ij}| - 1 + \text{shrinkage}} \cdot \hat{\rho}_{ij}
+        \end{align*}
+        Per il calcolo della baseline, si consideri la parte di \ref{knn_baseline}.
+\end{itemize}
+
+Altro iperparametro da considerare è il supporto minimo, che corrisponde al numero minimo di \textit{item} in comune o il numero minimo di \textit{user} in comune affinché la similarità non sia zero, i.e., se $|I_{uv}| < \text{min support}$, allora $\text{sim}(u, v) = 0$. Lo stesso vale per gli \textit{item}.
+
+\subsubsection{KNN base}
+
+L'algoritmo KNN base è l'algoritmo più semplice. Prevede il  \textit{rating} di un \textit{user} $u$ per un \textit{item} $i$ come la media ponderata dei \textit{rating} degli $k$ vicini più simili di $u$ o $i$, a seconda che si utilizzi un approccio basato sugli \textit{user} o sugli \textit{item}.
+
+La predizione viene calcolata come:
+
+\[
+\hat{r}_{ui} = \frac{\sum\limits_{v \in N^k_i(u)} \text{sim}(u, v) \cdot r_{vi}}{\sum\limits_{v \in N^k_i(u)} \text{sim}(u, v)}
+\]
+
+oppure, per \textit{item}
+
+\[
+\hat{r}_{ui} = \frac{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j) \cdot r_{uj}}{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j)}
+\]
+
+dipendentemente dall'approccio utilizzato.
+
+\subsubsection{KNN con la media}
+
+L'algoritmo è una variante dell'algoritmo \textit{KNN} base che tiene conto della media dei \textit{rating} degli \textit{user} o degli \textit{item}.
+
+La predizione viene calcolata come:
+
+\[
+\hat{r}_{ui} = \mu_u + \frac{\sum\limits_{v \in N_k(u)} \text{sim}(u, v) \cdot (r_{vi} - \mu_v)}{\sum\limits_{v \in N_k(u)} \text{sim}(u, v)}
+\]
+
+oppure, per \textit{item}
+
+\[
+\hat{r}_{ui} = \mu_i + \frac{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j) \cdot (r_{uj} - \mu_j)}{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j)}
+\]
+
+dipendentemente dall'approccio utilizzato.
+
+\subsubsection{KNN normalizzato}
+
+L'algoritmo è una variante dell'algoritmo che utilizza la media con l'aggiunta della normalizzazione \textit{z-score}, con la deviazione standard dello \textit{user} o dell'\textit{item}, dei \textit{rating} corrispondenti prima di calcolare la similarità.
+
+La predizione viene calcolata come:
+
+\[
+\hat{r}_{ui} = \mu_u + \sigma_u \frac{\sum\limits_{v \in N^k_i(u)} \text{sim}(u, v) \cdot (r_{vi} - \mu_v) / \sigma_v}{\sum\limits_{v \in N^k_i(u)} \text{sim}(u, v)}
+\]
+
+oppure, per \textit{item}
+
+\[
+\hat{r}_{ui} = \mu_i + \sigma_i \frac{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j) \cdot (r_{uj} - \mu_j) / \sigma_j}{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j)}
+\]
+
+dipendentemente dall'approccio utilizzato.
+
+\subsubsection{KNN con baseline}\label{knn_baseline}
+
+L'algoritmo KNN con baseline~\cite{KNN_baseline} è una variante dell'algoritmo base che tiene conto degli effetti dei bias degli \textit{user} o degli \textit{item}.
+
+La predizione viene calcolata come:
+
+\[
+\hat{r}_{ui} = b_{ui} + \frac{\sum\limits_{v \in N^k_i(u)} \text{sim}(u, v) \cdot (r_{vi} - b_{vi})}{\sum\limits_{v \in N^k_i(u)} \text{sim}(u, v)}
+\]
+
+oppure, per \textit{item}
+
+\[
+\hat{r}_{ui} = b_{ui} + \frac{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j) \cdot (r_{uj} - b_{uj})}{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j)}
+\]
+
+dipendentemente dall'approccio utilizzato.
+
+La baseline $b_{ui}$ viene calcolata come:
+
+\[
+b_{ui} = \mu + b_u + b_i
+\]
+
+Per calcolare $b_u$ e $b_i$, occorre minimizzare il seguente errore quadratico regolarizzato:
+
+\[
+\sum\limits_{r_{ui} \in R_{train}} \left(r_{ui} - \mu + b_u + b_i\right)^2 + \lambda \left(b_u^2 + b_i^2 \right).
+\]
+
+Il termine di regolarizzazione $\lambda \left(b_u^2 + b_i^2 \right)$ serve per evitare l'overfitting penalizzando la grandezza dei parametri.
+
+La minimizzazione può essere effettuata tramite \textit{Stochastic Gradient Descent} o \textit{Alternating Least Squares}.
+
+Per \textit{Alternating Least Squares}, i due valori di $b_u$ e $b_i$ si ottengono come:
+
+\[
+b_i = \frac{\sum\limits_{r_{ui} \in R_{train}} (r_{ui} - \mu)}{\lambda_2 + |U_i|}
+\]
+
+e
+
+\[
+b_u = \frac{\sum\limits_{r_{ui} \in R_{train}} (r_{ui} - \mu - b_i)}{\lambda_3 + |I_u|}
+\]
+
+I punti di forza della famiglia di algoritmi \textit{KNN} sono:
+\begin{itemize}
+    \item semplicità: Gli algoritmi \textit{KNN} sono facili da capire e implementare. L'idea di base di trovare ``vicini" simili è intuitiva e facilmente comprensibile
+    \item nessuna assunzione sui dati: l'algoritmo non fa assunzioni sulla distribuzione dei dati. Questo lo rende flessibile e adatto a una varietà di dataset
+    \item aggiornamento: l'aggiunta di nuovi dati non richiede una fase di addestramento esplicita. Questo lo rende utile in ambienti in cui i dati cambiano frequentemente o per previsioni online
+    \item flessibilità: \textit{KNN} può essere utilizzato sia per problemi di \textit{recommendation} basati su \textit{user} che basati su \textit{item}
+\end{itemize}
+
+Gli algoritmi soffrono anche di diverse problematiche:
+\begin{itemize}
+    \item costo computazionale: \textit{KNN} può essere computazionalmente costoso, soprattutto con set di dati di grandi dimensioni
+    \item requisiti di memoria: \textit{KNN} richiede la memorizzazione dell'intero set di dati, il che può essere problematico per set di dati molto grandi
+    \item sensibilità alla scelta di $k$: La scelta del valore di $k$ può avere un impatto significativo sulle prestazioni di \textit{KNN}. Un valore di $k$ troppo piccolo può portare a un overfitting, mentre un valore di $k$ troppo grande può portare a un underfitting. Inoltre, la ricerca dei $k$ vicini più prossimi richiede il calcolo delle distanze tra tutti i punti dati
+    \item gestione della sparsità dei dati: la sparsità può rendere difficile trovare vicini significativi e quindi portare a raccomandazioni di bassa qualità
+\end{itemize}
+
+\subsection{Slope One}\label{slopeone}
+
+L'algoritmo \textit{Slope One}, introdotto da Daniel Lemire e Anna Maclachlan~\cite{SlopeOne}, è una delle soluzioni più semplici ed efficienti di \textit{collaborative filtering}.
+
+Le caratteristiche che lo rendono un ottimo algoritmo per la \textit{recommendation} sono:
+\begin{itemize}
+    \item la semplicità e facilità di implementazione
+    \item velocità di calcolo: come verrà presentato più avanti alcuni valori calcolati possono essere salvati e aggiornati all'occorrenza rendendo il calcolo molto più veloce
+    \item scalabilità: l'algoritmo può essere abbastanza efficace su dataset di dimensioni moderate, soprattutto se si utilizzano tecniche di compressione dei dati
+    \item facilità di interpretazione
+\end{itemize}
+
+Viene proposto un predittore basato su differenze di \textit{rating} lineari che ha un costo computazionale $\mathcal{O}(nm)$ per predizione e $\mathcal{O}(mn^2)$ per addestramento.
+
+L'algoritmo si basa sulla differenza media tra le valutazioni di due \textit{item} per predire il \textit{rating} mancante. La differenza media dei \textit{rating} di due \textit{item} $i$ e $j$ viene calcolata come:
+
+\[
+    \text{dev}(i, j) = \frac{1}{|U_{i,j}|} \sum\limits_{u \in U_{i,j}} (r_{u,i} - r_{u,j})
+\]
+
+La matrice simmetrica, definita da $\text{dev}(i, j)$, può essere computata una volta e aggiornata velocemente quando vengono aggiunti nuovi dati.
+
+La predizione viene dunque calcolata come:
+
+\[
+    \hat{r}_{ui} = \mu_u + \frac{1}{|R_i(u)|} \sum\limits_{j \in R_i(u)} \text{dev}(i, j)
+\]
+
+dove:
+
+\begin{itemize}
+    \item $R_j = \{ i \mid i \in S(u), i \neq j, |S_{j,i}(\chi)| > 0 \}$ è l'insieme degli \textit{item} rilevanti
+    \item $S(u)$ è il sottoinsieme degli \textit{item} valutati dallo \textit{user} $u$
+    \item $S_{j,i}(\chi)$ è l'insieme di tutte le valutazioni $u$ nel dataset $\chi$ che contengono gli \textit{item} $i$ e $j$
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[keepaspectratio]{figures/algorithms/slope_one.PNG}
+    \caption{Base dello schema Slope One: le valutazioni dello \textit{user} A di due \textit{item} e la valutazione  dello \textit{user} B di un \textit{item} comune vengono utilizzate per prevedere la valutazione sconosciuta dello \textit{user}.}
+    \label{fig:slopeone}
+\end{figure}
+
+L'algoritmo soffre anche di diverse problematiche:
+\begin{itemize}
+    \item sparsità dei dati: le formule presentate prima sono approssimate considerando un dataset non sparso. Nel caso di matrici molto sparse l'algoritmo non sarà in grado di fare previsioni accurate
+    \item scalabilità limitata su dataset molto grandi: la memoria necessaria per memorizzare le differenze medie dei \textit{rating} può aumentare rapidamente
+    \item non tiene conto nè di personalizzazioni per \textit{user} nè di \textit{item}
+    \item difficoltà a gestire grandi variazioni nelle valutazioni degli utenti
+\end{itemize}
+
+L'approccio può essere esteso a modelli ponderati e versioni più avanzate, come per esempio \textit{Weighted Slope One}, che pesa le differenze di \textit{rating} in base alla frequenza di coppie di \textit{item} valutati, e \textit{Regression-based Slope One}, che introduce funzioni non lineari per migliorare la precisione delle previsioni.
+
 \subsection{SVD (Singular Value Decomposition)}\label{svd}
 
 L'algoritmo SVD (\textit{Singular Value Decomposition}), è stato reso popolare da Simon Funk durante la competizione \textit{the Netflix Prize} dimostrando come modelli di fattorizzazione matriciale sono superiori alle tecniche classiche basate su \textit{nearest neighbor}\ref{knn} per
@@ -226,181 +454,6 @@ L'algoritmo soffre anche di diverse problematiche:
     \item mancanza di soluzione chiusa: \textit{SVD} può gestire valori negativi e ha una soluzione ottima in termini di errore quadratico minimo
 \end{itemize}
 
-\subsection{KNN (K-Nearest Neighbors)}\label{knn}
-Si tratta di algoritmi derivati direttamente da un approccio di base basato sui \textit{Nearest Neighbors}.
-
-Gli algoritmi ispirati al KNN (\textit{K Nearest Neighbors}) sono una classe di algoritmi di \textit{recommendation} che si basano sull'idea che gli \textit{user} simili tendono a valutare gli stessi \textit{item} in modo simile. Questi algoritmi sono semplici da implementare e possono essere molto efficaci per problemi a piccola scala.
-
-Il numero effettivo di vicini che vengono considerati per calcolare la predizione è minore o uguale a $k$: potrebbero non esserci abbastanza vicini e/o gli insiemi $N_i^k(u)$ e $N_u^k(i)$ includono solo vicini per i quali la misura di similarità è positiva (non avrebbe senso considerare \textit{user} o \textit{item} correlati negativamente).
-
-$k$ è un iperparametro di ciascun algoritmo.
-
-Alcune misure di similarità, sia per \textit{user} che per \textit{item}, sono:
-\begin{itemize}
-    \item Coseno:
-        \[
-        \text{cosine sim}(u, v) = \frac{\sum\limits_{i \in I_{uv}} r_{ui} \cdot r_{vi}}{\sqrt{\sum\limits_{i \in I_{uv}} r_{ui}^2} \cdot \sqrt{\sum\limits_{i \in I_{uv}} r_{vi}^2}}
-        \]
-        oppure, per \textit{item}
-        \[
-        \text{cosine sim}(i, j) = \frac{\sum\limits_{u \in U_{ij}} r_{ui} \cdot r_{uj}}{\sqrt{\sum\limits_{u \in U_{ij}} r_{ui}^2} \cdot \sqrt{\sum\limits_{u \in U_{ij}} r_{uj}^2}}
-        \]
-    \item \textit{Mean Square Difference} (MSD):
-        \[
-        \text{msd}(u, v) = \frac{1}{|I_{uv}|} \cdot \sum\limits_{i \in I_{uv}} (r_{ui} - r_{vi})^2
-        \]
-        oppure, per \textit{item}
-        \[
-        \text{msd}(i, j) = \frac{1}{|U_{ij}|} \cdot \sum\limits_{u \in U_{ij}} (r_{ui} - r_{uj})^2
-        \]
-        La similarità è calcolata come:
-        \begin{align*}
-            \text{msd sim}(u, v) &= \frac{1}{\text{msd}(u, v) + 1} \\
-            \text{msd sim}(i, j) &= \frac{1}{\text{msd}(i, j) + 1}
-        \end{align*}
-        Il termine $+1$ viene aggiunto per evitare divisioni per zero.
-    \item Pearson: Il coefficiente di correlazione di Pearson può essere visto come una similarità del coseno centrato sulla media. Se non ci sono \textit{item} comuni, la similarità è 0 (non -1).
-        \[
-        \text{pearson sim}(u, v) = \frac{\sum\limits_{i \in I_{uv}} (r_{ui} - \mu_u) \cdot (r_{vi} - \mu_v)}{\sqrt{\sum\limits_{i \in I_{uv}} (r_{ui} - \mu_u)^2} \cdot \sqrt{\sum\limits_{i \in I_{uv}} (r_{vi} - \mu_v)^2}}
-        \]
-        oppure, per \textit{item}
-        \[
-        \text{pearson sim}(i, j) = \frac{\sum\limits_{u \in U_{ij}} (r_{ui} - \mu_i) \cdot (r_{uj} - \mu_j)}{\sqrt{\sum\limits_{u \in U_{ij}} (r_{ui} - \mu_i)^2} \cdot \sqrt{\sum\limits_{u \in U_{ij}} (r_{uj} - \mu_j)^2}}
-        \]
-    \item Pearson con baseline \cite{Recommendation_book}: calcola il coefficiente di correlazione di Pearson (ridotto) tra tutte le coppie di \textit{user} (o \textit{item}) utilizzando le baseline anziché le medie. Il parametro di riduzione aiuta a evitare l'overfitting quando sono disponibili solo poche valutazioni. Se non ci sono \textit{item} comuni, la similarità è 0 (non -1). Introduce un nuovo iperparametro che corrisponde alla riduzione (o \textit{``shrinkage''}). Se impostato uguale a 0, non viene applicata nessuna riduzione.
-        \[
-        \text{pearson baseline sim}(u, v) = \hat{\rho}_{uv} = \frac{\sum\limits_{i \in I_{uv}} (r_{ui} - b_{ui}) \cdot (r_{vi} - b_{vi})}{\sqrt{\sum\limits_{i \in I_{uv}} (r_{ui} - b_{ui})^2} \cdot \sqrt{\sum\limits_{i \in I_{uv}} (r_{vi} - b_{vi})^2}}
-        \]
-        oppure, per \textit{item}
-        \[
-        \text{pearson baseline sim}(i, j) = \hat{\rho}_{ij} = \frac{\sum\limits_{u \in U_{ij}} (r_{ui} - b_{ui}) \cdot (r_{uj} - b_{uj})}{\sqrt{\sum\limits_{u \in U_{ij}} (r_{ui} - b_{ui})^2} \cdot \sqrt{\sum\limits_{u \in U_{ij}} (r_{uj} - b_{uj})^2}}
-        \]
-        Il coefficiente ridotto si calcola come:
-        \begin{align*}
-            \text{pearson baseline shrunk sim}(u, v) &= \frac{|I_{uv}| - 1}{|I_{uv}| - 1 + \text{shrinkage}} \cdot \hat{\rho}_{uv} \\
-            \text{pearson baseline shrunk sim}(i, j) &= \frac{|U_{ij}| - 1}{|U_{ij}| - 1 + \text{shrinkage}} \cdot \hat{\rho}_{ij}
-        \end{align*}
-        Per il calcolo della baseline, si consideri la parte di \ref{knn_baseline}.
-\end{itemize}
-
-Altro iperparametro da considerare è il supporto minimo, che corrisponde al numero minimo di \textit{item} in comune o il numero minimo di \textit{user} in comune affinché la similarità non sia zero, i.e., se $|I_{uv}| < \text{min support}$, allora $\text{sim}(u, v) = 0$. Lo stesso vale per gli \textit{item}.
-
-\subsubsection{KNN base}
-
-L'algoritmo KNN base è l'algoritmo più semplice. Prevede il  \textit{rating} di un \textit{user} $u$ per un \textit{item} $i$ come la media ponderata dei \textit{rating} degli $k$ vicini più simili di $u$ o $i$, a seconda che si utilizzi un approccio basato sugli \textit{user} o sugli \textit{item}.
-
-La predizione viene calcolata come:
-
-\[
-\hat{r}_{ui} = \frac{\sum\limits_{v \in N^k_i(u)} \text{sim}(u, v) \cdot r_{vi}}{\sum\limits_{v \in N^k_i(u)} \text{sim}(u, v)}
-\]
-
-oppure, per \textit{item}
-
-\[
-\hat{r}_{ui} = \frac{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j) \cdot r_{uj}}{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j)}
-\]
-
-dipendentemente dall'approccio utilizzato.
-
-\subsubsection{KNN con la media}
-
-L'algoritmo è una variante dell'algoritmo \textit{KNN} base che tiene conto della media dei \textit{rating} degli \textit{user} o degli \textit{item}.
-
-La predizione viene calcolata come:
-
-\[
-\hat{r}_{ui} = \mu_u + \frac{\sum\limits_{v \in N_k(u)} \text{sim}(u, v) \cdot (r_{vi} - \mu_v)}{\sum\limits_{v \in N_k(u)} \text{sim}(u, v)}
-\]
-
-oppure, per \textit{item}
-
-\[
-\hat{r}_{ui} = \mu_i + \frac{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j) \cdot (r_{uj} - \mu_j)}{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j)}
-\]
-
-dipendentemente dall'approccio utilizzato.
-
-\subsubsection{KNN normalizzato}
-
-L'algoritmo è una variante dell'algoritmo che utilizza la media con l'aggiunta della normalizzazione \textit{z-score}, con la deviazione standard dello \textit{user} o dell'\textit{item}, dei \textit{rating} corrispondenti prima di calcolare la similarità.
-
-La predizione viene calcolata come:
-
-\[
-\hat{r}_{ui} = \mu_u + \sigma_u \frac{\sum\limits_{v \in N^k_i(u)} \text{sim}(u, v) \cdot (r_{vi} - \mu_v) / \sigma_v}{\sum\limits_{v \in N^k_i(u)} \text{sim}(u, v)}
-\]
-
-oppure, per \textit{item}
-
-\[
-\hat{r}_{ui} = \mu_i + \sigma_i \frac{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j) \cdot (r_{uj} - \mu_j) / \sigma_j}{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j)}
-\]
-
-dipendentemente dall'approccio utilizzato.
-
-\subsubsection{KNN con baseline}\label{knn_baseline}
-
-L'algoritmo KNN con baseline~\cite{KNN_baseline} è una variante dell'algoritmo base che tiene conto degli effetti dei bias degli \textit{user} o degli \textit{item}.
-
-La predizione viene calcolata come:
-
-\[
-\hat{r}_{ui} = b_{ui} + \frac{\sum\limits_{v \in N^k_i(u)} \text{sim}(u, v) \cdot (r_{vi} - b_{vi})}{\sum\limits_{v \in N^k_i(u)} \text{sim}(u, v)}
-\]
-
-oppure, per \textit{item}
-
-\[
-\hat{r}_{ui} = b_{ui} + \frac{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j) \cdot (r_{uj} - b_{uj})}{\sum\limits_{j \in N^k_u(i)} \text{sim}(i, j)}
-\]
-
-dipendentemente dall'approccio utilizzato.
-
-La baseline $b_{ui}$ viene calcolata come:
-
-\[
-b_{ui} = \mu + b_u + b_i
-\]
-
-Per calcolare $b_u$ e $b_i$, occorre minimizzare il seguente errore quadratico regolarizzato:
-
-\[
-\sum\limits_{r_{ui} \in R_{train}} \left(r_{ui} - \mu + b_u + b_i\right)^2 + \lambda \left(b_u^2 + b_i^2 \right).
-\]
-
-Il termine di regolarizzazione $\lambda \left(b_u^2 + b_i^2 \right)$ serve per evitare l'overfitting penalizzando la grandezza dei parametri.
-
-La minimizzazione può essere effettuata tramite \textit{Stochastic Gradient Descent} o \textit{Alternating Least Squares}.
-
-Per \textit{Alternating Least Squares}, i due valori di $b_u$ e $b_i$ si ottengono come:
-
-\[
-b_i = \frac{\sum\limits_{r_{ui} \in R_{train}} (r_{ui} - \mu)}{\lambda_2 + |U_i|}
-\]
-
-e
-
-\[
-b_u = \frac{\sum\limits_{r_{ui} \in R_{train}} (r_{ui} - \mu - b_i)}{\lambda_3 + |I_u|}
-\]
-
-I punti di forza della famiglia di algoritmi \textit{KNN} sono:
-\begin{itemize}
-    \item semplicità: Gli algoritmi \textit{KNN} sono facili da capire e implementare. L'idea di base di trovare ``vicini" simili è intuitiva e facilmente comprensibile
-    \item nessuna assunzione sui dati: l'algoritmo non fa assunzioni sulla distribuzione dei dati. Questo lo rende flessibile e adatto a una varietà di dataset
-    \item aggiornamento: l'aggiunta di nuovi dati non richiede una fase di addestramento esplicita. Questo lo rende utile in ambienti in cui i dati cambiano frequentemente o per previsioni online
-    \item flessibilità: \textit{KNN} può essere utilizzato sia per problemi di \textit{recommendation} basati su \textit{user} che basati su \textit{item}
-\end{itemize}
-
-Gli algoritmi soffrono anche di diverse problematiche:
-\begin{itemize}
-    \item costo computazionale: \textit{KNN} può essere computazionalmente costoso, soprattutto con set di dati di grandi dimensioni
-    \item requisiti di memoria: \textit{KNN} richiede la memorizzazione dell'intero set di dati, il che può essere problematico per set di dati molto grandi
-    \item sensibilità alla scelta di $k$: La scelta del valore di $k$ può avere un impatto significativo sulle prestazioni di \textit{KNN}. Un valore di $k$ troppo piccolo può portare a un overfitting, mentre un valore di $k$ troppo grande può portare a un underfitting. Inoltre, la ricerca dei $k$ vicini più prossimi richiede il calcolo delle distanze tra tutti i punti dati
-    \item gestione della sparsità dei dati: la sparsità può rendere difficile trovare vicini significativi e quindi portare a raccomandazioni di bassa qualità
-\end{itemize}
-
 \subsection{CoClustering}\label{coclustering}
 
 La soluzione proposta da Thomas George e Srujana Merugu~\cite{Co-Clustering} utilizza il \textit{Co-Clustering}. Questa tecnica viene utilizzata per raggruppare simultaneamente due entità in un dataset. Nel caso di un sistema di \textit{recommendation} basato su \textit{collaborative filtering}, L'obiettivo è individuare gruppi di \textit{user} simili e gruppi di \textit{item} simili. Il \textit{Co-Clustering} si propone di partizionare simultaneamente le righe (\textit{user}) e le colonne (\textit{item}) della matrice $R$, in modo tale che gli \textit{user} appartenenti allo stesso \textit{co-cluster} presentino comportamenti di valutazione analoghi, e che gli \textit{item} all'interno dello stesso \textit{co-cluster} ricevano valutazioni simili da parte degli \textit{user} del medesimo gruppo. Il numero di cluster deve essere definito a priori sia per gli \textit{user} sia per gli \textit{item}. Il processo di \textit{Co-Clustering} si distingue dal clustering tradizionale in quanto quest'ultimo si limita a raggruppare lungo un'unica dimensione (righe oppure colonne), mentre il \textit{Co-Clustering} effettua la suddivisione simultaneamente su entrambe le dimensioni della matrice.
@@ -450,59 +503,6 @@ Per l'aggiornamento quando un nuovo \textit{rating} viene aggiunto o un nuovo \t
 \end{itemize}
 
 L'aggiornamento ha quindi costo pari a $\mathcal{O}(1)$.
-
-\subsection{Slope One}\label{slopeone}
-
-L'algoritmo \textit{Slope One}, introdotto da Daniel Lemire e Anna Maclachlan~\cite{SlopeOne}, è una delle soluzioni più semplici ed efficienti di \textit{collaborative filtering}.
-
-Le caratteristiche che lo rendono un ottimo algoritmo per la \textit{recommendation} sono:
-\begin{itemize}
-    \item la semplicità e facilità di implementazione
-    \item velocità di calcolo: come verrà presentato più avanti alcuni valori calcolati possono essere salvati e aggiornati all'occorrenza rendendo il calcolo molto più veloce
-    \item scalabilità: l'algoritmo può essere abbastanza efficace su dataset di dimensioni moderate, soprattutto se si utilizzano tecniche di compressione dei dati
-    \item facilità di interpretazione
-\end{itemize}
-
-Viene proposto un predittore basato su differenze di \textit{rating} lineari che ha un costo computazionale $\mathcal{O}(nm)$ per predizione e $\mathcal{O}(mn^2)$ per addestramento.
-
-L'algoritmo si basa sulla differenza media tra le valutazioni di due \textit{item} per predire il \textit{rating} mancante. La differenza media dei \textit{rating} di due \textit{item} $i$ e $j$ viene calcolata come:
-
-\[
-    \text{dev}(i, j) = \frac{1}{|U_{i,j}|} \sum\limits_{u \in U_{i,j}} (r_{u,i} - r_{u,j})
-\]
-
-La matrice simmetrica, definita da $\text{dev}(i, j)$, può essere computata una volta e aggiornata velocemente quando vengono aggiunti nuovi dati.
-
-La predizione viene dunque calcolata come:
-
-\[
-    \hat{r}_{ui} = \mu_u + \frac{1}{|R_i(u)|} \sum\limits_{j \in R_i(u)} \text{dev}(i, j)
-\]
-
-dove:
-
-\begin{itemize}
-    \item $R_j = \{ i \mid i \in S(u), i \neq j, |S_{j,i}(\chi)| > 0 \}$ è l'insieme degli \textit{item} rilevanti
-    \item $S(u)$ è il sottoinsieme degli \textit{item} valutati dallo \textit{user} $u$
-    \item $S_{j,i}(\chi)$ è l'insieme di tutte le valutazioni $u$ nel dataset $\chi$ che contengono gli \textit{item} $i$ e $j$
-\end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[keepaspectratio]{figures/algorithms/slope_one.PNG}
-    \caption{Base dello schema Slope One: le valutazioni dello \textit{user} A di due \textit{item} e la valutazione  dello \textit{user} B di un \textit{item} comune vengono utilizzate per prevedere la valutazione sconosciuta dello \textit{user}.}
-    \label{fig:slopeone}
-\end{figure}
-
-L'algoritmo soffre anche di diverse problematiche:
-\begin{itemize}
-    \item sparsità dei dati: le formule presentate prima sono approssimate considerando un dataset non sparso. Nel caso di matrici molto sparse l'algoritmo non sarà in grado di fare previsioni accurate
-    \item scalabilità limitata su dataset molto grandi: la memoria necessaria per memorizzare le differenze medie dei \textit{rating} può aumentare rapidamente
-    \item non tiene conto nè di personalizzazioni per \textit{user} nè di \textit{item}
-    \item difficoltà a gestire grandi variazioni nelle valutazioni degli utenti
-\end{itemize}
-
-L'approccio può essere esteso a modelli ponderati e versioni più avanzate, come per esempio \textit{Weighted Slope One}, che pesa le differenze di \textit{rating} in base alla frequenza di coppie di \textit{item} valutati, e \textit{Regression-based Slope One}, che introduce funzioni non lineari per migliorare la precisione delle previsioni.
 
 \section{Algoritmi per il feedback implicito}
 
