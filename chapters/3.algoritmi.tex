@@ -39,6 +39,119 @@ La notazione utilizzata è la seguente:
     \item $k$: dimensione dello spazio latente negli algoritmi di \textit{Matrix Factorization} o il numero dei \textit{neighbors} negli algoritmi della famiglia \textit{KNN}
 \end{itemize}
 
+
+\section{Tassonomia degli algoritmi}
+
+Viene presentata una tassonomia degli algoritmi di \textit{recommendation}.
+
+\begin{itemize}[label=\textbullet]
+
+    \item \textit{AutoRec}
+    \begin{itemize}
+        \item feedback: implicito ed esplicito
+        \item tecnica: \textit{Autoencoder}
+        \item approccio: \textit{Model-based}
+        \item filtering: \textit{Collaborative Filtering}
+    \end{itemize}
+
+    \item \textit{NCF (Neural Collaborative Filtering)}
+    \begin{itemize}
+        \item feedback: implicito ed esplicito
+        \item tecnica: \textit{Reti Neurali}
+        \item approccio: \textit{Model-based}
+        \item filtering: \textit{Collaborative Filtering}
+    \end{itemize}
+
+    \item \textit{DeepFM}
+    \begin{itemize}
+        \item feedback: implicito ed esplicito
+        \item tecnica: \textit{Matrix Factorization} / \textit{Reti Neurali}
+        \item approccio: \textit{Model-based}
+        \item filtering: \textit{Collaborative Filtering} (potrebbe anche essere \textit{Content-based})
+    \end{itemize}
+
+    \item \textit{KNN (K-Nearest Neighbors)}
+    \begin{itemize}
+        \item feedback: esplicito
+        \item tecnica: \textit{Memory-based} (calcola la \textit{somiglianza} tra utenti o item)
+        \item approccio: \textit{Memory-based}
+        \item filtering: \textit{Collaborative Filtering}
+    \end{itemize}
+
+    \item \textit{Slope One}
+    \begin{itemize}
+        \item feedback: esplicito
+        \item tecnica: \textit{Model-based} (calcola le \textit{deviazioni medie} tra gli item)
+        \item approccio: \textit{Model-based}
+        \item filtering: \textit{Collaborative Filtering}
+    \end{itemize}
+
+    \item \textit{SVD (Singular Value Decomposition)}
+    \begin{itemize}
+        \item feedback: esplicito
+        \item tecnica: \textit{Matrix Factorization}
+        \item approccio: \textit{Model-based}
+        \item filtering: \textit{Collaborative Filtering}
+    \end{itemize}
+
+    \item \textit{SVD++}
+    \begin{itemize}
+        \item feedback: implicito ed esplicito
+        \item tecnica: \textit{Matrix Factorization} (un'estensione di \textit{SVD})
+        \item approccio: \textit{Model-based}
+        \item filtering: \textit{Collaborative Filtering}
+    \end{itemize}
+
+    \item \textit{NMF (Non-Negative Matrix Factorization)}
+    \begin{itemize}
+        \item feedback: esplicito
+        \item tecnica: \textit{Matrix Factorization} (con vincoli di \textit{non negatività})
+        \item approccio: \textit{Model-based}
+        \item filtering: \textit{Collaborative Filtering}
+    \end{itemize}
+
+    \item \textit{CoClustering}
+    \begin{itemize}
+        \item feedback: esplicito
+        \item tecnica: \textit{Clustering} (raggruppa simultaneamente \textit{utenti} e \textit{item})
+        \item approccio: \textit{Model-based}
+        \item filtering: \textit{Collaborative Filtering}
+    \end{itemize}
+
+    \item \textit{ALS (Alternating Least Squares)}
+    \begin{itemize}
+        \item feedback: implicito ed esplicito
+        \item tecnica: \textit{Matrix Factorization}
+        \item approccio: \textit{Model-based}
+        \item filtering: \textit{Collaborative Filtering}
+    \end{itemize}
+
+    \item \textit{BPR (Bayesian Personalized Ranking)}
+    \begin{itemize}
+        \item feedback: implicito
+        \item tecnica: \textit{Matrix Factorization} (ottimizzato per problemi di \textit{ranking})
+        \item approccio: \textit{Model-based}
+        \item filtering: \textit{Collaborative Filtering}
+    \end{itemize}
+
+    \item \textit{LMF (Logistic Matrix Factorization)}
+    \begin{itemize}
+        \item feedback: implicito
+        \item tecnica: \textit{Matrix Factorization} (usa un \textit{modello logistico})
+        \item approccio: \textit{Model-based}
+        \item filtering: \textit{Collaborative Filtering}
+    \end{itemize}
+
+    \item \textit{LightFM}
+    \begin{itemize}
+        \item feedback: impliciti ed espliciti
+        \item tecnica: \textit{Hybrid} (combina \textit{Matrix Factorization} e \textit{Content-based Features})
+        \item approccio: \textit{Model-based}
+        \item filtering: \textit{Hybrid} (\textit{Collaborative Filtering} e \textit{Content-based Filtering})
+    \end{itemize}
+
+\end{itemize}
+
 \section{Algoritmi per il feedback esplicito}\label{algoritmi-per-feedback-esplicito}
 
 \subsection{KNN (K-Nearest Neighbors)}\label{knn}
