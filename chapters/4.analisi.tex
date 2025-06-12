@@ -15,12 +15,10 @@ Un ulteriore vantaggio nello sviluppare una libreria interna riguarda il control
 Di seguito sono elencati i principali requisiti funzionali che la libreria deve soddisfare:
 
 \begin{itemize}
-    \item la libreria deve seguire lo stile e la struttura di \textit{Scikit-learn}, in modo da garantire un utilizzo intuitivo per gli utenti che già conoscono questa piattaforma
+    \item deve seguire lo stile e la struttura di \textit{Scikit-learn}, in modo da garantire un utilizzo intuitivo per gli utenti che già conoscono questa piattaforma
     \item deve includere, come base, algoritmi provenienti da librerie esistenti come \textit{Surprise}, \textit{LightFM} e \textit{Implicit}, ma con interfacce standardizzate per semplificare l'uso e renderle più facili da integrare
-    \item la libreria deve supportare sia algoritmi espliciti che impliciti, per gestire diversi tipi di dati, come feedback espliciti (e.g. valutazioni dirette) e interazioni indirette (e.g. acquisti, visualizzazioni, click)
+    \item deve supportare algoritmi per gestire diversi tipi di dati, come feedback espliciti (e.g. valutazioni dirette) e impliciti (e.g. acquisti, visualizzazioni, click)
     \item gli utenti devono poter creare e integrare facilmente modelli personalizzati che siano compatibili con l'interfaccia della libreria e possano sfruttare tutte le funzionalità di \textit{preprocessing} e valutazione già standardizzate
-    \item l'interfaccia comune dei modelli deve supportare feature aggiuntive, che siano informazioni supplementari per utenti e prodotti
-    \item deve includere funzionalità per il \textit{preprocessing} automatico del dataset, come la gestione delle colonne categoriche e numeriche, e la conversione di dataset sparsi in notazione di coordinate (COO) a formati accettati dalla libreria
     \item deve essere incluso un modulo che contiene classi per la manipolazione dei \textit{DataFrame} che permetta operazioni generiche (e.g. rimozione di colonne, normalizzazione e mapping)
     \item la libreria deve fornire anche funzioni per analizzare e visualizzare facilmente i dataset, offrendo grafici e statistiche che aiutino a comprendere meglio i dati
 \end{itemize}
@@ -34,7 +32,7 @@ Per quanto riguarda i requisiti non funzionali, la libreria dovrà:
     \item essere modulare, per permettere estensioni e adattamenti a diverse esigenze o casi d'uso
 \end{itemize}
 
-In generale, l'obiettivo finale è quello di creare una libreria modulare, scalabile e facile da usare, che rispetti i vincoli aziendali e che, al contempo, risponda alle esigenze specifiche di modelli di \textit{recommendation} meno complessi ma altamente efficaci.
+In generale, l'obiettivo finale è quello di creare una libreria modulare, estendibile e facile da usare, che rispetti i vincoli aziendali e che, al contempo, risponda alle esigenze specifiche di modelli di \textit{recommendation} meno complessi ma altamente efficaci.
 
 
 

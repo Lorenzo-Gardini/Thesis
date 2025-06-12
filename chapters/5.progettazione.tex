@@ -7,14 +7,13 @@
 Il tipo di dati che la libreria è in grado di gestire sono due:
 
 \begin{itemize}
-    \item \texttt{NumPy array}
-    \item \texttt{Pandas DataFrame}
+    \item \textit{NumPy array}
+    \item \textit{Pandas DataFrame}
 \end{itemize}
 
 La scelta sull'utilizzo di questi due tipi di dati è stata fatta sulla base sia del fatto che sono tipi ampiamente diffusi ed utilizzati, sia per la compatibilità con la libreria \textit{Scikit-learn}.
 
-Ogni algoritmo può quindi ricevere in ingresso dati in uno di questi due formati. Questo vincolo vale anche per tutte le altre funzionalità della libreria.
-
+Ogni algoritmo può quindi ricevere in ingresso dati in uno di questi due formati. Questo vincolo vale anche per tutte le altre funzionalità della libreria con alcune eccezioni.
 
 \subsection{Divisione in moduli}
 
@@ -29,12 +28,12 @@ La libreria è composta principalmente da cinque moduli, in modo che ogni funzio
     \item \texttt{visualization}
 \end{itemize}
 
-I moduli di \texttt{models} e di \texttt{evaluation} sono a sua volta divisi in \texttt{implicit} e \texttt{explicit} che contengono le classi dei modelli e le funzioni di \textit{evaluation} che gestiscono i dati e i modelli con i feedback del tipo corrispondente.
+I moduli di \texttt{models} e di \texttt{evaluation} sono a sua volta divisi in \texttt{implicit} e \texttt{explicit} che contengono le classi dei modelli e le funzioni di \textit{evaluation} per gestire i dati con il tipo di feedback corrispondente.
 
 \section{Preprocessing}
 Il modulo contiene un serie di funzionalità che hanno lo scopo di processare i dati in modo semplice per poterli renderli adatti per i modelli. Vengono definite diverse funzioni di trasformazione che applicano una specifica trasformazione ai dati in input.
 
-\subsection{Compatibilità con Scikit-learn del preprocessing}
+\subsection{Compatibilità con Scikit-learn}
 
 Per avere compatibilità con \textit{Scikit-learn} ogni funzione di trasformazione, chiamata \textit{transformer}, deve soddisfare i seguenti requisiti:
 
@@ -49,12 +48,14 @@ Per avere compatibilità con \textit{Scikit-learn} ogni funzione di trasformazio
     \begin{itemize}
         \item implementazione automatica di \texttt{get\_params()} e \texttt{set\_params()} che rispettivamente restituiscono e impostano i parametri del \textit{transformer}
         \item supporto alla ricerca di iperparametri con \texttt{GridSearchCV} e \\ \texttt{RandomizedSearchCV}
-        \item una struttura standard per la serializzazione con \texttt{pickle} o altro
+        \item una struttura standard per la serializzazione
     \end{itemize}
+    \item tutti i campi devono essere pubblici e chiamarsi allo stesso modo dei parametri del costruttore
+    \item non ci devono essere computazioni all'interno del costruttore ma solamente le inizializzazioni dei campi
     \item se il \textit{transformer} apprende informazioni con la chiamata al metodo \texttt{fit} allora:
     \begin{itemize}
         \item i parametri appresi devono essere settati come campi pubblici e devono terminare con il carattere "\_" (e.g. \texttt{transformer.min\_} o \\ \texttt{transformer.scale\_} per \texttt{MinMaxScaler})
-        \item se durante la \texttt{fit} vengono appresi dei parametri nel metodo \texttt{transform} deve essere chiamata la funzione \texttt{check\_is\_fitted}. Questa funzione verifica la presenza di almeno un attributo il cui nome termini con il carattere ``\_'' (convenzionalmente utilizzato da \textit{Scikit-learn} per indicare che l'attributo è stato appreso durante la \texttt{fit}). In caso contrario, viene sollevata un'eccezione di tipo \texttt{NotFittedError}
+        \item se durante la \texttt{fit} vengono appresi dei parametri, nel metodo \texttt{transform} deve essere chiamata la funzione \texttt{check\_is\_fitted}. Questa funzione verifica la presenza di almeno un attributo il cui nome termini con il carattere ``\_'' (convenzionalmente utilizzato da \textit{Scikit-learn} per indicare che l'attributo è stato appreso durante la \texttt{fit}). In caso contrario, viene sollevata un'eccezione di tipo \texttt{NotFittedError}
     \end{itemize} 
 \end{itemize}
 
@@ -113,7 +114,7 @@ Vengono create anche diverse classi per poter raggruppare comportamenti comuni d
         \caption{Gerarchia di \texttt{InvertibleGroupByFunction}}
     \end{figure}
     
-    \item \texttt{BinDensity}: estende \texttt{DataFramePreprocessFunction}, si occupa di binning e densità dei dati. Viene definito il metodo astratto \texttt{\_divide} applicando il pattern \textit{Template Method}, il quale viene invocato dentro il metodo \texttt{fit} e restituisce una funzione che viene salvata come attributo. Questa funzione viene poi utilizzata nel metodo \texttt{transform} per applicare la trasformazione corrispondente.
+    \item \texttt{BinDensity}: estende \texttt{DataFramePreprocessFunction}, si occupa di binning e densità dei dati. Viene definito il metodo astratto \texttt{\_divide} applicando il pattern \textit{Template Method}, il quale viene invocato dentro il metodo \texttt{fit} e restituisce una funzione che viene salvata come attributo. Questa funzione viene poi utilizzata nel metodo \texttt{transform} per applicare una divisione dei dati in modo coerente con il tipo di densità utilizzata.
     
     La classe viene estesa a sua volta da \texttt{BinThreshold}, che effettua \textit{binning} basato su una soglia di frequenza, e \texttt{BinCumulative}, che effettua \textit{binning} basato su cumulativi di distribuzione.
     \begin{figure}[H]
@@ -125,7 +126,7 @@ Vengono create anche diverse classi per poter raggruppare comportamenti comuni d
 
 \subsection{Pipeline pattern}
 
-Si è deciso di utilizzare il \textit{pipeline pattern} per l'applicazione dei \textit{transformer} ai dati. Questo pattern è una struttura architetturale in cui una serie di elaborazioni vengono applicate sequenzialmente a un flusso di dati, in questo caso il \textit{dataset} del tipo \textit{DataFrame}. Ogni stadio della \textit{pipeline} prende in input l'output dello stadio precedente, eseguendo una trasformazione. Ogni componente della \textit{pipeline} è modulare, indipendente, non modifica i valori in input (genera una copia in output) né causa \textit{side effect}. L'elaborazione delle trasformazioni avviene in sequenza ed è possibile modificare sia l'ordine delle trasformazioni che le trasformazioni stesse. In caso ci fosse un errore in una delle trasformazioni la \textit{pipeline} non va a buon fine.
+Si è deciso di utilizzare il \textit{pipeline pattern} per l'applicazione dei \textit{transformer} ai dati. Questo pattern è una struttura architetturale in cui una serie di elaborazioni vengono applicate sequenzialmente ad un flusso di dati, in questo caso il \textit{dataset} del tipo \textit{DataFrame}. Ogni stadio della \textit{pipeline} prende in input l'output dello stadio precedente, eseguendo una trasformazione. Ogni componente della \textit{pipeline} è modulare, indipendente, non modifica i valori in input (genera una copia in output) né causa \textit{side effect}. L'elaborazione delle trasformazioni avviene in sequenza ed è possibile modificare sia l'ordine delle trasformazioni che le trasformazioni stesse. In caso ci fosse un errore in una delle trasformazioni la \textit{pipeline} non va a buon fine.
 
 \begin{figure}[H]
     \centering
@@ -142,6 +143,8 @@ La pipeline, anch'essa una \textit{DataFramePreprocessFunction} che applica tutt
     \caption{Diagramma della classe \texttt{PreprocessPipeline}}
     \label{fig:preprocess_pipeline}
 \end{figure}
+
+È possibile accedere al singolo \textit{transformer} della \textit{pipeline} tramite l'indice, che può essere un numero. Viene definito il metodo \texttt{get\_transformer} che restituisce il \textit{transformer} corrispondente all'indice passato come parametro. I metodi \texttt{fit}, \texttt{transform} e \texttt{fit\_transform} della \texttt{PreprocessPipeline} applicano in sequenza tutti i \textit{transformer} definiti nella \textit{pipeline}. Per esempio il metodo \texttt{fit} chiama il metodo \texttt{fit} di ogni \textit{transformer} in ordine.
 
 Un esempio di utilizzo è:
 
@@ -242,7 +245,7 @@ I modelli possono, in base alle necessità, aggiungere parametri aggiuntivi alle
 
 \subsection{Salvataggio modelli}
 
-Viene definita l'interfaccia \texttt{PersistableModel} che espone il metodo \texttt{save} per il salvataggio dei modelli. Il metodo riceve come parametro \texttt{fileobj\_or\_path} che corrisponde al nome del file (che include anche il percorso, tipo \texttt{str}) oppure un oggetto file aperto (tipo \texttt{io.IOBase}) su cui salvare il modello.
+Viene definita l'interfaccia \texttt{PersistableModel} che espone il metodo \texttt{save} per il salvataggio dei modelli. Il metodo riceve come parametro \texttt{fileobj\_or\_path} che corrisponde al nome del file (che include anche il percorso, di tipo \texttt{str}) oppure un oggetto file aperto (di tipo \texttt{io.IOBase}) su cui salvare il modello.
 
 \begin{figure}[H]
     \centering
@@ -281,8 +284,7 @@ Ogni volta che si fa riferimento ad un id, che sia \texttt{user\_id} o \texttt{i
 
 \subsection{Model predict data}\label{model_predict_data}
 
-I vari modelli possono predire il \textit{rating} o lo \textit{score} con il metodo \texttt{predict} su diversi formati di dati, purché rispettino i vincoli sopra descritti. Il formato standard deciso è identico a quello utilizzato per l'addestramento~\ref{model_fit_data}. I modelli possono in modo indipendente introdurre eventuali vincoli sui dati in input.
-
+I vari modelli possono predire il \textit{rating} o lo \textit{score} con il metodo \texttt{predict} su diversi formati di dati, purché rispettino i vincoli sopra descritti. Il formato standard deciso è identico a quello utilizzato per l'addestramento. I modelli possono in modo indipendente introdurre eventuali vincoli sui dati in input.
 In questo caso però il modello utilizza la singola coppia (\textit{user\_id}, \textit{item\_id}) alla quale viene associato un \textit{rating} o lo \textit{score} in base al tipo di modello utilizzato, rispettivamente per feedback espliciti e per feedback impliciti. Se, per esempio, vengono dati in input al modello, che gestisce feedback impliciti, cinque coppie (\textit{user\_id}, \textit{item\_id}) quest'ultimo restituisce un \textit{NumPy array} di cinque valori, ciascuno corrispondente allo \textit{score} ottenuto da ciascuna coppia. Se si vuole ottenere il \textit{ranking} occorre ordinare gli \textit{score} ottenuti in ordine decrescente. Se si vuole calcolare \textit{rating} o lo \textit{score}, dati un insieme $U$ di \textit{user} e $I$ di \textit{item}, occorre dare in input al metodo \texttt{predict} tutte le combinazioni $\left\{(u, i) \mid u \in U,\; i \in I \right\}$.
 
 Un esempio di input in formato \textit{DataFrame} e di output in formato \textit{NumPy array}:
@@ -351,11 +353,11 @@ Entrambi i metodo restituiscono un \textit{NumPy array} di (\textit{user\_id}/\t
     \caption{Diagramma dell'interfaccia \texttt{SimilarityModel}}
 \end{figure}
 
-Importante inserire, all'interno del due metodi, un controllo che verifichi che il modello sia stato addestrato, utilizzando la funzione \texttt{check\_is\_fitted} come per il metodo \texttt{predict}~\ref{compatibilita_sklearn}.
+Importante inserire, all'interno del due metodi, un controllo che verifichi che il modello sia stato addestrato, utilizzando la funzione \texttt{check\_is\_fitted} come per il metodo \texttt{predict} descritto in precedenza.
 
 \subsection{Modelli Surprise}
 
-Viene definita la classe astratta \texttt{SurpriseModel} che estende \texttt{BaseEstimator} e \texttt{PersistableModel} e che gestisce il comportamento comune della \texttt{fit} e della \texttt{predict} di tutti i modelli della libreria \textit{Surprise}. Viene definito il metodo astratto \texttt{\_fit\_surprise\_model}, applicando il pattern \textit{Template Method}. Così facendo, l'implementazione di ogni modello deve definire solamente le modalità di addestramento del modello della libreria \textit{Surprise} e quali attributi, il cui nome termina con il carattere "\_", vengono appresi.
+Viene definita la classe astratta \texttt{SurpriseModel} che estende \texttt{BaseEstimator} e \texttt{PersistableModel} e che gestisce il comportamento comune della \texttt{fit} e della \texttt{predict} di tutti i modelli della libreria \textit{Surprise}. Viene definito il metodo astratto \texttt{\_fit\_surprise\_model}, applicando il pattern \textit{Template Method}. Così facendo, l'implementazione di ogni modello deve definire solamente le modalità di addestramento del modello della libreria \textit{Surprise} e gli attributi, il cui nome termina con il carattere "\_", che vengono appresi.
 
 \begin{figure}[H]
     \centering
@@ -463,8 +465,8 @@ Se il \textit{trainset} contiene una terza colonna, che deve essere numerica, qu
 Il costruttore riceve gli stessi parametri del modello originale della libreria \textit{LightFM} più quattro parametri extra:
 
 \begin{itemize}
-    \item \texttt{user\_identity\_features} (\texttt{bool}): crea una feature unica per ogni \textit{user} in aggiunta alle altre features. Se impostato su \texttt{True} (il valore di default), verrà allocato un vettore latente per ogni \textit{user}.  Questo è un valore predefinito ragionevole per la maggior parte delle applicazioni, ma dovrebbe essere impostato su \texttt{false} se sono disponibili pochissimi dati per ciascun \textit{user}. Per ulteriori dettagli, consultare le \textit{Note} sulla documentazione di \textit{LightFM}
-    \item \texttt{item\_identity\_features} (\texttt{bool}): crea una feature unica per ogni \textit{item} in aggiunta alle altre features. Se impostato su \texttt{True} (il valore di default), verrà allocato un vettore latente per ogni \textit{item}. Questo è un valore predefinito ragionevole per la maggior parte delle applicazioni, ma dovrebbe essere impostato su \texttt{false} se sono disponibili pochissimi dati per ciascun \textit{item}. Per ulteriori dettagli, consultare le \textit{Note} sulla documentazione di \textit{LightFM}
+    \item \texttt{user\_identity\_features} (\texttt{bool}): crea una feature unica per ogni \textit{user} in aggiunta alle altre features. Se impostato su \texttt{True} (il valore di default), verrà allocato un vettore latente per ogni \textit{user}.  Questo è un valore predefinito ragionevole per la maggior parte delle applicazioni, ma dovrebbe essere impostato su \texttt{False} se sono disponibili pochissimi dati per ciascun \textit{user}. Per ulteriori dettagli, consultare le \textit{Note} sulla documentazione di \textit{LightFM}
+    \item \texttt{item\_identity\_features} (\texttt{bool}): crea una feature unica per ogni \textit{item} in aggiunta alle altre features. Se impostato su \texttt{True} (il valore di default), verrà allocato un vettore latente per ogni \textit{item}. Questo è un valore predefinito ragionevole per la maggior parte delle applicazioni, ma dovrebbe essere impostato su \texttt{False} se sono disponibili pochissimi dati per ciascun \textit{item}. Per ulteriori dettagli, consultare le \textit{Note} sulla documentazione di \textit{LightFM}
     \item \texttt{normalize\_user\_features} (\texttt{bool}): se impostato su \texttt{True} (il valore di default), il modello utilizzerà, per l'addestramento, una versione normalizzata delle feature degli \textit{user}, garantendo che i pesi delle features sommino a 1 in ogni riga
     \item \texttt{normalize\_item\_features} (\texttt{bool}): se impostato su \texttt{True} (il valore di default), il modello utilizzerà, per l'addestramento, una versione normalizzata delle feature degli \textit{item}, garantendo che i pesi delle features sommino a 1 in ogni riga
 \end{itemize}
@@ -523,7 +525,7 @@ Il metodo \texttt{predict} di questo modello può ricevere tre parametri extra:
 \section{Model Selection}
 
 Il modulo contiene le funzioni per poter eseguire lo split del 
-\textit{dataset} in \textit{trainset} e \textit{testset}. La principale, chiamata \texttt{train\_test\_split\_with\_coverage}, riceve in ingresso un \textit{DataFrame} o un \textit{NumPy array} che deve rispettare il formato standard definito sui dati che utilizzano i modelli~\ref{model_fit_data}. 
+\textit{dataset} in \textit{trainset} e \textit{testset}. La principale, chiamata \texttt{train\_test\_split\_with\_coverage}, riceve in ingresso un \textit{DataFrame} o un \textit{NumPy array} che deve rispettare il formato standard definito sui dati che utilizzano i modelli. 
 
 Lo \textit{split} viene effettuato in modo che nel \textit{trainset} ci sia almeno un'interazione per ogni \textit{user} e ogni \textit{item} in modo che, durante la \textit{prediction}, sia possibile generare un risultato per qualunque \textit{user}/\textit{item} presente durante la fase di \textit{training}. Non ci sono invece sicurezze sul fatto che nel \textit{testset} ci sia, per ogni \textit{user}/\textit{item}, almeno un'interazione. Questo potrebbe portare ad un caso particolare di \textit{cold-start} nel \textit{testset}.
 
@@ -551,14 +553,12 @@ mentre per quelli che gestiscono feedback impliciti:
     \item Normalized Discounted Cumulative Gain (NDCG) con la funzione \texttt{ndcg}
 \end{itemize}
 
-Tutte queste funzioni
-
 \section{Utils}
 
 Il modulo \texttt{utils} raccoglie un insieme di funzioni ausiliarie progettate per supportare attività comuni nella fase di preparazione dei dati e predizione nei modelli di raccomandazione. Le funzioni sono pensate per essere modulari, riutilizzabili e indipendenti dalla specifica implementazione del modello.
 
 \begin{itemize}
-    \item \texttt{check\_model\_inputs}: funzione di validazione degli input forniti a un modello. Controlla che tutte le colonne richieste siano presenti, che i dati siano nel formato standard (vedere~\ref{model_fit_data} e~\ref{model_predict_data}) e che rispettino le specifiche attese dal modello. Può essere inclusa nei metodi \texttt{fit} e \texttt{predict} dei modelli che accettano i dati nel formato standard
+    \item \texttt{check\_model\_inputs}: funzione di validazione degli input forniti a un modello. Controlla che tutte le colonne richieste siano presenti, che i dati siano nel formato standard e che rispettino le specifiche attese dal modello. Può essere inclusa nei metodi \texttt{fit} e \texttt{predict} dei modelli che accettano i dati nel formato standard
 
     \item \texttt{generate\_user\_item\_pairs}: prende in input una matrice (in formato \textit{DataFrame} o \textit{NumPy array}) che contiene almeno due colonne: la prima con gli \texttt{user\_id} e la seconda con gli \texttt{item\_id}. Le eventuali colonne aggiuntive vengono ignorate. La funzione genera un \textit{DataFrame} contenente tutte le coppie possibili (\texttt{user\_id}, \texttt{item\_id}) ottenute dal prodotto cartesiano tra gli \textit{user} e gli \textit{item} presenti nei dati forniti. Questo serve affinché i modelli possano calcolare, tramite il metodo \texttt{predict}, il \textit{ranking} di tutti gli \textit{item} per ciascuno \textit{user}
     \begin{table}[H]
@@ -604,7 +604,7 @@ Il modulo \texttt{utils} raccoglie un insieme di funzioni ausiliarie progettate 
 
 
 \section{Visualization}
-Il modulo comprende l'insieme delle funzioni di supporto dedicate all'analisi esplorativa e alla visualizzazione di dati in formato \textit{DataFrame}. In particolare, fornisce strumenti per rappresentare graficamente la distribuzione di variabili continue e categoriali tramite istogrammi, curve di densità e grafici a barre, facilitando la comprensione della frequenza e della percentuale dei valori presenti. Inoltre, include una funzione principale, \texttt{describe}, che, data una struttura dati tabellare, consente di visualizzare in modo personalizzato le distribuzioni di colonne categoriali e continue, supportando anche colonne con valori multipli separati da un delimitatore.
+Il modulo comprende l'insieme delle funzioni di supporto dedicate all'analisi esplorativa e alla visualizzazione di dati in formato \textit{DataFrame}. In particolare, fornisce strumenti per rappresentare graficamente la distribuzione di variabili continue e categoriali tramite istogrammi, curve di densità e grafici a barre, facilitando la comprensione della frequenza e della percentuale dei valori presenti.
 
 Questo modulo è stato pensato per poter visualizzare ed analizzare le distribuzioni di eventuali \textit{rating} e features di \textit{user} e \textit{item}.
 

@@ -12,7 +12,7 @@ Lo sviluppo della libreria è stato effettuato utilizzando \textit{Python} 3.11,
 
 A causa di incompatibilità tra \textit{Surprise} e le versioni più recenti di \textit{NumPy}, è stato necessario utilizzare la versione 1.24.4 di \textit{NumPy}. Tale scelta non ha comportato problemi di compatibilità con le altre librerie utilizzate.
 
-Per la gestione dei pacchetti e delle dipendenze è stato utilizzato \textit{uv}, un gestore di pacchetti Python di nuova generazione sviluppato da \textit{Astral} (gli stessi creatori di \textit{ruff}). Scritto in \textit{Rust}, \textit{uv} si distingue per le sue elevate prestazioni, risultando fino a 10--100 volte più veloce rispetto a \textit{pip}.
+Per la gestione dei pacchetti e delle dipendenze è stato utilizzato \textit{uv}, un gestore di pacchetti Python di nuova generazione sviluppato da \textit{Astral} (gli stessi creatori di \textit{ruff}). Scritto in \textit{Rust}, \textit{uv} si distingue per le sue elevate prestazioni, risultando fino a 10--100 volte più veloce rispetto a \textit{pip}. Questo è particolarmente importante in contesti in cui la libreria viene installata frequentemente, come durante il rilascio in ambienti cloud mediante l'utilizzo di \textit{CI/CD}.
 
 Oltre a offrire un'interfaccia compatibile con \textit{pip}, \textit{uv} integra diverse funzionalità avanzate, tra cui:
 
@@ -32,7 +32,7 @@ La classe astratta \texttt{SurpriseModel} implementa internamente la logica per 
 Alcune considerazioni sull'implementazione:
 
 \begin{itemize}
-    \item per l'addestramento e la previsione viene utilizzata la struttura dati \\ \texttt{surprise.dataset.Dataset}, creata con la chiamata al metodo statico \\ \texttt{load\_from\_df} utilizzando direttamente dai dati passati tramite le funzioni \texttt{fit} e \texttt{predict}. Il valore del parametro \texttt{rating\_scale} dell'oggetto \\ \texttt{surprise.reader.Reader}, che viene utilizzato per la creazione dell'oggetto \texttt{Dataset}, viene impostato come \texttt{(rating\_column.min, \\ rating\_column.max)}. Se non sono presenti i \textit{rating} nel \textit{trainset}, il valore di default viene impostato a \texttt{(0, 1)}
+    \item per l'addestramento e la previsione viene utilizzata la struttura dati \\ \texttt{surprise.dataset.Dataset}, creata con la chiamata al metodo statico \\ \texttt{load\_from\_df} della classe stessa utilizzando direttamente dai dati passati tramite le funzioni \texttt{fit} e \texttt{predict}. Il valore del parametro \texttt{rating\_scale} dell'oggetto \texttt{surprise.reader.Reader}, che viene utilizzato per la creazione dell'oggetto \texttt{Dataset}, viene impostato come \texttt{(rating\_column.min, \\ rating\_column.max)}. Se non sono presenti i \textit{rating} nel \textit{trainset}, il valore di default viene impostato a \texttt{(0, 1)}
     \item per il salvataggio, all'interno del metodo \texttt{save} viene utilizzato il metodo \texttt{pickle.dump} per serializzare il modello
     \item il metodo statico \texttt{load} che implementa ogni sottoclasse utilizza invece il metodo \texttt{pickle.load} per deserializzare il file salvato e ricostruire il modello
 \end{itemize}
@@ -117,7 +117,7 @@ Per i \textit{transformers}:
     \end{itemize}
 \end{itemize}
 
-Tutti i modelli apprendono ed espongono come attributi anche \texttt{user\_ids\_} e \texttt{item\_ids\_} e \texttt{train\_user\_item\_pairs\_}, che corrispondono rispettivamente a due liste ordinate degli id di \texttt{user} e \texttt{item} e ad un set di coppie (\textit{user\_id}, \textit{item\_id}) viste durante l'addestramento. Questi valori vengono anche utilizzati dalle funzioni di evaluation implicite~\ref{evaluation_implementation}, quindi i modelli che intendono utilizzare le implementazioni proposte devono esporre questi attributi.
+Tutti i modelli apprendono ed espongono come attributi anche \texttt{user\_ids\_} e \texttt{item\_ids\_} e \texttt{train\_user\_item\_pairs\_}, che corrispondono rispettivamente a due liste ordinate degli id di \texttt{user} e \texttt{item} e ad un set di coppie (\textit{user\_id}, \textit{item\_id}) viste durante l'addestramento. Questi valori vengono anche utilizzati dalle funzioni di evaluation implicite, quindi i modelli che intendono utilizzare le implementazioni proposte devono esporre questi attributi.
 
 Gli altri attributi sono:
 
@@ -179,8 +179,7 @@ Gli altri attributi sono:
 
 \begin{lstlisting}[caption=Esempio di utilizzo dei parametri appresi]
 light_fm = LightFM(no_components=30)
-# light_fm.user_embeddings_ 
-# raises NotFittedError because models is not fitted yet
+# the use of light_fm.user_embeddings_ before fit raises NotFittedError because models is not fitted yet
 light_fm.fit(train, epochs=20)
 print(light_fm.user_embeddings_) # shows a matrix of shape (num_users, 30)
 \end{lstlisting}
@@ -268,7 +267,7 @@ Per questo motivo ogni funzione di evaluation all'interno del modulo è stata im
 
 \begin{itemize}
     \item funzione normale, con la signature specificata sopra in cui viene chiamata semplicemente la \texttt{predict} del modello
-    \item una sua versione \textit{Factory}: questa versione riceve in ingresso una funzione \textit{higher order} \texttt{predict\_fn} e le \textit{keyword args} (\texttt{**kwargs}) di \textit{Python}. \texttt{predict\_fn} verrà chiamata all'interno di una nuova funzione costruita dalla \textit{factory} che avrà la \textit{signature} compatibile con i requisiti di \textit{Scikit-learn}. I \textit{keyword args} verranno passati a \texttt{predict\_fn}. Questo serve per poter dare la possibilità di creare funzioni di metriche custom, per esempio dare la possibilità di poter passare features o parametri aggiuntivi per il metodo \texttt{predict}, come nel caso della classe di \texttt{LightFM} che può ricevere le features di \textit{user} e \textit{item}
+    \item una sua versione \textit{Factory}: questa versione, il cui nome termina con \texttt{\_factory}, riceve in ingresso una funzione \textit{higher order} \texttt{predict\_fn} e le \textit{keyword args} (\texttt{**kwargs}) di \textit{Python}. \texttt{predict\_fn} verrà chiamata all'interno di una nuova funzione costruita dalla \textit{factory} che avrà la \textit{signature} compatibile con i requisiti di \textit{Scikit-learn}. I \textit{keyword args} verranno passati a \texttt{predict\_fn}. Questo serve per poter dare la possibilità di creare funzioni di metriche custom, per esempio dare la possibilità di poter passare features o parametri aggiuntivi per il metodo \texttt{predict}, come nel caso della classe di \texttt{LightFM} che può ricevere le features di \textit{user} e \textit{item}
     \begin{lstlisting}[caption=Implementazione in pseudo codice di una \textit{factory} per una metrica generica ]
         def metric_factory(predict_fn, **kwargs):
             def metric(model, testset, y=None):

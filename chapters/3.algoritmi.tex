@@ -22,8 +22,8 @@ La notazione utilizzata è la seguente:
     \item $I_{uv}$ : l'insieme di tutti gli \textit{item} valutati sia dallo \textit{user} $u$ che dallo \textit{user} $v$
     \item $r_{ui}$ : il \textit{rating} \textit{vero} dello \textit{user} $u$ per l'\textit{item} $i$
     \item $\hat{r}_{ui}$ : il \textit{rating} \textit{stimato} dello \textit{user} $u$ per l'\textit{item} $i$
-    \item $b_u$: \textit{bias} dello \textit{user} $u$, misura quanto in media lo \textit{user} tende a dare valutazioni più alte o più basse rispetto alla media generale. Se tende sempre a dare voti più alti della media $b_u$ sarà positivo; se tende a dare voti più bassi, sarà negativo
-    \item $b_u$: \textit{bias} dell'\textit{item} $i$, misura quanto un \textit{item} tende a ricevere valutazioni più alte o più basse rispetto alla media, indipendentemente dallo \textit{user}. Per esempio, un \textit{item} molto popolare potrebbe avere un $b_u$ positivo perché riceve in media voti più alti rispetto alla media generale
+    \item $b_u$: bias dello \textit{user} $u$, misura quanto in media lo \textit{user} tende a dare valutazioni più alte o più basse rispetto alla media generale. Se tende sempre a dare voti più alti della media $b_u$ sarà positivo; se tende a dare voti più bassi, sarà negativo
+    \item $b_u$: bias dell'\textit{item} $i$, misura quanto un \textit{item} tende a ricevere valutazioni più alte o più basse rispetto alla media, indipendentemente dallo \textit{user}. Per esempio, un \textit{item} molto popolare potrebbe avere un $b_u$ positivo perché riceve in media voti più alti rispetto alla media generale
     \item $b_{ui}$ : il \textit{rating} di base dello \textit{user} $u$ per l'\textit{item} $i$, viene definito \textit{baseline estimate}: $b_{ui} = \mu + b_u + b_i$
     \item $\mu$ : la media di tutti i \textit{rating}
     \item $\mu_u$ : la media di tutti i \textit{rating} dati dallo \textit{user} $u$
@@ -157,7 +157,7 @@ Viene presentata una tassonomia degli algoritmi di \textit{recommendation}.
 \subsection{KNN (K-Nearest Neighbors)}\label{knn}
 Si tratta di algoritmi derivati direttamente da un approccio di base basato sui \textit{Nearest Neighbors}.
 
-Gli algoritmi ispirati al KNN (\textit{K Nearest Neighbors}) sono una classe di algoritmi di \textit{recommendation} che si basano sull'idea che gli \textit{user} simili tendono a valutare gli stessi \textit{item} in modo simile. Questi algoritmi sono semplici da implementare e possono essere molto efficaci per problemi a piccola scala.
+Gli algoritmi ispirati al KNN (\textit{K Nearest Neighbors}) sono una classe di algoritmi di \textit{recommendation} semplici da implementare e possono essere molto efficaci per problemi a piccola scala.
 
 Il numero effettivo di vicini che vengono considerati per calcolare la predizione è minore o uguale a $k$: potrebbero non esserci abbastanza vicini e/o gli insiemi $N_i^k(u)$ e $N_u^k(i)$ includono solo vicini per i quali la misura di similarità è positiva (non avrebbe senso considerare \textit{user} o \textit{item} correlati negativamente).
 
@@ -208,7 +208,6 @@ Alcune misure di similarità, sia per \textit{user} che per \textit{item}, sono:
             \text{pearson baseline shrunk sim}(u, v) &= \frac{|I_{uv}| - 1}{|I_{uv}| - 1 + \text{shrinkage}} \cdot \hat{\rho}_{uv} \\
             \text{pearson baseline shrunk sim}(i, j) &= \frac{|U_{ij}| - 1}{|U_{ij}| - 1 + \text{shrinkage}} \cdot \hat{\rho}_{ij}
         \end{align*}
-        Per il calcolo della baseline, si consideri la parte di \ref{knn_baseline}.
 \end{itemize}
 
 Altro iperparametro da considerare è il supporto minimo, che corrisponde al numero minimo di \textit{item} in comune o il numero minimo di \textit{user} in comune affinché la similarità non sia zero, i.e., se $|I_{uv}| < \text{min support}$, allora $\text{sim}(u, v) = 0$. Lo stesso vale per gli \textit{item}.
@@ -384,8 +383,7 @@ L'approccio può essere esteso a modelli ponderati e versioni più avanzate, com
 
 \subsection{SVD (Singular Value Decomposition)}\label{svd}
 
-L'algoritmo SVD (\textit{Singular Value Decomposition}), è stato reso popolare da Simon Funk durante la competizione \textit{the Netflix Prize} dimostrando come modelli di fattorizzazione matriciale sono superiori alle tecniche classiche basate su \textit{nearest neighbor}\ref{knn} per
-la produzione di raccomandazioni.
+L'algoritmo \textit{SVD} (\textit{Singular Value Decomposition}), è stato reso popolare da Simon Funk durante la competizione \textit{the Netflix Prize} dimostrando come modelli di fattorizzazione matriciale sono superiori alle tecniche classiche basate su \textit{nearest neighbor} per la produzione di raccomandazioni.
 
 I modelli di \textit{Matrix Factorization} mappano gli \textit{user} e gli \textit{item} in uno spazio latente comune di dimensione $k$, che rappresenta il numero di caratteristiche latenti. Ogni \textit{item} $i$ è associato a un vettore $q_i$ di dimensione $k$, che misura quanto l'\textit{item} possieda ciascuna di queste caratteristiche latenti. Per ogni \textit{user} $u$, invece, il vettore $p_u$ misura l'interesse dello \textit{user} per gli \textit{item}. Il numero di fattori è un iperparametro dell'algoritmo.
 
@@ -435,7 +433,7 @@ Per ottenere un ulteriore miglioramento, si possono applicare $\gamma$ e $\lambd
 I punti di forza dell'algoritmo sono:
 
 \begin{itemize}
-    \item semplicità: l'algoritmo SVD è relativamente semplice da comprendere e implementare
+    \item semplicità: l'algoritmo \textit{SVD} è relativamente semplice da comprendere e implementare
     \item riduzione della dimensionalità: l'algoritmo permette di ridurre la dimensione del problema mappando sia gli \textit{user} che gli \textit{item} in uno spazio latente di dimensione inferiore, gestendo la sparsità delle matrici. Funziona molto bene quando la matrice delle valutazioni è abbastanza completa
     \item caratteristiche latenti: identifica strutture sottostanti che non sono immediatamente evidenti
 \end{itemize}
@@ -478,8 +476,8 @@ I parametri del modello vengono determinati minimizzando la funzione di errore q
 I punti di forza dell'algoritmo sono:
 
 \begin{itemize}
-    \item miglioramento della personalizzazione: SVD++ è un miglioramento significativo rispetto a SVD, poiché prende in considerazione anche l'influenza degli \textit{item} che lo \textit{user} ha già valutato nel termine $\sum\limits_{j \in I_u} y_j$, il che lo rende molto più sensibile alle preferenze individuali dello \textit{user}
-    \item migliore gestione della sparsità: poiché SVD++ tiene conto dei feedback impliciti, riesce a fare previsioni migliori anche quando la matrice delle valutazioni è sparsa
+    \item miglioramento della personalizzazione: \textit{SVD++} è un miglioramento significativo rispetto a \textit{SVD}, poiché prende in considerazione anche l'influenza degli \textit{item} che lo \textit{user} ha già valutato nel termine $\sum\limits_{j \in I_u} y_j$, il che lo rende molto più sensibile alle preferenze individuali dello \textit{user}
+    \item migliore gestione della sparsità: poiché \textit{SVD++} tiene conto dei feedback impliciti, riesce a fare previsioni migliori anche quando la matrice delle valutazioni è sparsa
     \item previsioni più accurate: i feedback impliciti aiutano a produrre previsioni più accurate, soprattutto in scenari dove gli \textit{user} hanno interagito con più \textit{item}
 \end{itemize}
 
@@ -488,14 +486,14 @@ L'algoritmo soffre anche di diverse problematiche:
 \begin{itemize}
     \item complessità computazionale maggiore: la necessità di aggiornare $y_i$ aumenta il carico computazionale
     \item richiede più dati: poiché prende in considerazione anche i feedback impliciti, ha bisogno di un numero maggiore di dati per generare previsioni precise
-    \item overfitting: SVD++ è più propenso a overfitting su dataset piccoli
+    \item overfitting: \textit{SVD++} è più propenso a overfitting su dataset piccoli
 \end{itemize}
 
 \subsection{NMF (Non-Negative Matrix Factorization)}\label{nmf}
 
 \textit{NMF} (\textit{Non-Negative Matrix Factorization}) è un algoritmo di \textit{collaborative filtering} basato sulla \textit{fattorizzazione matriciale non negativa}.  
 
-Questo algoritmo è molto simile a SVD\ref{svd} ma con una restrizione che tutti gli elementi devono essere non negativi. Questo ha senso, ad esempio, quando si tratta di rating o quantità (che non possono essere negativi).
+Questo algoritmo è molto simile a \textit{SVD} ma con una restrizione che tutti gli elementi devono essere non negativi. Questo ha senso, ad esempio, quando si tratta di rating o quantità (che non possono essere negativi).
 
 L'idea è approssimare la matrice $R$ come prodotto di due matrici più piccole:
 
@@ -547,7 +545,7 @@ Questo algoritmo è altamente dipendente dai valori iniziali con cui vengono ini
 
 Gli iperparametri $\lambda_u$ e $\lambda_i$ corrispondono alla regolarizzazione rispettivamente per \textit{user} e \textit{item}.
 
-Anche in questo caso si può utilizzare la predizione con l'utilizzo di bias\ref{svd}.
+Anche in questo caso si può utilizzare la predizione con l'utilizzo di bias.
 
 \[
 \hat{r}_{ui} = \mu + b_u + b_i + q_i^T p_u
@@ -569,7 +567,7 @@ L'algoritmo soffre anche di diverse problematiche:
 
 \subsection{CoClustering}\label{coclustering}
 
-La soluzione proposta da Thomas George e Srujana Merugu~\cite{Co-Clustering} utilizza il \textit{Co-Clustering}. Questa tecnica viene utilizzata per raggruppare simultaneamente due entità in un dataset. Nel caso di un sistema di \textit{recommendation} basato su \textit{collaborative filtering}, L'obiettivo è individuare gruppi di \textit{user} simili e gruppi di \textit{item} simili. Il \textit{Co-Clustering} si propone di partizionare simultaneamente le righe (\textit{user}) e le colonne (\textit{item}) della matrice $R$, in modo tale che gli \textit{user} appartenenti allo stesso \textit{co-cluster} presentino comportamenti di valutazione analoghi, e che gli \textit{item} all'interno dello stesso \textit{co-cluster} ricevano valutazioni simili da parte degli \textit{user} del medesimo gruppo. Il numero di cluster deve essere definito a priori sia per gli \textit{user} sia per gli \textit{item}. Il processo di \textit{Co-Clustering} si distingue dal clustering tradizionale in quanto quest'ultimo si limita a raggruppare lungo un'unica dimensione (righe oppure colonne), mentre il \textit{Co-Clustering} effettua la suddivisione simultaneamente su entrambe le dimensioni della matrice.
+La soluzione proposta da Thomas George e Srujana Merugu~\cite{Co-Clustering} utilizza il \textit{Co-Clustering}. Questa tecnica viene utilizzata per raggruppare simultaneamente due entità in un dataset. Il \textit{Co-Clustering} si propone di partizionare simultaneamente le righe (\textit{user}) e le colonne (\textit{item}) della matrice $R$, in modo tale che gli \textit{user} appartenenti allo stesso \textit{co-cluster} presentino comportamenti di valutazione analoghi, e che gli \textit{item} all'interno dello stesso \textit{co-cluster} ricevano valutazioni simili da parte degli \textit{user} del medesimo gruppo. Il numero di cluster deve essere definito a priori sia per gli \textit{user} sia per gli \textit{item}. Il processo di \textit{Co-Clustering} si distingue dal clustering tradizionale in quanto quest'ultimo si limita a raggruppare lungo un'unica dimensione (righe oppure colonne), mentre il \textit{Co-Clustering} effettua la suddivisione simultaneamente su entrambe le dimensioni della matrice.
  
 L'algoritmo, nella fase di inizializzazione, assegna casualmente i \textit{co-cluster} a \textit{user} e \textit{item}. Durante l'esecuzione i \textit{co-cluster} vengono aggiornati iterativamente, per cercare di migliorare la qualità del raggruppamento, alternando tra il raggruppamento degli \textit{user} e degli \textit{item} fino a convergenza. Una volta che i \textit{co-cluster} sono definiti si può calcolare la media dei \textit{rating} all'interno di ciascun \textit{co-cluster}. $ \overline{C_{ui}} $ rappresenta la media dei \textit{rating} all'interno del \textit{co-cluster} che contiene lo \textit{user} $u$ e l'\textit{item} $i$. In altre parole, è il \textit{rating} medio tra gli \textit{user} e gli \textit{item} che appartengono allo stesso \textit{co-cluster}.
 
@@ -579,7 +577,7 @@ Si può quindi definire la predizione come
 \hat{r}_{ui} = \overline{C_{ui}} + (\mu_u - \overline{C_u}) + (\mu_i - \overline{C_i})
 \]
 
-dove $\overline{C_u}$ è la media dei \textit{rating} del cluster di $u$ e $\overline{C_i}$ è la media dei \textit{rating} del cluster di $i$. $ \mu_u - \overline{C_u} $ e $ \mu_i - \overline{C_i} $ vengono definiti \textit{bias}. Se: 
+dove $\overline{C_u}$ è la media dei \textit{rating} del cluster di $u$ e $\overline{C_i}$ è la media dei \textit{rating} del cluster di $i$. $ \mu_u - \overline{C_u} $ e $ \mu_i - \overline{C_i} $ vengono definiti bias. Se: 
 \begin{itemize}
   \item \textit{user} mancante: la previsione è $ \overline{C_i} $
   \item \textit{item} mancante: la previsione è $ \overline{C_u} $
@@ -608,7 +606,7 @@ Il costo computazionale per l'addestramento è $ \mathcal{O}(W^{\text{glob}} + m
 
 Per il calcolo della predizione, il costo è $\mathcal{O}(1)$, in quanto si tratta di operazioni media e il calcolo dei bias.
 
-Per l'aggiornamento quando un nuovo \textit{rating} viene aggiunto o un nuovo \textit{user}/\textit{item} entra nel sistema, l'algoritmo non ricalcola tutto da zero. Invece, utilizza un aggiornamento incrementale parziale, che si basa sull'aggiornamento delle medie delle matrici:
+Per l'aggiornamento quando un nuovo \textit{rating} viene aggiunto o un nuovo \\ \textit{user}/\textit{item} entra nel sistema, l'algoritmo non ricalcola tutto da zero. Invece, utilizza un aggiornamento incrementale parziale, che si basa sull'aggiornamento delle medie delle matrici:
 
 \begin{itemize}
   \item Se il nuovo \textit{rating} riguarda un \textit{user} e un \textit{item} esistenti si aggiornano direttamente le medie
@@ -874,7 +872,7 @@ I punti di forza dell'algoritmo sono:
     \item ottimizzazione diretta: massimizza la probabilità che un \textit{item} positivo sia sopra uno negativo
     \item scalabilità: efficiente con \textit{SGD} e \textit{negative sampling}, anche su grandi dataset
     \item flessibilità: compatibile con \textit{Matrix Factorization}, \textit{Neural Collaborative Filtering} e modelli più avanzati (\textit{CNN}, \textit{RNN}, \textit{GNN})
-    \item empiricamente superiore: spesso batte metodi classici come \textit{Weighted Regularized Matrix Factorization} e \textit{SVD}\ref{svd}
+    \item empiricamente superiore: spesso batte metodi classici come \textit{Weighted Regularized Matrix Factorization} e \textit{SVD}
     \item indipendente da valutazioni esplicite: non richiede rating numerici
 \end{itemize}
 
@@ -1141,9 +1139,9 @@ Viene introdotto il framework di \textit{Neural Collaborative Filtering} (\texti
 
 Il modello, chiamato \textit{Neural Matrix Factorization} (\textit{NeuMF})~\cite{NeuMF} mira ad affrontare il compito di ordinamento personalizzato basato su feedback implicito. Questo modello sfrutta la flessibilità e la non-linearità delle reti neurali per sostituire i prodotti scalari della fattorizzazione di matrici, con l'obiettivo di aumentare l'espressività del modello.
 
-In particolare, il modello è composto da due sottoreti: \textit'{Generalized Matrix Factorization} (\textit{GMF}) e una rete \textit{Multi-Layer Perceptron} (\textit{MLP}), e modella le interazioni attraverso due percorsi distinti anziché usare un semplice prodotto scalare. Gli output di queste due reti sono concatenate per calcolare il punteggio finale di predizione.
+In particolare, il modello è composto da due sottoreti: \textit{Generalized Matrix Factorization} (\textit{GMF}) e una rete \textit{Multi-Layer Perceptron} (\textit{MLP}), e modella le interazioni attraverso due percorsi distinti anziché usare un semplice prodotto scalare. Gli output di queste due reti sono concatenate per calcolare il punteggio finale di predizione.
 
-Diversamente dal compito di previsione dei \textit{rating} (come in \textit{AutoRec}~\ref{autorec}), questo modello genera una lista ordinata di raccomandazioni per ciascun \textit{user} basata su feedback implicito.
+Diversamente dal compito di previsione dei \textit{rating} (come in \textit{AutoRec}), questo modello genera una lista ordinata di raccomandazioni per ciascun \textit{user} basata su feedback implicito.
 
 \subsubsection{Il modello NeuMF}\label{neufm}
 
@@ -1294,7 +1292,7 @@ dove $\sigma$ è la funzione sigmoide.
 
 Importante sottolineare che \textit{DeepFM} non è l'unico modo per combinare reti neurali profonde con \textit{FM}. Si possono aggiungere livelli non lineari sulle interazioni tra le caratteristiche~\cite{NFA_SPA}.
 
-Come per \textit{NeuMF}~\ref{neufm} la \textit{loss} utilizzata è la \textit{binary cross entropy}.
+Come per \textit{NeuMF} la \textit{loss} utilizzata è la \textit{binary cross entropy}.
 
 I punti di forza dell'algoritmo sono:
 
