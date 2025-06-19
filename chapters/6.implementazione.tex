@@ -225,8 +225,7 @@ Un esempio di quello che si può ottenere analizzando \textit{dataset} e feature
         \includegraphics[width=\textwidth]{figures/visualization/output3.png}
     \end{subfigure}
 
-    \caption{Visualizzazione esplorativa dei dati. In alto: distribuzione dei generi cinematografici presenti nel dataset, originariamente uniti in gruppi contenti più generi e uniti dal carattere "|". In basso a sinistra: istogramma delle valutazioni assegnate dagli utenti. In basso a destra: distribuzione delle età degli utenti
-}
+    \caption{Visualizzazione esplorativa dei dati. In alto: distribuzione dei generi cinematografici presenti nel dataset, originariamente uniti in gruppi contenti più generi e uniti dal carattere "|". In basso a sinistra: istogramma delle valutazioni assegnate dagli \textit{user}. In basso a destra: distribuzione delle età degli \textit{user}.}
 \end{figure}
 
 \section{Model Selection}
@@ -246,7 +245,7 @@ Questo approccio garantisce che il \textit{trainset} contenga almeno un'interazi
 
 La funzione \texttt{random\_train\_test\_split} è ispirata alla omonima funzione della libreria \textit{Scikit-learn}, ma i tipo di dati in input e in output è un \textit{DataFrame}.
 
-\section{Evaluation}~\label{evaluation_implementation}
+\section{Evaluation}
 
 Le funzioni all'interno del modulo di \textit{evaluation} sono state pensate per essere utilizzate all'interno dell'oggetto \texttt{GridSearchCV} di \textit{Scikit-learn}, che permette di effettuare la ricerca dei migliori iperparametri per un modello tramite \textit{cross-validation}.
 
@@ -277,4 +276,27 @@ Per questo motivo ogni funzione di evaluation all'interno del modulo è stata im
                 return result
             return metric
     \end{lstlisting}
+\end{itemize}
+
+Le funzioni di evaluation implicite utilizzano la funzione \\ \texttt{create\_rankings\_from\_implicit} presente nel modulo \texttt{utils} per calcolare il ranking dei \textit{k} migliori \textit{item} per ogni \textit{user} a partire dagli \textit{score} calcolati dal modello.
+
+
+\section{Utils}
+
+Viene fornita una descrizione più dettagliata delle funzioni presenti nel modulo \texttt{utils}:
+
+\begin{itemize}
+    
+    \item \texttt{check\_model\_inputs}: controlla che l'input sia dei tipi e nel formato corretto o lancia un \texttt{ValueError}
+    \item \texttt{generate\_user\_item\_pairs}: genera tutte le possibili coppie \\ (\textit{user\_id}, \textit{item\_id}) utilizzando la funzione \texttt{itertools.product}
+    \item \texttt{create\_rankings\_from\_implicit} / \texttt{create\_rankings\_from\_explicit}: \\ queste funzioni ricevono in ingresso un \textit{DataFrame} o \textit{NumPy array} di coppie \texttt{(user\_id, item\_id)}, una lista di \textit{score} o \textit{rating} e generano una classifica ordinata per ciascun \textit{user} o \textit{item}, a seconda del valore del parametro booleano \texttt{is\_user\_ranking}.
+    \begin{itemize}
+        \item se \texttt{True}, il ranking è costruito per ciascun \textit{user}, raggruppando tutti gli \textit{item} associati e ordinandoli in base allo \textit{score} (o \textit{rating}) in ordine decrescente
+        \item se \texttt{False}, il ranking è costruito per ciascun \textit{item}, raggruppando tutti gli \textit{user} associati e ordinandoli in base allo \textit{score} (o \textit{rating}) in ordine decrescente.
+    \end{itemize}
+    La funzione restituisce un dizionario in cui:
+    \begin{itemize}
+        \item le chiavi sono gli \textit{user\_id} oppure di \textit{item\_id}
+        \item i valori sono liste ordinate in modo decrescente per \textit{score/rating} di \textit{(item\_id/user\_id, score/rating)}.
+    \end{itemize}
 \end{itemize}

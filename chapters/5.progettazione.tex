@@ -4,7 +4,7 @@
 
 \subsection{Scelta sul tipo di dato}
 
-Il tipo di dati che la libreria è in grado di gestire sono due:
+I tipi di dati che la libreria è in grado di gestire sono due:
 
 \begin{itemize}
     \item \textit{NumPy array}
@@ -285,7 +285,9 @@ Ogni volta che si fa riferimento ad un id, che sia \texttt{user\_id} o \texttt{i
 \subsection{Model predict data}\label{model_predict_data}
 
 I vari modelli possono predire il \textit{rating} o lo \textit{score} con il metodo \texttt{predict} su diversi formati di dati, purché rispettino i vincoli sopra descritti. Il formato standard deciso è identico a quello utilizzato per l'addestramento. I modelli possono in modo indipendente introdurre eventuali vincoli sui dati in input.
-In questo caso però il modello utilizza la singola coppia (\textit{user\_id}, \textit{item\_id}) alla quale viene associato un \textit{rating} o lo \textit{score} in base al tipo di modello utilizzato, rispettivamente per feedback espliciti e per feedback impliciti. Se, per esempio, vengono dati in input al modello, che gestisce feedback impliciti, cinque coppie (\textit{user\_id}, \textit{item\_id}) quest'ultimo restituisce un \textit{NumPy array} di cinque valori, ciascuno corrispondente allo \textit{score} ottenuto da ciascuna coppia. Se si vuole ottenere il \textit{ranking} occorre ordinare gli \textit{score} ottenuti in ordine decrescente. Se si vuole calcolare \textit{rating} o lo \textit{score}, dati un insieme $U$ di \textit{user} e $I$ di \textit{item}, occorre dare in input al metodo \texttt{predict} tutte le combinazioni $\left\{(u, i) \mid u \in U,\; i \in I \right\}$.
+In questo caso però il modello utilizza la singola coppia (\textit{user\_id}, \textit{item\_id}) alla quale viene associato un \textit{rating} o lo \textit{score} in base al tipo di modello utilizzato, rispettivamente per feedback espliciti e per feedback impliciti. Se, per esempio, vengono dati in input al modello, che gestisce feedback impliciti, cinque coppie (\textit{user\_id}, \textit{item\_id}) quest'ultimo restituisce un \textit{NumPy array} di cinque valori, ciascuno corrispondente allo \textit{score} ottenuto da ciascuna coppia. Se si vuole ottenere il \textit{ranking} occorre ordinare gli \textit{score} ottenuti in ordine decrescente o utilizzare le apposite funzioni presenti nel modulo \texttt{utils}. Se si vuole calcolare \textit{rating} o lo \textit{score}, dati un insieme $U$ di \textit{user} e $I$ di \textit{item}, occorre dare in input al metodo \texttt{predict} tutte le combinazioni $\left\{(u, i) \mid u \in U,\; i \in I \right\}$.
+
+Il metodo predict permette anche di effettuare una \textit{item-to-user recommendation}, ovvero di predire il \textit{rating} o lo \textit{score} per un insieme di \textit{user} dato uno specifico \textit{item}. In questo caso, l’obiettivo è identificare quali \textit{user} sono più interessati a un determinato \textit{item}, ad esempio per inviare notifiche mirate, promuovere contenuti o ottimizzare campagne pubblicitarie. Si tratta quindi di ordinare gli \textit{user} in base alla loro affinità o probabilità di interazione con un \textit{item} specifico, utilizzando le stesse tecniche predittive del modello, ma invertendo la direzione del ranking: non più "quali \textit{item} per questo utente", ma "quali \textit{user} per questo \textit{item}".
 
 Un esempio di input in formato \textit{DataFrame} e di output in formato \textit{NumPy array}:
 
@@ -600,6 +602,8 @@ Il modulo \texttt{utils} raccoglie un insieme di funzioni ausiliarie progettate 
         \end{minipage}
         \caption{Esempio di input e output per \texttt{generate\_user\_item\_pairs}}
     \end{table}
+    \item \texttt{create\_rankings\_from\_implicit} e \texttt{create\_rankings\_from\_explicit}: \\ queste funzioni generano una classifica dei migliori \textit{item} o \textit{user} da raccomandare, ordinate in base alla rilevanza stimata. Sono progettate per supportare modelli che utilizzano rispettivamente \textit{feedback impliciti} e \textit{feedback espliciti}. Utilizzando un dataset di interazioni e una lista di punteggi predetti (\textit{score} o \textit{rating}), per ciascun \textit{user} o \textit{item} viene ordinata la lista di candidati in base alla stima di rilevanza, restituendo solo i primi \textit{k} risultati. Le funzioni permettono quindi di poter generare raccomandazioni anche per gli \textit{item} (\textit{item-to-user recommendation}). Entrambe le funzioni sono fondamentali per la valutazione delle raccomandazioni tramite metriche come \textit{precision@k}, \textit{recall@k} e \textit{NDCG}.
+
 \end{itemize}
 
 
