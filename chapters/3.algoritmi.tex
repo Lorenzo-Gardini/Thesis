@@ -155,13 +155,7 @@ Viene presentata una tassonomia degli algoritmi di \textit{recommendation}.
 \section{Algoritmi per il feedback esplicito}\label{algoritmi-per-feedback-esplicito}
 
 \subsection{KNN (K-Nearest Neighbors)}\label{knn}
-Si tratta di algoritmi derivati direttamente da un approccio di base basato sui \textit{Nearest Neighbors}.
-
-Gli algoritmi ispirati al KNN (\textit{K Nearest Neighbors}) sono una classe di algoritmi di \textit{recommendation} semplici da implementare e possono essere molto efficaci per problemi a piccola scala.
-
-Il numero effettivo di vicini che vengono considerati per calcolare la predizione è minore o uguale a $k$: potrebbero non esserci abbastanza vicini e/o gli insiemi $N_i^k(u)$ e $N_u^k(i)$ includono solo vicini per i quali la misura di similarità è positiva (non avrebbe senso considerare \textit{user} o \textit{item} correlati negativamente).
-
-$k$ è un iperparametro di ciascun algoritmo.
+Si tratta di algoritmi derivati direttamente da un approccio di base basato sui \textit{Nearest Neighbors}. Gli algoritmi ispirati al KNN (\textit{K Nearest Neighbors}) sono una classe di algoritmi di \textit{recommendation} semplici da implementare e possono essere molto efficaci per problemi a piccola scala. Il numero effettivo di vicini che vengono considerati per calcolare la predizione è minore o uguale a $k$: potrebbero non esserci abbastanza vicini e/o gli insiemi $N_i^k(u)$ e $N_u^k(i)$ includono solo vicini per i quali la misura di similarità è positiva (non avrebbe senso considerare \textit{user} o \textit{item} correlati negativamente). $k$ è un iperparametro di ciascun algoritmo.
 
 Alcune misure di similarità, sia per \textit{user} che per \textit{item}, sono:
 \begin{itemize}
@@ -296,9 +290,7 @@ Per calcolare $b_u$ e $b_i$, occorre minimizzare il seguente errore quadratico r
 \sum\limits_{r_{ui} \in R_{train}} \left(r_{ui} - \mu + b_u + b_i\right)^2 + \lambda \left(b_u^2 + b_i^2 \right).
 \]
 
-Il termine di regolarizzazione $\lambda \left(b_u^2 + b_i^2 \right)$ serve per evitare l'overfitting penalizzando la grandezza dei parametri.
-
-La minimizzazione può essere effettuata tramite \textit{Stochastic Gradient Descent} o \textit{Alternating Least Squares}.
+Il termine di regolarizzazione $\lambda \left(b_u^2 + b_i^2 \right)$ serve per evitare l'overfitting penalizzando la grandezza dei parametri. La minimizzazione può essere effettuata tramite \textit{Stochastic Gradient Descent} o \textit{Alternating Least Squares}.
 
 Per \textit{Alternating Least Squares}, i due valori di $b_u$ e $b_i$ si ottengono come:
 
@@ -340,9 +332,7 @@ Le caratteristiche che lo rendono un ottimo algoritmo per la \textit{recommendat
     \item facilità di interpretazione
 \end{itemize}
 
-Viene proposto un predittore basato su differenze di \textit{rating} lineari che ha un costo computazionale $\mathcal{O}(nm)$ per predizione e $\mathcal{O}(mn^2)$ per addestramento.
-
-L'algoritmo si basa sulla differenza media tra le valutazioni di due \textit{item} per predire il \textit{rating} mancante. La differenza media dei \textit{rating} di due \textit{item} $i$ e $j$ viene calcolata come:
+Viene proposto un predittore basato su differenze di \textit{rating} lineari che ha un costo computazionale $\mathcal{O}(nm)$ per predizione e $\mathcal{O}(mn^2)$ per addestramento. L'algoritmo si basa sulla differenza media tra le valutazioni di due \textit{item} per predire il \textit{rating} mancante. La differenza media dei \textit{rating} di due \textit{item} $i$ e $j$ viene calcolata come:
 
 \[
     \text{dev}(i, j) = \frac{1}{|U_{i,j}|} \sum\limits_{u \in U_{i,j}} (r_{u,i} - r_{u,j})
@@ -364,7 +354,7 @@ dove:
     \item $S_{j,i}(\chi)$ è l'insieme di tutte le valutazioni $u$ nel dataset $\chi$ che contengono gli \textit{item} $i$ e $j$
 \end{itemize}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[keepaspectratio]{figures/algorithms/slope_one.PNG}
     \caption{Base dello schema Slope One: le valutazioni dello \textit{user} A di due \textit{item} e la valutazione  dello \textit{user} B di un \textit{item} comune vengono utilizzate per prevedere la valutazione sconosciuta dello \textit{user}.}
@@ -383,13 +373,7 @@ L'approccio può essere esteso a modelli ponderati e versioni più avanzate, com
 
 \subsection{SVD (Singular Value Decomposition)}\label{svd}
 
-L'algoritmo \textit{SVD} (\textit{Singular Value Decomposition}), è stato reso popolare da Simon Funk durante la competizione \textit{the Netflix Prize} dimostrando come modelli di fattorizzazione matriciale sono superiori alle tecniche classiche basate su \textit{nearest neighbor} per la produzione di raccomandazioni.
-
-I modelli di \textit{Matrix Factorization} mappano gli \textit{user} e gli \textit{item} in uno spazio latente comune di dimensione $k$, che rappresenta il numero di caratteristiche latenti. Ogni \textit{item} $i$ è associato a un vettore $q_i$ di dimensione $k$, che misura quanto l'\textit{item} possieda ciascuna di queste caratteristiche latenti. Per ogni \textit{user} $u$, invece, il vettore $p_u$ misura l'interesse dello \textit{user} per gli \textit{item}. Il numero di fattori è un iperparametro dell'algoritmo.
-
-In questo spazio, le interazioni tra \textit{user} e \textit{item} vengono modellate come prodotti scalari tra i rispettivi vettori. Lo spazio latente cerca di spiegare i \textit{rating} caratterizzando sia gli \textit{item} che gli \textit{user} in base a fattori che vengono automaticamente dedotti. Ad esempio, se gli \textit{item} sono film, i fattori potrebbero rappresentare il genere piuttosto che un altro (e.g. Azione piuttosto che Drama), profondità della trama o il concetto di ``adatto ai bambini".
-
-Il prodotto scalare risultante cattura l'interazione tra lo \textit{user} $u$ e l'\textit{item} $i$, che corrisponde all'interesse complessivo dello \textit{user} per le caratteristiche dell'\textit{item}. Il \textit{rating} finale viene ottenuto aggiungendo anche i predittori di base, che dipendono solo dallo \textit{user} o dall'\textit{item}. Pertanto, un \textit{rating} viene predetto dalla regola~\cite{SVD_analysis}~\cite{Recommendation_book}:
+L'algoritmo \textit{SVD} (\textit{Singular Value Decomposition}), è stato reso popolare da Simon Funk durante la competizione \textit{the Netflix Prize} dimostrando come modelli di fattorizzazione matriciale sono superiori alle tecniche classiche basate su \textit{nearest neighbor} per la produzione di raccomandazioni. I modelli di \textit{Matrix Factorization} mappano gli \textit{user} e gli \textit{item} in uno spazio latente comune di dimensione $k$, che rappresenta il numero di caratteristiche latenti. Ogni \textit{item} $i$ è associato a un vettore $q_i$ di dimensione $k$, che misura quanto l'\textit{item} possieda ciascuna di queste caratteristiche latenti. Per ogni \textit{user} $u$, invece, il vettore $p_u$ misura l'interesse dello \textit{user} per gli \textit{item}. Il numero di fattori è un iperparametro dell'algoritmo. In questo spazio, le interazioni tra \textit{user} e \textit{item} vengono modellate come prodotti scalari tra i rispettivi vettori. Lo spazio latente cerca di spiegare i \textit{rating} caratterizzando sia gli \textit{item} che gli \textit{user} in base a fattori che vengono automaticamente dedotti. Ad esempio, se gli \textit{item} sono film, i fattori potrebbero rappresentare il genere piuttosto che un altro (e.g. Azione piuttosto che Drama), profondità della trama o il concetto di "adatto ai bambini". Il prodotto scalare risultante cattura l'interazione tra lo \textit{user} $u$ e l'\textit{item} $i$, che corrisponde all'interesse complessivo dello \textit{user} per le caratteristiche dell'\textit{item}. Il \textit{rating} finale viene ottenuto aggiungendo anche i predittori di base, che dipendono solo dallo \textit{user} o dall'\textit{item}. Pertanto, un \textit{rating} viene predetto dalla regola~\cite{SVD_analysis}~\cite{Recommendation_book}:
 
 \[
 \hat{r}_{ui} = \mu + b_u + b_i + q_i^T p_u
@@ -402,20 +386,13 @@ Dove:
 \end{itemize}
 
 Se lo \textit{user} $u$ è sconosciuto, allora il bias $b_u$ e i fattori $p_u$ vengono considerati uguali a zero. Lo stesso vale per
-l'\textit{item} $i$, con $b_i$ e $q_i$ anch'essi assunti uguali a zero.
-
-Per apprendere i parametri del modello ($b_u$, $b_i$, $p_u$, $q_i$), si minimizza l'errore quadratico regolarizzato tra i \textit{rating} reali e quelle previste. L'errore quadratico è dato da:
+l'\textit{item} $i$, con $b_i$ e $q_i$ anch'essi assunti uguali a zero. Per apprendere i parametri del modello ($b_u$, $b_i$, $p_u$, $q_i$), si minimizza l'errore quadratico regolarizzato tra i \textit{rating} reali e quelle previste. L'errore quadratico è dato da:
 
 \[
 \min \sum\limits_{(u,i) \in K} \left( (r_{ui} - \hat{r}_{ui})^2 + \lambda (\|q_i\|^2 + \|p_u\|^2 + b_u^2 + b_i^2) \right)
 \]
 
-
-Dove il primo termine è l'errore quadratico tra i \textit{rating} previste e reali e il secondo termine è la regolarizzazione, che penalizza valori troppo grandi per i parametri $b_u$, $b_i$, $p_u$, $q_i$ per evitare l'overfitting.
-
-Per ottimizzare questi parametri, viene utilizzato \textit{Stochastic Gradient Descent} (SGD), che aggiorna i parametri dopo ogni  esempio di training (ad esempio, per ogni \textit{rating} di un \textit{user}).
-
-Per ogni \textit{rating} ($r_{ui}$) data, viene fatta una previsione ($\hat{r}_{ui}$), e l'errore di previsione associato ($e_{ui} = r_{ui} - \hat{r}_{ui}$) viene calcolato. Per un dato caso di \textit{addestramento} ($r_{ui}$), si modificano i parametri spostandoci nella direzione opposta al gradiente, ottenendo:
+Dove il primo termine è l'errore quadratico tra i \textit{rating} previste e reali e il secondo termine è la regolarizzazione, che penalizza valori troppo grandi per i parametri $b_u$, $b_i$, $p_u$, $q_i$ per evitare l'overfitting. Per ottimizzare questi parametri, viene utilizzato \textit{Stochastic Gradient Descent} (SGD), che aggiorna i parametri dopo ogni  esempio di training (ad esempio, per ogni \textit{rating} di un \textit{user}). Per ogni \textit{rating} ($r_{ui}$) data, viene fatta una previsione ($\hat{r}_{ui}$), e l'errore di previsione associato ($e_{ui} = r_{ui} - \hat{r}_{ui}$) viene calcolato. Per un dato caso di \textit{addestramento} ($r_{ui}$), si modificano i parametri spostandoci nella direzione opposta al gradiente, ottenendo:
 
 \begin{flalign*}
 & b_u \leftarrow b_u + \gamma \cdot e_{ui} \\
@@ -425,10 +402,7 @@ Per ogni \textit{rating} ($r_{ui}$) data, viene fatta una previsione ($\hat{r}_{
 \end{flalign*}
 
 Queste formule vengono utilizzate per aggiornare i parametri durante l'addestramento del modello, in modo da ridurre l'errore tra le
-\textit{rating} reali e quelle previste.
-
-Per ottenere un ulteriore miglioramento, si possono applicare $\gamma$ e $\lambda$ separati per i bias degli \textit{user}, i bias degli
-\textit{item} e i fattori stessi~\cite{SVD_optimized}.
+\textit{rating} reali e quelle previste. Per ottenere un ulteriore miglioramento, si possono applicare $\gamma$ e $\lambda$ separati per i bias degli \textit{user}, i bias degli \textit{item} e i fattori stessi~\cite{SVD_optimized}.
 
 I punti di forza dell'algoritmo sono:
 
@@ -449,17 +423,17 @@ L'algoritmo soffre anche di diverse problematiche:
 
 \subsection{SVD++}\label{svdpp}
 
-La precisione delle previsioni può essere migliorata considerando anche il feedback implicito, che fornisce un'indicazione aggiuntiva delle preferenze degli \textit{user}. Questo è particolarmente utile per gli \textit{user} che hanno fornito molto più feedback implicito che esplicito. Anche nei casi in cui il feedback implicito indipendente è assente, è possibile catturare un segnale significativo tenendo conto degli \textit{item} che gli \textit{user} hanno valutato, indipendentemente dal valore del \textit{rating}. Ciò ha portato a diversi metodi (\textit{Asymmetric-SVD}, \textit{SVD++}, \textit{SVD\_KNN}, ecc.~\cite{SVD++, SVD_KNN}) che modellano il fattore \textit{user} in base agli \textit{item} valutati. Il metodo \textit{SVD++} ha dimostrato di offrire una precisione superiore rispetto a \textit{SVD}.
+La precisione delle previsioni può essere migliorata considerando anche il feedback implicito, che fornisce un'indicazione aggiuntiva delle preferenze degli \textit{user}. Questo è particolarmente utile per gli \textit{user} che hanno fornito molto più feedback implicito che esplicito. Anche nei casi in cui il feedback implicito indipendente è assente, è possibile catturare un segnale significativo tenendo conto degli \textit{item} che gli \textit{user} hanno valutato, indipendentemente dal valore del \textit{rating}. Ciò ha portato a diversi metodi (\textit{Asymmetric-SVD}, \textit{SVD++}, \textit{SVD\_KNN}, ecc.~\cite{SVD++, SVD_KNN}) che modellano il fattore \textit{user} in base agli \textit{item} valutati. Il metodo \textit{SVD++} ha dimostrato di offrire una precisione superiore rispetto a \textit{SVD}. Viene aggiunto un secondo set di fattori degli \textit{item}, che collega ogni \textit{item} $i$ a un vettore di fattori $y_i$ di dimensione $k$. Questi nuovi fattori vengono utilizzati per caratterizzare gli \textit{user} in base al set di \textit{item} che hanno valutato. 
 
-Viene aggiunto un secondo set di fattori degli \textit{item}, che collega ogni \textit{item} $i$ a un vettore di fattori $y_i$ di dimensione $k$. Questi nuovi fattori vengono utilizzati per caratterizzare gli \textit{user} in base al set di \textit{item} che hanno valutato. La nuova predizione si calcola come segue:
+La nuova predizione si calcola come segue:
 
 \[
 \hat{r}_{ui} = \mu + b_u + b_i + q_i^T \left(p_u + |I_u|^{\frac{1}{2}} \sum\limits_{j \in I_u} y_j \right)
 \]
 
-Ora, un \textit{user} $u$ viene modellato come $p_u + |I_u|^{\frac{1}{2}} \sum\limits_{j \in I_u} y_j$, mentre la parte $\sum\limits_{j \in I_u} y_j$ rappresenta i feedback impliciti. Poiché i vettori $y_j$ sono centrati intorno a zero grazie alla regolarizzazione $|I_u|^{\frac{1}{2}}$, la varianza rispetto all'intervallo di valori osservati $|I_u|$ viene stabilizzata.
+Ora, un \textit{user} $u$ viene modellato come $p_u + |I_u|^{\frac{1}{2}} \sum\limits_{j \in I_u} y_j$, mentre la parte $\sum\limits_{j \in I_u} y_j$ rappresenta i feedback impliciti. Poiché i vettori $y_j$ sono centrati intorno a zero grazie alla regolarizzazione $|I_u|^{\frac{1}{2}}$, la varianza rispetto all'intervallo di valori osservati $|I_u|$ viene stabilizzata. I parametri del modello vengono determinati minimizzando la funzione di errore quadratico regolarizzato, utilizzando sempre \textit{Stochastic Gradient Descent}. 
 
-I parametri del modello vengono determinati minimizzando la funzione di errore quadratico regolarizzato, utilizzando sempre \textit{Stochastic Gradient Descent}. Si itera su tutti i \textit{rating}:
+Si itera su tutti i \textit{rating}:
 
 \begin{flalign*}
 & b_u \leftarrow b_u + \gamma \cdot (e_{ui} - \lambda \cdot b_u) \\
@@ -468,8 +442,6 @@ I parametri del modello vengono determinati minimizzando la funzione di errore q
 & p_u \leftarrow p_u + \gamma \cdot (e_{ui} \cdot q_i - \lambda \cdot p_u) \\
 & \forall j \in I_u: \quad y_j \leftarrow y_j + \gamma \cdot \left( e_{ui} \cdot |I_u|^{-\frac{1}{2}} \cdot q_i - \lambda \cdot y_j \right) 
 \end{flalign*}
-
-
 
 È possibile introdurre diversi tipi di feedback implicito nel modello simultaneamente, utilizzando set aggiuntivi di fattori degli \textit{item}.
 
@@ -541,19 +513,15 @@ q_{if} &\leftarrow q_{if} \cdot \frac{\sum\limits_{u \in U_i} p_{uf} \cdot r_{ui
 \end{aligned}
 \]
 
-Questo algoritmo è altamente dipendente dai valori iniziali con cui vengono inizializzate le matrici $H$ e $W$. I fattori latenti degli \textit{user} e degli \textit{item} vengono inizializzati casualmente in modo uniforme tra un minimo e un massimo, solitamente nell'intervallo $[0, 1]$.
+Questo algoritmo è altamente dipendente dai valori iniziali con cui vengono inizializzate le matrici $H$ e $W$. I fattori latenti degli \textit{user} e degli \textit{item} vengono inizializzati casualmente in modo uniforme tra un minimo e un massimo, solitamente nell'intervallo $[0, 1]$. Gli iperparametri $\lambda_u$ e $\lambda_i$ corrispondono alla regolarizzazione rispettivamente per \textit{user} e \textit{item}.
 
-Gli iperparametri $\lambda_u$ e $\lambda_i$ corrispondono alla regolarizzazione rispettivamente per \textit{user} e \textit{item}.
-
-Anche in questo caso si può utilizzare la predizione con l'utilizzo di bias.
+Anche in questo caso si può utilizzare la predizione con l'utilizzo di bias:
 
 \[
 \hat{r}_{ui} = \mu + b_u + b_i + q_i^T p_u
 \]
 
-garantendo comunque fattori positivi. I bias sono ottimizzati nello stesso modo dell'algoritmo \textit{SVD}. Pur producendo una migliore accuratezza, la versione che utilizza i bias sembra molto incline all'overfitting, che può essere ridotto diminuendo $k$ o aumentando la regolarizzazione.
-
-\textit{NFM}, grazie al vincolo della non negatività, è più interpretabile di \textit{SVD}: i valori nelle matrici fattorizzate $W$ e $H$ sono tutti $\geq 0$, quindi possono essere interpretati come pesi o intensità (es. quanto uno \textit{user} apprezza un certo genere, quanto un \textit{item} rappresenta un tema).
+garantendo comunque fattori positivi. I bias sono ottimizzati nello stesso modo dell'algoritmo \textit{SVD}. Pur producendo una migliore accuratezza, la versione che utilizza i bias sembra molto incline all'overfitting, che può essere ridotto diminuendo $k$ o aumentando la regolarizzazione. \textit{NFM}, grazie al vincolo della non negatività, è più interpretabile di \textit{SVD}: i valori nelle matrici fattorizzate $W$ e $H$ sono tutti $\geq 0$, quindi possono essere interpretati come pesi o intensità (es. quanto uno \textit{user} apprezza un certo genere, quanto un \textit{item} rappresenta un tema).
 
 L'algoritmo soffre anche di diverse problematiche:
 
@@ -567,9 +535,7 @@ L'algoritmo soffre anche di diverse problematiche:
 
 \subsection{CoClustering}\label{coclustering}
 
-La soluzione proposta da Thomas George e Srujana Merugu~\cite{Co-Clustering} utilizza il \textit{Co-Clustering}. Questa tecnica viene utilizzata per raggruppare simultaneamente due entità in un dataset. Il \textit{Co-Clustering} si propone di partizionare simultaneamente le righe (\textit{user}) e le colonne (\textit{item}) della matrice $R$, in modo tale che gli \textit{user} appartenenti allo stesso \textit{co-cluster} presentino comportamenti di valutazione analoghi, e che gli \textit{item} all'interno dello stesso \textit{co-cluster} ricevano valutazioni simili da parte degli \textit{user} del medesimo gruppo. Il numero di cluster deve essere definito a priori sia per gli \textit{user} sia per gli \textit{item}. Il processo di \textit{Co-Clustering} si distingue dal clustering tradizionale in quanto quest'ultimo si limita a raggruppare lungo un'unica dimensione (righe oppure colonne), mentre il \textit{Co-Clustering} effettua la suddivisione simultaneamente su entrambe le dimensioni della matrice.
- 
-L'algoritmo, nella fase di inizializzazione, assegna casualmente i \textit{co-cluster} a \textit{user} e \textit{item}. Durante l'esecuzione i \textit{co-cluster} vengono aggiornati iterativamente, per cercare di migliorare la qualità del raggruppamento, alternando tra il raggruppamento degli \textit{user} e degli \textit{item} fino a convergenza. Una volta che i \textit{co-cluster} sono definiti si può calcolare la media dei \textit{rating} all'interno di ciascun \textit{co-cluster}. $ \overline{C_{ui}} $ rappresenta la media dei \textit{rating} all'interno del \textit{co-cluster} che contiene lo \textit{user} $u$ e l'\textit{item} $i$. In altre parole, è il \textit{rating} medio tra gli \textit{user} e gli \textit{item} che appartengono allo stesso \textit{co-cluster}.
+La soluzione proposta da Thomas George e Srujana Merugu~\cite{Co-Clustering} utilizza il \textit{Co-Clustering}. Questa tecnica viene utilizzata per raggruppare simultaneamente due entità in un dataset. Il \textit{Co-Clustering} si propone di partizionare simultaneamente le righe (\textit{user}) e le colonne (\textit{item}) della matrice $R$, in modo tale che gli \textit{user} appartenenti allo stesso \textit{co-cluster} presentino comportamenti di valutazione analoghi, e che gli \textit{item} all'interno dello stesso \textit{co-cluster} ricevano valutazioni simili da parte degli \textit{user} del medesimo gruppo. Il numero di cluster deve essere definito a priori sia per gli \textit{user} sia per gli \textit{item}. Il processo di \textit{Co-Clustering} si distingue dal clustering tradizionale in quanto quest'ultimo si limita a raggruppare lungo un'unica dimensione (righe oppure colonne), mentre il \textit{Co-Clustering} effettua la suddivisione simultaneamente su entrambe le dimensioni della matrice. L'algoritmo, nella fase di inizializzazione, assegna casualmente i \textit{co-cluster} a \textit{user} e \textit{item}. Durante l'esecuzione i \textit{co-cluster} vengono aggiornati iterativamente, per cercare di migliorare la qualità del raggruppamento, alternando tra il raggruppamento degli \textit{user} e degli \textit{item} fino a convergenza. Una volta che i \textit{co-cluster} sono definiti si può calcolare la media dei \textit{rating} all'interno di ciascun \textit{co-cluster}. $ \overline{C_{ui}} $ rappresenta la media dei \textit{rating} all'interno del \textit{co-cluster} che contiene lo \textit{user} $u$ e l'\textit{item} $i$. In altre parole, è il \textit{rating} medio tra gli \textit{user} e gli \textit{item} che appartengono allo stesso \textit{co-cluster}.
 
 Si può quindi definire la predizione come
 
@@ -602,11 +568,7 @@ L'algoritmo soffre anche di diverse problematiche:
   \item Difficoltà di interpretazione: il co-clustering fornisce gruppi di \textit{user} e \textit{item} che potrebbero non essere sempre facili da interpretare o da analizzare in modo intuitivo.
 \end{itemize}
 
-Il costo computazionale per l'addestramento è $ \mathcal{O}(W^{\text{glob}} + mkl + nkl) $ dove $ W^{\text{glob}} $ corrisponde al numero di valori diversi da $0$ nella matrice in input , $l$ corrisponde al numero di cluster per gli \textit{user} e $k$ corrisponde al numero di cluster per gli \textit{item}.
-
-Per il calcolo della predizione, il costo è $\mathcal{O}(1)$, in quanto si tratta di operazioni media e il calcolo dei bias.
-
-Per l'aggiornamento quando un nuovo \textit{rating} viene aggiunto o un nuovo \\ \textit{user}/\textit{item} entra nel sistema, l'algoritmo non ricalcola tutto da zero. Invece, utilizza un aggiornamento incrementale parziale, che si basa sull'aggiornamento delle medie delle matrici:
+Il costo computazionale per l'addestramento è $ \mathcal{O}(W^{\text{glob}} + mkl + nkl) $ dove $ W^{\text{glob}} $ corrisponde al numero di valori diversi da $0$ nella matrice in input , $l$ corrisponde al numero di cluster per gli \textit{user} e $k$ corrisponde al numero di cluster per gli \textit{item}. Per il calcolo della predizione, il costo è $\mathcal{O}(1)$, in quanto si tratta di operazioni media e il calcolo dei bias. Per l'aggiornamento quando un nuovo \textit{rating} viene aggiunto o un nuovo \\ \textit{user}/\textit{item} entra nel sistema, l'algoritmo non ricalcola tutto da zero. Invece, utilizza un aggiornamento incrementale parziale, che si basa sull'aggiornamento delle medie delle matrici:
 
 \begin{itemize}
   \item Se il nuovo \textit{rating} riguarda un \textit{user} e un \textit{item} esistenti si aggiornano direttamente le medie
@@ -619,11 +581,7 @@ L'aggiornamento ha quindi costo pari a $\mathcal{O}(1)$.
 
 \subsection{ALS (Alternating Least Squares)}\label{als}
 
-Il lavoro di Hu, Koren e Volinsky~\cite{ALS} propone una formulazione adatta a modellare feedback impliciti, come click, acquisti o visualizzazioni.
-
-Si basa sulla \textit{Matrix Factorization}, e una delle sue tecniche di ottimizzazione più efficaci è \textit{ALS (Alternating Least Squares)}, in particolare per dataset con \textit{feedback impliciti}.
-
-L'obiettivo è approssimare la matrice osservata $R \in \mathbb{R}^{m \times n}$ (dove $m$ è il numero di \textit{user} e $n$ il numero di \textit{item}) come il prodotto di due matrici a bassa dimensionalità:
+Il lavoro di Hu, Koren e Volinsky~\cite{ALS} propone una formulazione adatta a modellare feedback impliciti, come click, acquisti o visualizzazioni. Si basa sulla \textit{Matrix Factorization}, e una delle sue tecniche di ottimizzazione più efficaci è \textit{ALS (Alternating Least Squares)}, in particolare per dataset con \textit{feedback impliciti}. L'obiettivo è approssimare la matrice osservata $R \in \mathbb{R}^{m \times n}$ (dove $m$ è il numero di \textit{user} e $n$ il numero di \textit{item}) come il prodotto di due matrici a bassa dimensionalità:
 
 \[
 R \approx W H^\top
@@ -651,6 +609,7 @@ e la confidenza
 \[
 c_{ui} = 1 + \alpha \cdot r_{ui}
 \]
+
 dove $r_{ui}$ in questo caso è l'interazione (es. \% visualizzazione o numero di acquisti), e $\alpha$ è un iperparametro che modula l'importanza delle osservazioni positive.
 
 Il problema di ottimizzazione da risolvere è:
@@ -666,9 +625,7 @@ dove:
     \item $h_i$: vettore dei fattori latenti per l' \textit{item} $i$,
 \end{itemize}
 
-Il primo termine rappresenta l'\textit{errore quadratico pesato} tra la preferenza osservata e la previsione del modello. Il secondo termine è una \textit{regolarizzazione} di tipo \textit{L2} per evitare overfitting.
-
-Il problema in $(W,H)$ non è convesso (cioè potrebbe avere più minimi locali e non è facile trovare il minimo assoluto) ma lo diventa se si fissa una delle due variabili. Questo significa che si può trovare il minimo facilmente rispetto a $W$ tenendo $H$ fisso e viceversa. Per questo motivo, si usa un metodo iterativo finché non si arriva a una soluzione stabile:
+Il primo termine rappresenta l'\textit{errore quadratico pesato} tra la preferenza osservata e la previsione del modello. Il secondo termine è una \textit{regolarizzazione} di tipo \textit{L2} per evitare overfitting. Il problema in $(W,H)$ non è convesso (cioè potrebbe avere più minimi locali e non è facile trovare il minimo assoluto) ma lo diventa se si fissa una delle due variabili. Questo significa che si può trovare il minimo facilmente rispetto a $W$ tenendo $H$ fisso e viceversa. Per questo motivo, si usa un metodo iterativo finché non si arriva a una soluzione stabile:
 
 \begin{enumerate}
     \item Si fissa $H$ e si ottimizza $W$,
@@ -703,7 +660,7 @@ A x = b \quad \text{con} \quad A = H^\top C^u H + \lambda I, \quad b = H^\top C^
 
 utilizzando il \textit{metodo del gradiente coniugato (CG)}~\cite{ALS_opt}. Questo metodo è iterativo e richiede solo moltiplicazioni matrice-vettore, con complessità per iterazione $\mathcal{O}(k^2)$.
 
-\begin{algorithm}[H]
+\begin{algorithm}[htbp]
     \caption{Metodo del Gradiente Coniugato per risolvere $Ax = b$}
     \begin{algorithmic}[1]
     \Require Matrice $A \in \mathbb{R}^{n \times n}$ simmetrica e definita positiva, vettore $b \in \mathbb{R}^n$, iniziale $x_0$, tolleranza $\epsilon$
@@ -766,10 +723,13 @@ Nei sistemi basati su \textit{feedback impliciti}, la mancanza di interazione tr
 \end{itemize}
 
 L'obiettivo di BPR è massimizzare la probabilità a posteriori dei parametri del modello $\Theta$, dati i dati osservati:
+
 \[
 \text{BPR-Opt} = \sum_{(u, i, j) \in D_S} \ln \sigma(\hat{y}_{uij}) - \lambda_\Theta ||\Theta||^2
 \]
+
 dove:
+
 \begin{itemize}
     \item $\hat{y}_{uij} = \hat{y}_{ui} - \hat{y}_{uj}$ è la differenza tra le valutazioni stimate per $i$ e $j$;
     \item $\sigma(x) = \frac{1}{1 + e^{-x}}$ è la funzione sigmoide;
@@ -804,7 +764,7 @@ L'ottimizzazione di \textit{BPR-Opt} viene effettuata tramite \textit{SGD}. I pa
 
 L'algoritmo effettua un campionamento \textit{bootstrap}:
 
-\begin{algorithm}[H]
+\begin{algorithm}[htbp]
 \caption{LearnBPR}
 \begin{algorithmic}[1]
 \Procedure{LearnBPR}{$D_S, \Theta$}
@@ -818,11 +778,7 @@ L'algoritmo effettua un campionamento \textit{bootstrap}:
 \end{algorithmic}
 \end{algorithm}
 
-Questo approccio consente una rapida convergenza e un buon bilanciamento tra classi positive e negative.
-
-\textit{BPR} può essere applicato a diverse famiglie di modelli. Di seguito viene presentata la versione con \textit{Matrix Factorization} (BPR-MF):
-
-Ogni \textit{user} $u \in U$ e ogni \textit{item} $i \in I$ sono rappresentati da un vettore latente in $\mathbb{R}^k$:
+Questo approccio consente una rapida convergenza e un buon bilanciamento tra classi positive e negative. \textit{BPR} può essere applicato a diverse famiglie di modelli. Di seguito viene presentata la versione con \textit{Matrix Factorization} (\textit{BPR-MF}). Ogni \textit{user} $u \in U$ e ogni \textit{item} $i \in I$ sono rappresentati da un vettore latente in $\mathbb{R}^k$:
 
 \[
 \mathbf{w}_u \in \mathbb{R}^k \quad \text{(user)} \qquad
@@ -897,6 +853,7 @@ R \approx WH
 \]
 
 dove:
+
 \begin{itemize}
     \item $W \in \mathbb{R}_{\geq 0}^{m \times k}$ rappresenta la matrice dei profili latenti degli \textit{user};
     \item $H \in \mathbb{R}_{\geq 0}^{k \times n}$ rappresenta la matrice dei profili latenti degli \textit{item};
@@ -924,20 +881,14 @@ L(R \mid W, H, b) = \prod_{u, i} p(l_{ui} \mid w_u, h_i, b_u, b_i)^{\alpha r_{ui
 \left( 1 - p(l_{ui} \mid w_u, h_i, b_u, b_i) \right)^{(1 - \alpha r_{ui})}
 \]
 
-Dove $\alpha$ è un iperparametro che bilancia il peso tra le osservazioni positive e negative.
-
-La funzione di verosimiglianza descrive la probabilità complessiva del modello dato il comportamento osservato. In altre parole, misura quanto bene il modello spiega $R$.
-
-Per evitare l'overfitting, si impone una distribuzione gaussiana a media zero sui vettori latenti degli utenti e degli oggetti:
+Dove $\alpha$ è un iperparametro che bilancia il peso tra le osservazioni positive e negative. La funzione di verosimiglianza descrive la probabilità complessiva del modello dato il comportamento osservato. In altre parole, misura quanto bene il modello spiega $R$. Per evitare l'overfitting, si impone una distribuzione gaussiana a media zero sui vettori latenti degli utenti e degli oggetti:
 
 \[
 p(W \mid \sigma^2) = \prod_u N(w_u \mid 0, \sigma_u^2 I), \quad 
 p(H \mid \sigma^2) = \prod_i N(h_i \mid 0, \sigma_i^2 I)
 \]
 
-Dove $\sigma_u^2$ e $\sigma_i^2$ sono i parametri di varianza per le distribuzioni degli utenti e degli oggetti.
-
-L'obiettivo del modello è massimizzare il logaritmo della funzione di verosimiglianza (log-likelihood), che è dato da:
+Dove $\sigma_u^2$ e $\sigma_i^2$ sono i parametri di varianza per le distribuzioni degli utenti e degli oggetti. L'obiettivo del modello è massimizzare il logaritmo della funzione di verosimiglianza (log-likelihood), che è dato da:
 
 \[
 \log p(W, H, b \mid R) = \sum_{u,i} \alpha r_{ui} (w_u^T h_i + b_u + b_i) 
@@ -946,9 +897,7 @@ L'obiettivo del modello è massimizzare il logaritmo della funzione di verosimig
 \]
 
 
-Il termine di regolarizzazione $\lambda$ aiuta a prevenire l'overfitting, penalizzando la grandezza dei vettori latenti.
-
-Per ottimizzare la funzione obiettivo, vengono calcolati i gradienti parziali rispetto ai fattori latenti $w_u$ e $h_i$ e ai bias $b_u$ e $b_i$, come segue:
+Il termine di regolarizzazione $\lambda$ aiuta a prevenire l'overfitting, penalizzando la grandezza dei vettori latenti. Per ottimizzare la funzione obiettivo, vengono calcolati i gradienti parziali rispetto ai fattori latenti $w_u$ e $h_i$ e ai bias $b_u$ e $b_i$, come segue:
 
 \[
 \frac{\partial}{\partial w_u} \log p(W, H, b \mid R) = 
@@ -963,18 +912,14 @@ Per ottimizzare la funzione obiettivo, vengono calcolati i gradienti parziali ri
 - \frac{(1 + \alpha r_{ui}) \exp(w_u^T h_i + b_u + b_i)}{1 + \exp(w_u^T h_i + b_u + b_i)}
 \]
 
-L'ottimizzazione avviene alternando l'ottimizzazione dei fattori latenti prima per gli \textit{user} e poi degli \textit{item}. 
-
-Per migliorare la velocità di convergenza, viene utilizzato l'algoritmo \textit{AdaGrad} per aggiornare i parametri, adattando il tasso di apprendimento in base alla somma dei gradienti passati:
+L'ottimizzazione avviene alternando l'ottimizzazione dei fattori latenti prima per gli \textit{user} e poi degli \textit{item}. Per migliorare la velocità di convergenza, viene utilizzato l'algoritmo \textit{AdaGrad} per aggiornare i parametri, adattando il tasso di apprendimento in base alla somma dei gradienti passati:
 
 \[
 w_u^t = w_u^{t-1} + \gamma \frac{g_u^{t-1}}{\sqrt{\sum_{t'=1}^t (g_u^{t'})^2}}
 \]
 
 
-Dove $g_u^{t-1}$ è il gradiente calcolato all'iterazione precedente e $\gamma$ è il passo di apprendimento.
-
-Infine lo \textit{score} per la coppia \textit{user} $u$ e \textit{item} $i$ si calcola come:
+Dove $g_u^{t-1}$ è il gradiente calcolato all'iterazione precedente e $\gamma$ è il passo di apprendimento. Infine lo \textit{score} per la coppia \textit{user} $u$ e \textit{item} $i$ si calcola come:
 
 \[
 \hat{y}_{ui} = \sigma(w_u^T h_i + b_u + b_i)
@@ -999,11 +944,7 @@ L'algoritmo soffre anche di diverse problematiche:
 
 \subsection{LightFM}\label{lightfm}
 
-I sistemi di raccomandazione basati su \textit{Matrix Factorization} si sono dimostrati estremamente efficaci quando la matrice delle interazioni tra \textit{user} e \textit{item} è sufficientemente densa. Tuttavia, tali metodi risultano inefficaci in scenari di \textit{cold-start}, in cui nuovi \textit{user} o nuovi \textit{item} non hanno ancora prodotto interazioni significative.
-
-I modelli \textit{content-based filtering}, che utilizzano le feature conosciute degli \textit{item} (ad esempio genere, attori, descrizioni) per generare raccomandazioni, superano questo limite, ma mancano della capacità di apprendere dalle interazioni collettive.
-
-Il modello \textit{LightFM}~\cite{LightFM}, proposto da \textit{Maciej Kula}, fonde questi due approcci: rappresenta \textit{user} e \textit{item} come combinazioni lineari dei loro metadati, appresi attraverso i dati contenuti in $R$, cioè l'insieme di tutte le interazioni osservate.
+I sistemi di raccomandazione basati su \textit{Matrix Factorization} si sono dimostrati estremamente efficaci quando la matrice delle interazioni tra \textit{user} e \textit{item} è sufficientemente densa. Tuttavia, tali metodi risultano inefficaci in scenari di \textit{cold-start}, in cui nuovi \textit{user} o nuovi \textit{item} non hanno ancora prodotto interazioni significative. I modelli \textit{content-based filtering}, che utilizzano le feature conosciute degli \textit{item} (ad esempio genere, attori, descrizioni) per generare raccomandazioni, superano questo limite, ma mancano della capacità di apprendere dalle interazioni collettive. Il modello \textit{LightFM}~\cite{LightFM}, proposto da \textit{Maciej Kula}, fonde questi due approcci: rappresenta \textit{user} e \textit{item} come combinazioni lineari dei loro metadati, appresi attraverso i dati contenuti in $R$, cioè l'insieme di tutte le interazioni osservate.
 
 Utilizziamo la seguente notazione:
 \begin{itemize}
@@ -1022,24 +963,31 @@ Ad ogni feature $f$ associata a uno \textit{user} o a un \textit{item} viene ass
 
 \subsubsection{Rappresentazioni latenti}
 La rappresentazione latente di uno \textit{user} $u$ è data dalla somma dei vettori latenti delle sue feature:
+
 \[
 \mathbf{q}_u = \sum_{f \in f_u} \mathbf{e}_f
 \]
+
 Analogamente, per l'\textit{item} $i$:
+
 \[
 \mathbf{p}_i = \sum_{f \in f_i} \mathbf{e}_f
 \]
 
 Il bias dello \textit{user} e dell'\textit{item} si calcolano come:
+
 \[
 b_u = \sum_{f \in f_u} b_f, \quad b_i = \sum_{f \in f_i} b_f
 \]
 
 Lo \textit{score} stimato $\hat{r}_{ui}$ per lo \textit{user} $u$ sull'\textit{item} $i$ è dato da:
+
 \[
 \hat{y}_{ui} = f\left( \mathbf{q}_u \cdot \mathbf{p}_i + b_u + b_i \right)
 \]
+
 dove $f(x)$ è una funzione di attivazione. Per problemi di classificazione binaria (ad esempio click o no click), si utilizza la funzione sigmoide:
+
 \[
 f(x) = \frac{1}{1 + \exp(-x)}
 \]
@@ -1058,11 +1006,7 @@ La funzione di verosimiglianza da massimizzare è:
 \mathcal{L} = \prod_{(u,i) \in S^+} \hat{y}_{ui} \cdot \prod_{(u,i) \in S^-} (1 - \hat{y}_{ui})
 \]
 
-L'ottimizzazione si effettua mediante \textit{stochastic gradient Descent}, con un learning rate adattivo controllato da $\gamma$ (ad esempio tramite \textit{Adagrad}), e regolarizzazione tramite $\lambda$.
-
-Sebbene LightFM non fattorizzi direttamente la matrice $R \in \mathbb{R}^{m \times n}$, dove $m$ è il numero di \textit{user} e $n$ è il numero di \textit{item}, essa viene utilizzata per costruire i set $S^+$ e $S^-$, su cui si basa l'allenamento.
-
-L'informazione di $R$ serve quindi a guidare l'apprendimento degli \textit{embedding} delle feature, anche se non compare esplicitamente nella formulazione come in \textit{Matrix Factorization} classico.
+L'ottimizzazione si effettua mediante \textit{stochastic gradient Descent}, con un learning rate adattivo controllato da $\gamma$ (ad esempio tramite \textit{Adagrad}), e regolarizzazione tramite $\lambda$. Sebbene \textit{LightFM} non fattorizzi direttamente la matrice $R \in \mathbb{R}^{m \times n}$, dove $m$ è il numero di \textit{user} e $n$ è il numero di \textit{item}, essa viene utilizzata per costruire i set $S^+$ e $S^-$, su cui si basa l'allenamento. L'informazione di $R$ serve quindi a guidare l'apprendimento degli \textit{embedding} delle feature, anche se non compare esplicitamente nella formulazione come in \textit{Matrix Factorization} classico.
 
 I punti di forza dell'algoritmo sono:
 
@@ -1082,14 +1026,7 @@ L'algoritmo soffre anche di diverse problematiche:
 \section{Deep Learning}
 
 \subsection{AutoRec}\label{autorec}
-Sebbene la \textit{Matrix Factorization} ottenga prestazioni decenti rimane un modello lineare. Questo significa che la relazione tra le caratteristiche latenti di \textit{user} e \textit{item} è modellata come un prodotto scalare, cioè una combinazione lineare: le preferenze stimate sono ottenute moltiplicando (o combinando linearmente) i vettori degli spazi latenti. In altre parole, non ci sono trasformazioni o combinazioni non lineari che possano catturare interazioni più complesse. Pertanto, tali modelli non sono in grado di catturare relazioni complesse, non lineari e intricate che potrebbero essere predittive delle preferenze degli \textit{user}. \textit{AutoRec}~\cite{AutoRec} interpreta il \textit{collaborative filtering} tramite un'architettura di autoencoder e mira a integrare trasformazioni non lineari basandosi su feedback espliciti. Le reti neurali si sono dimostrate capaci di approssimare qualsiasi funzione continua, rendendole adatte a superare le limitazioni della \textit{Matrix Factorization} e ad arricchirne la capacità espressiva.
-
-Da un lato, \textit{AutoRec} ha la stessa struttura di un autoencoder, composta da uno strato di input, uno strato nascosto e uno strato di ricostruzione (output). Un autoencoder è una rete neurale che impara a copiare il proprio input sull'output al fine di codificare gli input in rappresentazioni nascoste (solitamente a bassa dimensionalità). In \textit{AutoRec}, invece di incorporare esplicitamente \textit{user} o \textit{item} in uno spazio a bassa dimensionalità, viene utilizzata la colonna o riga della matrice di interazioni come input, per poi ricostruire la matrice stessa nello strato di output.
-
-Dall'altro lato, \textit{AutoRec} si differenzia da un autoencoder tradizionale: invece di concentrarsi sull'apprendimento delle rappresentazioni nascoste, \textit{AutoRec} si focalizza sull'apprendimento e ricostruzione dello strato di output. Utilizza una matrice di interazioni parzialmente osservata come input, con l'obiettivo di ricostruire una matrice di valutazioni completa. Nel frattempo, i valori mancanti dell'input vengono riempiti nello strato di output tramite la ricostruzione, a fini di raccomandazione.
-
-Esistono due varianti di \textit{AutoRec}: una basata sugli \textit{user} (\textit{user-based}) e una sugli \textit{item} (\textit{item-based}). Verrà introdotta solamente la versione \textit{item-based} di \textit{AutoRec}. La versione \textit{user-based} può essere derivata in modo analogo.
-
+Sebbene la \textit{Matrix Factorization} ottenga prestazioni decenti rimane un modello lineare. Questo significa che la relazione tra le caratteristiche latenti di \textit{user} e \textit{item} è modellata come un prodotto scalare, cioè una combinazione lineare: le preferenze stimate sono ottenute moltiplicando (o combinando linearmente) i vettori degli spazi latenti. In altre parole, non ci sono trasformazioni o combinazioni non lineari che possano catturare interazioni più complesse. Pertanto, tali modelli non sono in grado di catturare relazioni complesse, non lineari e intricate che potrebbero essere predittive delle preferenze degli \textit{user}. \textit{AutoRec}~\cite{AutoRec} interpreta il \textit{collaborative filtering} tramite un'architettura di autoencoder e mira a integrare trasformazioni non lineari basandosi su feedback espliciti. Le reti neurali si sono dimostrate capaci di approssimare qualsiasi funzione continua, rendendole adatte a superare le limitazioni della \textit{Matrix Factorization} e ad arricchirne la capacità espressiva. Da un lato, \textit{AutoRec} ha la stessa struttura di un autoencoder, composta da uno strato di input, uno strato nascosto e uno strato di ricostruzione (output). Un autoencoder è una rete neurale che impara a copiare il proprio input sull'output al fine di codificare gli input in rappresentazioni nascoste (solitamente a bassa dimensionalità). In \textit{AutoRec}, invece di incorporare esplicitamente \textit{user} o \textit{item} in uno spazio a bassa dimensionalità, viene utilizzata la colonna o riga della matrice di interazioni come input, per poi ricostruire la matrice stessa nello strato di output. Dall'altro lato, \textit{AutoRec} si differenzia da un autoencoder tradizionale: invece di concentrarsi sull'apprendimento delle rappresentazioni nascoste, \textit{AutoRec} si focalizza sull'apprendimento e ricostruzione dello strato di output. Utilizza una matrice di interazioni parzialmente osservata come input, con l'obiettivo di ricostruire una matrice di valutazioni completa. Nel frattempo, i valori mancanti dell'input vengono riempiti nello strato di output tramite la ricostruzione, a fini di raccomandazione. Esistono due varianti di \textit{AutoRec}: una basata sugli \textit{user} (\textit{user-based}) e una sugli \textit{item} (\textit{item-based}). Verrà introdotta solamente la versione \textit{item-based} di \textit{AutoRec}. La versione \textit{user-based} può essere derivata in modo analogo.
 
 Sia $R^*_i$ la $i$-esima colonna della matrice delle valutazioni (\textit{rating matrix}), dove le valutazioni sconosciute sono impostate a zero di default.
 
@@ -1099,9 +1036,7 @@ L'architettura è definita come:
 h(R^*_i) = f\left( W \cdot g\left( VR^*_i + \mu \right) + b \right)
 \]
 
-dove $f(\cdot)$ e $g(\cdot)$ sono funzioni di attivazione non lineari, $W$ e $V$ sono matrici di pesi, $\mu$ è un termine di bias nel livello nascosto, e $b$ è il bias del livello di output. Indichiamo con $h(\cdot)$ l'intera rete di AutoRec. L'output $h(R*_{i})$ è la ricostruzione della colonna $i$-esima della matrice delle valutazioni.
-
-La seguente funzione obiettivo mira a minimizzare l'errore di ricostruzione:
+dove $f(\cdot)$ e $g(\cdot)$ sono funzioni di attivazione non lineari, $W$ e $V$ sono matrici di pesi, $\mu$ è un termine di bias nel livello nascosto, e $b$ è il bias del livello di output. Indichiamo con $h(\cdot)$ l'intera rete di AutoRec. L'output $h(R*_{i})$ è la ricostruzione della colonna $i$-esima della matrice delle valutazioni. La seguente funzione obiettivo mira a minimizzare l'errore di ricostruzione:
 
 \[
 \underset{W, V, \mu, b}{\mathrm{argmin}} \sum_{i=1}^M{\parallel R_{*i} - h(R_{*i}) \parallel_{\mathcal{O}}^2} + \lambda(\| W \|_F^2 + \| V \|_F^2)
@@ -1109,16 +1044,14 @@ La seguente funzione obiettivo mira a minimizzare l'errore di ricostruzione:
 
 Dove $ \| \cdot \|_{\mathcal{O}}$ indica che viene considerato solo il contributo delle valutazioni osservate, ovvero durante la \textit{backpropagation} vengono aggiornati solo i pesi associati agli input osservati.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[keepaspectratio]{figures/algorithms/auto_rc.PNG}
     \caption{Modello AutoRec basato sugli \textit{item}. Si utilizza la notazione a piatto per indicare che ci sono $n$ copie della rete neurale (una per ciascun \textit{item}), dove $W$ e $V$ sono condivisi tra tutte le copie.}
     \label{fig:auto_rec}
 \end{figure}
 
-Un tipico autoencoder è composto da un \textit{encoder} e un \textit{decodificatore}. L'\textit{encoder} proietta l'input verso rappresentazioni nascoste e il \textit{decodificatore} mappa il livello nascosto al livello di ricostruzione. Nessuna funzione di attivazione è applicata al \textit{decodificatore}. Il \textit{dropout} è incluso dopo l'\textit{encoding} per ridurre l'overfitting. I gradienti degli input non osservati vengono mascherati per garantire che solo le valutazioni osservate contribuiscano al processo di apprendimento del modello.
-
-Per l'addestramento si può utilizzare \textit{L2 loss} e come metrica di accuratezza l'\textit{RMSE}.
+Un tipico autoencoder è composto da un \textit{encoder} e un \textit{decodificatore}. L'\textit{encoder} proietta l'input verso rappresentazioni nascoste e il \textit{decodificatore} mappa il livello nascosto al livello di ricostruzione. Nessuna funzione di attivazione è applicata al \textit{decodificatore}. Il \textit{dropout} è incluso dopo l'\textit{encoding} per ridurre l'overfitting. I gradienti degli input non osservati vengono mascherati per garantire che solo le valutazioni osservate contribuiscano al processo di apprendimento del modello. Per l'addestramento si può utilizzare \textit{L2 loss} e come metrica di accuratezza l'\textit{RMSE}.
 
 \begin{itemize}
   \item semplice da implementare: la struttura autoencoder consente una modellazione diretta delle preferenze degli \textit{user} o degli \textit{item}
@@ -1135,13 +1068,7 @@ L'algoritmo soffre anche di diverse problematiche:
 \end{itemize}
 
 \subsection{NCF}\label{ncf}
-Viene introdotto il framework di \textit{Neural Collaborative Filtering} (\textit{NCF}) per sistemi di raccomandazione basati su feedback implicito.
-
-Il modello, chiamato \textit{Neural Matrix Factorization} (\textit{NeuMF})~\cite{NeuMF} mira ad affrontare il compito di ordinamento personalizzato basato su feedback implicito. Questo modello sfrutta la flessibilità e la non-linearità delle reti neurali per sostituire i prodotti scalari della fattorizzazione di matrici, con l'obiettivo di aumentare l'espressività del modello.
-
-In particolare, il modello è composto da due sottoreti: \textit{Generalized Matrix Factorization} (\textit{GMF}) e una rete \textit{Multi-Layer Perceptron} (\textit{MLP}), e modella le interazioni attraverso due percorsi distinti anziché usare un semplice prodotto scalare. Gli output di queste due reti sono concatenate per calcolare il punteggio finale di predizione.
-
-Diversamente dal compito di previsione dei \textit{rating} (come in \textit{AutoRec}), questo modello genera una lista ordinata di raccomandazioni per ciascun \textit{user} basata su feedback implicito.
+Viene introdotto il framework di \textit{Neural Collaborative Filtering} (\textit{NCF}) per sistemi di raccomandazione basati su feedback implicito. Il modello, chiamato \textit{Neural Matrix Factorization} (\textit{NeuMF})~\cite{NeuMF} mira ad affrontare il compito di ordinamento personalizzato basato su feedback implicito. Questo modello sfrutta la flessibilità e la non-linearità delle reti neurali per sostituire i prodotti scalari della fattorizzazione di matrici, con l'obiettivo di aumentare l'espressività del modello. In particolare, il modello è composto da due sottoreti: \textit{Generalized Matrix Factorization} (\textit{GMF}) e una rete \textit{Multi-Layer Perceptron} (\textit{MLP}), e modella le interazioni attraverso due percorsi distinti anziché usare un semplice prodotto scalare. Gli output di queste due reti sono concatenate per calcolare il punteggio finale di predizione. Diversamente dal compito di previsione dei \textit{rating} (come in \textit{AutoRec}), questo modello genera una lista ordinata di raccomandazioni per ciascun \textit{user} basata su feedback implicito.
 
 \subsubsection{Il modello NeuMF}\label{neufm}
 
@@ -1154,10 +1081,7 @@ x &= p_u \odot q_i \\
 \end{split}
 \]
 
-dove $\odot$ rappresenta l'\textit{Hadamard product} tra vettori, $P \in \mathbb{R}^{m \times k}$ e $Q \in \mathbb{R}^{n \times k}$ sono rispettivamente la matrice latente degli utenti e quella degli oggetti, $p_u \in \mathbb{R}^{k}$ è la riga $u$-esima di $P$, $q_i \in \mathbb{R}^{ k}$ è la riga $i$-esima di $Q$, $a$ è la funzione di attivazione, e $h$ è il vettore dei pesi dell'output layer.  
-$\hat{y}_{ui}$ è il punteggio predetto che lo \textit{user} $u$ potrebbe assegnare all'\textit{item} $i$.
-
-L'altro componente del modello è la \textit{MLP}. Per aumentare la flessibilità del modello, le embedding di \textit{user} e \textit{item} non sono condivise con la \textit{GMF}. Il \textit{MLP} utilizza la concatenazione delle embedding come input. Grazie a connessioni complesse e trasformazioni non lineari, è in grado di modellare interazioni sofisticate tra utenti e oggetti. Più precisamente:
+dove $\odot$ rappresenta l'\textit{Hadamard product} tra vettori, $P \in \mathbb{R}^{m \times k}$ e $Q \in \mathbb{R}^{n \times k}$ sono rispettivamente la matrice latente degli utenti e quella degli oggetti, $p_u \in \mathbb{R}^{k}$ è la riga $u$-esima di $P$, $q_i \in \mathbb{R}^{ k}$ è la riga $i$-esima di $Q$, $a$ è la funzione di attivazione, e $h$ è il vettore dei pesi dell'output layer. $\hat{y}_{ui}$ è il punteggio predetto che lo \textit{user} $u$ potrebbe assegnare all'\textit{item} $i$. L'altro componente del modello è la \textit{MLP}. Per aumentare la flessibilità del modello, le embedding di \textit{user} e \textit{item} non sono condivise con la \textit{GMF}. Il \textit{MLP} utilizza la concatenazione delle embedding come input. Grazie a connessioni complesse e trasformazioni non lineari, è in grado di modellare interazioni sofisticate tra utenti e oggetti. Più precisamente:
 
 \[
 \begin{aligned}
@@ -1169,25 +1093,21 @@ z^{(1)} &= \phi_1(U_u, V_i) = \left[ U_u, V_i \right] \\
 \end{aligned}
 \]
 
-
-dove $W^*$, $b^*$ e $\alpha^*$ sono rispettivamente la matrice dei pesi, il vettore di bias e la funzione di attivazione. $\phi^*$ denota la funzione del layer corrispondente mentre $z^*$ è l'output del layer corrispondente.
-
-Per combinare i risultati di \textit{GMF} e \textit{MLP}, invece della semplice somma, \textit{NeuMF} concatena i penultimi layer delle due sottoreti per creare un vettore di features che viene passato a un ulteriore layer. Successivamente, gli output vengono proiettate con la matrice $h$ e una funzione di attivazione sigmoide. L'output finale è calcolato come:
+dove $W^*$, $b^*$ e $\alpha^*$ sono rispettivamente la matrice dei pesi, il vettore di bias e la funzione di attivazione. $\phi^*$ denota la funzione del layer corrispondente mentre $z^*$ è l'output del layer corrispondente. Per combinare i risultati di \textit{GMF} e \textit{MLP}, invece della semplice somma, \textit{NeuMF} concatena i penultimi layer delle due sotto reti per creare un vettore di features che viene passato a un ulteriore layer. Successivamente, gli output vengono proiettate con la matrice $h$ e una funzione di attivazione sigmoide. L'output finale è calcolato come:
 
 \[
 \hat{y}_{ui} = \sigma(h^\top[x, \phi^L(z^{(L-1)})]).
 \]
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[scale=0.6]{figures/algorithms/neu_mf.png}
     \caption{Modello \textit{NeuMF}}
     \label{fig:neu_mf}
 \end{figure}
 
-\textit{NeuMF} consiste in un modello di \textit{Generalized Matrix Factorization} (\textit{GMF}) e una rete neurale \textit{Multi-Layer Perceptron} (\textit{MLP}) con vettori di \textit{embedding} distinti per utenti e \textit{item}. La struttura dell'MLP è controllata dal parametro \\ \texttt{nums\_hiddens}. \textit{ReLU} è utilizzata come funzione di attivazione predefinita.
+\textit{NeuMF} consiste in un modello di \textit{Generalized Matrix Factorization} (\textit{GMF}) e una rete neurale \textit{Multi-Layer Perceptron} (\textit{MLP}) con vettori di \textit{embedding} distinti per utenti e \textit{item}. La struttura dell'MLP è controllata dal parametro \\ \texttt{nums\_hiddens}. \textit{ReLU} è utilizzata come funzione di attivazione predefinita. Come \textit{loss} si utilizza la \textit{binary cross entropy}, conosciuta anche come \textit{log loss}, in cui un passaggio importante è il campionamento negativo.
 
-Come \textit{loss} si utilizza la \textit{binary cross entropy}, conosciuta anche come \textit{log loss}, in cui un passaggio importante è il campionamento negativo. 
 \[
 \mathcal{L} = -\sum_{(u,i) \in Y \cup Y^{-}} \left[ y_{ui} \cdot \log \hat{y}_{ui} + (1 - y_{ui}) \cdot \log(1 - \hat{y}_{ui}) \right]
 \]
@@ -1211,14 +1131,7 @@ L'algoritmo soffre anche di diverse problematiche:
 \end{itemize}
 
 \subsection{DeepFM}
-
-Le reti neurali profonde sono potenti nell’apprendimento della rappresentazione delle caratteristiche e hanno il potenziale per apprendere interazioni sofisticate. Grazie a livelli di trasformazione non lineare si ottiene la capacità di modellare sia combinazioni di caratteristiche di basso ordine sia di alto ordine. Inoltre, le strutture intrinsecamente non lineari degli input possono essere catturate dalle reti neurali profonde. 
-
-Si introduce un modello rappresentativo chiamato \textit{Deep Factorization Machines} (\textit{DeepFM})~\cite{DeepFM}.
-
-\textit{DeepFM} è composto da una componente di \textit{Factorization Machine} (\textit{FM}) e da una componente deep, integrate in una struttura parallela. La componente \textit{FM} è identica alla \textit{2-Way Factorization Machine}, utilizzata per modellare le interazioni tra caratteristiche di basso ordine. La componente deep è una rete \textit{Multi Layer Perceptron} (MLP), usata per catturare interazioni tra caratteristiche di ordine superiore e non linearità.
-
-Queste due componenti condividono gli stessi input/\textit{embedding}, e i loro output vengono sommati per ottenere la previsione finale.
+Le reti neurali profonde sono potenti nell’apprendimento della rappresentazione delle caratteristiche e hanno il potenziale per apprendere interazioni sofisticate. Grazie a livelli di trasformazione non lineare si ottiene la capacità di modellare sia combinazioni di caratteristiche di basso ordine sia di alto ordine. Inoltre, le strutture intrinsecamente non lineari degli input possono essere catturate dalle reti neurali profonde. Si introduce un modello rappresentativo chiamato \textit{Deep Factorization Machines} (\textit{DeepFM})~\cite{DeepFM}. \textit{DeepFM} è composto da una componente di \textit{Factorization Machine} (\textit{FM}) e da una componente deep, integrate in una struttura parallela. La componente \textit{FM} è identica alla \textit{2-Way Factorization Machine}, utilizzata per modellare le interazioni tra caratteristiche di basso ordine. La componente deep è una rete \textit{Multi Layer Perceptron} (MLP), usata per catturare interazioni tra caratteristiche di ordine superiore e non linearità. Queste due componenti condividono gli stessi input/\textit{embedding}, e i loro output vengono sommati per ottenere la previsione finale.
 
 \subsubsection{2-Way Factorization Machine}
 
@@ -1228,23 +1141,14 @@ Le \textit{Factorization Machines} (\textit{FM}), proposte da \textit{Rendle}~\c
     \item un algoritmo di ottimizzazione veloce associato alle \textit{Factorization Machines} può ridurre il tempo di calcolo del polinomio a una complessità lineare, rendendolo estremamente efficiente soprattutto per input sparsi di elevata dimensionalità
 \end{itemize}
 
-Per questi motivi, le \textit{Factorization Machines} sono ampiamente utilizzate nella pubblicità moderna e nelle raccomandazioni di prodotto.
-
-
-Formalmente, sia $x \in \mathbb{R}^d$ il vettore delle caratteristiche di un campione, e $y$ l'etichetta corrispondente, che può essere un valore reale o un'etichetta di classe, come ad esempio una classe binaria "click/non-click".  
+Per questi motivi, le \textit{Factorization Machines} sono ampiamente utilizzate nella pubblicità moderna e nelle raccomandazioni di prodotto. Formalmente, sia $x \in \mathbb{R}^d$ il vettore delle caratteristiche di un campione, e $y$ l'etichetta corrispondente, che può essere un valore reale o un'etichetta di classe, come ad esempio una classe binaria "click/non-click".  
 Il modello per una factorization machine di grado due è definito come:
 
 \[
 \hat{y}(x) = \mathbf{w}_0 + \sum_{i=1}^d \mathbf{w}_i x_i + \sum_{i=1}^d\sum_{j=i+1}^d \langle\mathbf{v}_i, \mathbf{v}_j\rangle x_i x_j
 \]
 
-dove $w_0 \in \mathbb{R}$ è il bias globale; $w \in \mathbb{R}^d$ denota i pesi della i-esima variabile; $V \in \mathbb{R}^{d\times k}$ rappresenta le embedding delle feature; $v_i$ rappresenta l'$i$-esima riga di $V$; $k$ è la dimensionalità dei fattori latenti; $\langle\cdot, \cdot \rangle$ è il prodotto scalare di due vettori.
-
-$\langle \mathbf{v}_i, \mathbf{v}_j \rangle$ rappresenta l'interazione tra la $i$-esima e la $j$-esima feature. Alcune interazioni tra feature possono essere facilmente comprese, quindi possono essere progettate dagli esperti. Tuttavia, la maggior parte delle altre interazioni tra feature sono nascoste nei dati e difficili da identificare. Pertanto, modellare automaticamente le interazioni tra feature può ridurre notevolmente gli sforzi nell'ingegneria delle feature. È evidente che i primi due termini corrispondono al modello di regressione lineare e l'ultimo termine è un'estensione del modello di fattorizzazione della matrice. Se la feature $i$ rappresenta un articolo e la feature $j$ rappresenta un utente, il terzo termine è esattamente il prodotto scalare tra le embedding dell'utente e dell'articolo.
-
-Da notare che il modello \textit{FM} può anche generalizzarsi a ordini superiori (grado > 2). Tuttavia, la stabilità numerica potrebbe indebolire la generalizzazione.
-
-Ottimizzare le \textit{FM} in un modo diretto porta a una complessità di $\mathcal{O}(kd^2)$ poiché tutte le interazioni a coppie devono essere calcolate. Per risolvere questo problema di inefficienza, si può riorganizzare il terzo termine di \textit{FM}, il che potrebbe ridurre notevolmente il costo computazionale, portando a una complessità temporale lineare $\mathcal{O}(kd)$. La riformulazione del termine di interazione a coppie è la seguente:
+dove $w_0 \in \mathbb{R}$ è il bias globale; $w \in \mathbb{R}^d$ denota i pesi della i-esima variabile; $V \in \mathbb{R}^{d\times k}$ rappresenta le embedding delle feature; $v_i$ rappresenta l'$i$-esima riga di $V$; $k$ è la dimensionalità dei fattori latenti; $\langle\cdot, \cdot \rangle$ è il prodotto scalare di due vettori. $\langle \mathbf{v}_i, \mathbf{v}_j \rangle$ rappresenta l'interazione tra la $i$-esima e la $j$-esima feature. Alcune interazioni tra feature possono essere facilmente comprese, quindi possono essere progettate dagli esperti. Tuttavia, la maggior parte delle altre interazioni tra feature sono nascoste nei dati e difficili da identificare. Pertanto, modellare automaticamente le interazioni tra feature può ridurre notevolmente gli sforzi nell'ingegneria delle feature. È evidente che i primi due termini corrispondono al modello di regressione lineare e l'ultimo termine è un'estensione del modello di fattorizzazione della matrice. Se la feature $i$ rappresenta un articolo e la feature $j$ rappresenta un utente, il terzo termine è esattamente il prodotto scalare tra le embedding dell'utente e dell'articolo. Da notare che il modello \textit{FM} può anche generalizzarsi a ordini superiori (grado > 2). Tuttavia, la stabilità numerica potrebbe indebolire la generalizzazione. Ottimizzare le \textit{FM} in un modo diretto porta a una complessità di $\mathcal{O}(kd^2)$ poiché tutte le interazioni a coppie devono essere calcolate. Per risolvere questo problema di inefficienza, si può riorganizzare il terzo termine di \textit{FM}, il che potrebbe ridurre notevolmente il costo computazionale, portando a una complessità temporale lineare $\mathcal{O}(kd)$. La riformulazione del termine di interazione a coppie è la seguente:
 
 \[
 \begin{split}\begin{aligned}
@@ -1283,16 +1187,14 @@ dove $\alpha$ è la funzione di attivazione. $W_l$ e $b_l$ sono rispettivamente 
 
 dove $\sigma$ è la funzione sigmoide.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[scale=0.5]{figures/algorithms/deepfm.png}
     \caption{L'architettura di \textit{DeepFM}. In questa immagine $\hat{y}^{(MLP)} = \hat{y}^{(DNN)}$}
     \label{fig:deepfm}
 \end{figure}
 
-Importante sottolineare che \textit{DeepFM} non è l'unico modo per combinare reti neurali profonde con \textit{FM}. Si possono aggiungere livelli non lineari sulle interazioni tra le caratteristiche~\cite{NFA_SPA}.
-
-Come per \textit{NeuMF} la \textit{loss} utilizzata è la \textit{binary cross entropy}.
+Importante sottolineare che \textit{DeepFM} non è l'unico modo per combinare reti neurali profonde con \textit{FM}. Si possono aggiungere livelli non lineari sulle interazioni tra le caratteristiche~\cite{NFA_SPA}. Come per \textit{NeuMF} la \textit{loss} utilizzata è la \textit{binary cross entropy}.
 
 I punti di forza dell'algoritmo sono:
 
@@ -1329,21 +1231,16 @@ In un sistema di \textit{recommendation}, è fondamentale misurare l'efficacia d
     che corrisponde agli \textit{item} mai interagiti dall'utente. Nel contesto dei feedback impliciti, questi \textit{item} potrebbero essere semplicemente quelli non ancora scoperti dall'utente, quindi la loro rilevanza non è assolutamente garantita.
 \end{itemize}
 
-
-
-
-Di seguito sono presentate le definizioni formali di ciascuna di queste metriche.
-
-Le prime due metriche hanno senso solamente per feedback espliciti in quanto restituiscono un \textit{rating}:
+Di seguito sono presentate le definizioni formali di ciascuna di queste metriche. Le prime due metriche hanno senso solamente per feedback espliciti in quanto restituiscono un \textit{rating}:
 
 \begin{itemize}
-    \item Root Mean Squared Error (RMSE).\\
+    \item Root Mean Squared Error (RMSE) \\
     Errore quadratico medio tra i punteggi previsti e quelli reali; penalizza di più gli errori grandi.
     \[
     \text{RMSE} = \sqrt{ \frac{1}{|\hat{R}|} \sum_{\hat{r}_{ui} \in \hat{R}} (\hat{r}_{ui} - r_{ui})^2 }
     \]
     
-    \item Mean Absolute Error (MAE).\\
+    \item Mean Absolute Error (MAE) \\
     Errore assoluto medio tra le predizioni e i valori reali; più facile da interpretare rispetto a RMSE.
     \[
     \text{MAE} = \frac{1}{|\hat{R}|} \sum_{\hat{r}_{ui} \in \hat{R}} |\hat{r}_{ui} - r_{ui}|
@@ -1353,27 +1250,26 @@ Le prime due metriche hanno senso solamente per feedback espliciti in quanto res
 Le seguenti metriche valgono sia per feedback impliciti che espliciti:
 
 \begin{itemize}
-    \item Precision@K.\\
+    \item Precision@K\\
     Frazione dei top-K \textit{item} raccomandati che sono effettivamente rilevanti.
     \[
     \text{Precision@K}(u) = \frac{|I_u^{rel@K}|}{K}
     \]
     
-    \item Recall@K.\\
+    \item Recall@K\\
     Frazione degli \textit{item} rilevanti che sono stati inclusi nei top-K raccomandati.
     \[
     \text{Recall@K}(u) = \frac{|I_u^{rel@K}|}{|I_u^{rel}|}
     \]
     
-    \item F1@K.\\
+    \item F1@K\\
     Media armonica tra precision@K e recall@K; è alta solo se entrambe le metriche sono alte.
     \[
     \text{F1@K}(u) = 2 \cdot \frac{\text{Precision@K}(u) \cdot \text{Recall@K}(u)}{\text{Precision@K}(u) + \text{Recall@K}(u)}
     \]
-    \item Hit@K.\\
+    \item Hit@K\\
     Metrica binaria che indica se almeno un \textit{item} rilevante per lo \textit{user} compare tra i primi K raccomandati. Se sì, il valore è 1 (hit), altrimenti 0 (miss). Misura la capacità del sistema di \textit{recommendation} di "azzeccare" almeno una preferenza dello \textit{user} nelle top-K proposte.\\
     \[
-    \text{oppure} \quad 
     \text{Hit@K}(u) = \mathbf{1}\left\{ |I_u^{rel@K}| > 0 \right\}
     \]  
     

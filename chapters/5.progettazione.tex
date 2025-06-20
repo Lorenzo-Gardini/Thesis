@@ -11,9 +11,7 @@ I tipi di dati che la libreria è in grado di gestire sono due:
     \item \textit{Pandas DataFrame}
 \end{itemize}
 
-La scelta sull'utilizzo di questi due tipi di dati è stata fatta sulla base sia del fatto che sono tipi ampiamente diffusi ed utilizzati, sia per la compatibilità con la libreria \textit{Scikit-learn}.
-
-Ogni algoritmo può quindi ricevere in ingresso dati in uno di questi due formati. Questo vincolo vale anche per tutte le altre funzionalità della libreria con alcune eccezioni.
+La scelta sull'utilizzo di questi due tipi di dati è stata fatta sulla base sia del fatto che sono tipi ampiamente diffusi ed utilizzati, sia per la compatibilità con la libreria \textit{Scikit-learn}. Ogni algoritmo può quindi ricevere in ingresso dati in uno di questi due formati. Questo vincolo vale anche per tutte le altre funzionalità della libreria con alcune eccezioni.
 
 \subsection{Divisione in moduli}
 
@@ -71,53 +69,41 @@ Alcune considerazioni importanti:
 
 Viene definita la classe \texttt{DataFramePreprocessFunction} come estensione delle due classi sopra citate e che rappresenta una generica trasformazione.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[scale=0.2]{figures/UML/preprocessing/dataframe_preprocess_function.png}
     \caption{Diagramma della classe \texttt{DataFramePreprocessFunction}}
 \end{figure}
 
-Tutti i \textit{transformers} della libreria estendono direttamente o indirettamente questa classe per poter implementare i metodi \texttt{fit} e \texttt{transform}. 
-
-Vengono create anche diverse classi per poter raggruppare comportamenti comuni di alcune tipologie di \textit{transformers}:
+Tutti i \textit{transformers} della libreria estendono direttamente o indirettamente questa classe per poter implementare i metodi \texttt{fit} e \texttt{transform}. Vengono create anche diverse classi per poter raggruppare comportamenti comuni di alcune tipologie di \textit{transformers}:
 
 \begin{itemize}
-    \item \texttt{GroupByFunction}: estende \texttt{DataFramePreprocessFunction} e modella l'applicazione di una trasformazione su dati raggruppati (\textit{group-by}). Viene definito il metodo astratto \texttt{\_build\_transform\_function}, applicando il pattern \textit{Template Method}. Questo metodo viene invocato all'interno del metodo \texttt{fit} e restituisce una funzione, che viene salvata come attributo. Questa funzione viene poi utilizzata nel metodo \texttt{transform} sui dati in input trasformandoli.
-    
-    La classe viene estesa a sua volta da \texttt{Normalizer}, che normalizza vettori per lunghezza unitaria.
+    \item \texttt{GroupByFunction}: estende \texttt{DataFramePreprocessFunction} e modella l'applicazione di una trasformazione su dati raggruppati (\textit{group-by}). Viene definito il metodo astratto \texttt{\_build\_transform\_function}, applicando il pattern \textit{Template Method}. Questo metodo viene invocato all'interno del metodo \texttt{fit} e restituisce una funzione, che viene salvata come attributo. Questa funzione viene poi utilizzata nel metodo \texttt{transform} sui dati in input trasformandoli. La classe viene estesa a sua volta da \texttt{Normalizer}, che normalizza vettori per lunghezza unitaria.
 
     \begin{figure}[H]
         \centering
-        \includegraphics[scale=0.2]{figures/UML/preprocessing/group_by.png}
+        \includegraphics[scale=0.17]{figures/UML/preprocessing/group_by.png}
         \caption{Gerarchia di \texttt{GroupByFunction}}
     \end{figure}
 
-    \item \texttt{InverseTransformer}: classe base per trasformazioni invertibili (che permettono di tornare ai dati originali) grazie alla invocazione al metodo \\ \texttt{inverse\_transform}.
+    \item \texttt{InverseTransformer}: classe base per trasformazioni invertibili (che permettono di tornare ai dati originali) grazie alla invocazione al metodo \\ \texttt{inverse\_transform}. La classe viene estesa a sua volta da \texttt{LabelEncoder}, che codifica etichette categoriali in valori numerici e permette l'inversione.
     
-    La classe viene estesa a sua volta da \texttt{LabelEncoder}, che codifica etichette categoriali in valori numerici e permette l'inversione.
-    
-    \begin{figure}[H]
+    \begin{figure}[htbp]
         \centering
         \includegraphics[scale=0.2]{figures/UML/preprocessing/inverse_transformer.png}
         \caption{Gerarchia di \texttt{InverseTransformer}}
     \end{figure}
 
-    \item \texttt{InvertibleGroupByFunction}: estende \texttt{GroupByFunction} e \\ \texttt{InverseTransformer}, permette di invertire le trasformazioni su gruppi.
-    Vengono definiti i metodi astratti \texttt{\_build\_transform\_function} e \\ \texttt{\_build\_inverse\_function}, applicando il pattern \textit{Template Method}, i quali vengono invocati entrambi dentro i metodi \texttt{fit} e restituiscono una funzione ciascuno che vengono salvate come attributi.
-    Queste funzioni vengono poi utilizzate durante l'invocazione dei metodi \texttt{transform} e di\\\texttt{inverse\_transform} per applicare la trasformazione corrispondente.
+    \item \texttt{InvertibleGroupByFunction}: estende \texttt{GroupByFunction} e \\ \texttt{InverseTransformer}, permette di invertire le trasformazioni su gruppi. Vengono definiti i metodi astratti \texttt{\_build\_transform\_function} e \\ \texttt{\_build\_inverse\_function}, applicando il pattern \textit{Template Method}, i quali vengono invocati entrambi dentro i metodi \texttt{fit} e restituiscono una funzione ciascuno che vengono salvate come attributi. Queste funzioni vengono poi utilizzate durante l'invocazione dei metodi \texttt{transform} e di \\ \texttt{inverse\_transform} per applicare la trasformazione corrispondente. La classe viene estesa a sua volta da \texttt{StandardScaler}, che normalizza i dati rendendoli con media $0$ e deviazione standard $1$, e \texttt{MinMaxScaler}, che scala i dati in un intervallo specifico (di solito $[0, 1]$).
     
-    La classe viene estesa a sua volta da \texttt{StandardScaler}, che normalizza i dati rendendoli con media $0$ e deviazione standard $1$, e \texttt{MinMaxScaler}, che scala i dati in un intervallo specifico (di solito $[0, 1]$).
-    
-    \begin{figure}[H]
+    \begin{figure}[htbp]
         \centering
         \includegraphics[scale=0.14]{figures/UML/preprocessing/invertible_group_by.png}
         \caption{Gerarchia di \texttt{InvertibleGroupByFunction}}
     \end{figure}
     
-    \item \texttt{BinDensity}: estende \texttt{DataFramePreprocessFunction}, si occupa di binning e densità dei dati. Viene definito il metodo astratto \texttt{\_divide} applicando il pattern \textit{Template Method}, il quale viene invocato dentro il metodo \texttt{fit} e restituisce una funzione che viene salvata come attributo. Questa funzione viene poi utilizzata nel metodo \texttt{transform} per applicare una divisione dei dati in modo coerente con il tipo di densità utilizzata.
-    
-    La classe viene estesa a sua volta da \texttt{BinThreshold}, che effettua \textit{binning} basato su una soglia di frequenza, e \texttt{BinCumulative}, che effettua \textit{binning} basato su cumulativi di distribuzione.
-    \begin{figure}[H]
+    \item \texttt{BinDensity}: estende \texttt{DataFramePreprocessFunction}, si occupa di binning e densità dei dati. Viene definito il metodo astratto \texttt{\_divide} applicando il pattern \textit{Template Method}, il quale viene invocato dentro il metodo \texttt{fit} e restituisce una funzione che viene salvata come attributo. Questa funzione viene poi utilizzata nel metodo \texttt{transform} per applicare una divisione dei dati in modo coerente con il tipo di densità utilizzata. La classe viene estesa a sua volta da \texttt{BinThreshold}, che effettua \textit{binning} basato su una soglia di frequenza, e \texttt{BinCumulative}, che effettua \textit{binning} basato su cumulativi di distribuzione.
+    \begin{figure}[htbp]
         \centering
         \includegraphics[scale=0.17]{figures/UML/preprocessing/bin_density.png}
         \caption{Gerarchia di \texttt{BinDensity}}
@@ -137,7 +123,7 @@ Si è deciso di utilizzare il \textit{pipeline pattern} per l'applicazione dei \
 
 La pipeline, anch'essa una \textit{DataFramePreprocessFunction} che applica tutte le trasformazioni specificate, è definita come \texttt{PreprocessPipeline}.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[scale=0.2]{figures/UML/preprocessing/preprocess_pipeline.png}
     \caption{Diagramma della classe \texttt{PreprocessPipeline}}
@@ -182,17 +168,17 @@ Un elenco dei \textit{transformers} che estendono direttamente la classe \\
     \item \texttt{ToCOOMatrix}: trasforma dati in una matrice sparsa in rappresentazione \textit{COO} (sempre nel tipo \textit{DataFrame})
 \end{itemize}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[angle=90, scale=0.15]{figures/UML/preprocessing/direct_1.png}
     \caption{Diagrammi delle classi \texttt{Map}, \texttt{Condense}, \texttt{Cycle}, \\ \texttt{OneHotEncode}, \texttt{ToCOOMatrix}}
 
-\end{figure}\begin{figure}[H]
+\end{figure}\begin{figure}[htbp]
     \centering
     \includegraphics[angle=90, scale=0.13]{figures/UML/preprocessing/direct_2.png}
     \caption{Diagrammi delle classi \texttt{Filter}, \texttt{Update}, \texttt{DropNa}, \texttt{Rename}, \texttt{Drop}, \texttt{ExtractDate}}
 
-\end{figure}\begin{figure}[H]
+\end{figure}\begin{figure}[htbp]
     \centering
     \includegraphics[angle=90, scale=0.15]{figures/UML/preprocessing/direct_3.png}
     \caption{Diagrammi delle classi \texttt{Round}, \texttt{Bin}, \texttt{Clip}, \texttt{DropDuplicates}, \texttt{Select}, \texttt{FillNa}}
@@ -247,9 +233,9 @@ I modelli possono, in base alle necessità, aggiungere parametri aggiuntivi alle
 
 Viene definita l'interfaccia \texttt{PersistableModel} che espone il metodo \texttt{save} per il salvataggio dei modelli. Il metodo riceve come parametro \texttt{fileobj\_or\_path} che corrisponde al nome del file (che include anche il percorso, di tipo \texttt{str}) oppure un oggetto file aperto (di tipo \texttt{io.IOBase}) su cui salvare il modello.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
-    \includegraphics[scale=0.3]{figures/UML/models/persistable_model.png}
+    \includegraphics[scale=0.2]{figures/UML/models/persistable_model.png}
     \caption{Diagramma del'interfaccia \texttt{PersistableModel}}
 \end{figure}
 
@@ -285,9 +271,7 @@ Ogni volta che si fa riferimento ad un id, che sia \texttt{user\_id} o \texttt{i
 \subsection{Model predict data}\label{model_predict_data}
 
 I vari modelli possono predire il \textit{rating} o lo \textit{score} con il metodo \texttt{predict} su diversi formati di dati, purché rispettino i vincoli sopra descritti. Il formato standard deciso è identico a quello utilizzato per l'addestramento. I modelli possono in modo indipendente introdurre eventuali vincoli sui dati in input.
-In questo caso però il modello utilizza la singola coppia (\textit{user\_id}, \textit{item\_id}) alla quale viene associato un \textit{rating} o lo \textit{score} in base al tipo di modello utilizzato, rispettivamente per feedback espliciti e per feedback impliciti. Se, per esempio, vengono dati in input al modello, che gestisce feedback impliciti, cinque coppie (\textit{user\_id}, \textit{item\_id}) quest'ultimo restituisce un \textit{NumPy array} di cinque valori, ciascuno corrispondente allo \textit{score} ottenuto da ciascuna coppia. Se si vuole ottenere il \textit{ranking} occorre ordinare gli \textit{score} ottenuti in ordine decrescente o utilizzare le apposite funzioni presenti nel modulo \texttt{utils}. Se si vuole calcolare \textit{rating} o lo \textit{score}, dati un insieme $U$ di \textit{user} e $I$ di \textit{item}, occorre dare in input al metodo \texttt{predict} tutte le combinazioni $\left\{(u, i) \mid u \in U,\; i \in I \right\}$.
-
-Il metodo predict permette anche di effettuare una \textit{item-to-user recommendation}, ovvero di predire il \textit{rating} o lo \textit{score} per un insieme di \textit{user} dato uno specifico \textit{item}. In questo caso, l’obiettivo è identificare quali \textit{user} sono più interessati a un determinato \textit{item}, ad esempio per inviare notifiche mirate, promuovere contenuti o ottimizzare campagne pubblicitarie. Si tratta quindi di ordinare gli \textit{user} in base alla loro affinità o probabilità di interazione con un \textit{item} specifico, utilizzando le stesse tecniche predittive del modello, ma invertendo la direzione del ranking: non più "quali \textit{item} per questo utente", ma "quali \textit{user} per questo \textit{item}".
+In questo caso però il modello utilizza la singola coppia (\textit{user\_id}, \textit{item\_id}) alla quale viene associato un \textit{rating} o lo \textit{score} in base al tipo di modello utilizzato, rispettivamente per feedback espliciti e per feedback impliciti. Se, per esempio, vengono dati in input al modello, che gestisce feedback impliciti, cinque coppie (\textit{user\_id}, \textit{item\_id}) quest'ultimo restituisce un \textit{NumPy array} di cinque valori, ciascuno corrispondente allo \textit{score} ottenuto da ciascuna coppia. Se si vuole ottenere il \textit{ranking} occorre ordinare gli \textit{score} ottenuti in ordine decrescente o utilizzare le apposite funzioni presenti nel modulo \texttt{utils}. Se si vuole calcolare \textit{rating} o lo \textit{score}, dati un insieme $U$ di \textit{user} e $I$ di \textit{item}, occorre dare in input al metodo \texttt{predict} tutte le combinazioni $\left\{(u, i) \mid u \in U,\; i \in I \right\}$. Il metodo predict permette anche di effettuare una \textit{item-to-user recommendation}, ovvero di predire il \textit{rating} o lo \textit{score} per un insieme di \textit{user} dato uno specifico \textit{item}. In questo caso, l’obiettivo è identificare quali \textit{user} sono più interessati a un determinato \textit{item}, ad esempio per inviare notifiche mirate, promuovere contenuti o ottimizzare campagne pubblicitarie. Si tratta quindi di ordinare gli \textit{user} in base alla loro affinità o probabilità di interazione con un \textit{item} specifico, utilizzando le stesse tecniche predittive del modello, ma invertendo la direzione del ranking: non più "quali \textit{item} per questo utente", ma "quali \textit{user} per questo \textit{item}".
 
 Un esempio di input in formato \textit{DataFrame} e di output in formato \textit{NumPy array}:
 
@@ -349,7 +333,7 @@ Il metodo \texttt{similar\_items} ha i seguenti parametri:
 
 Entrambi i metodo restituiscono un \textit{NumPy array} di (\textit{user\_id}/\textit{item\_id}, \textit{score}), dove lo \textit{score} indica quanto sono simili. In base al modello utilizzato il valore potrebbe essere compreso in un intervallo oppure no.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[scale=0.25]{figures/UML/models/similarity_model.png}
     \caption{Diagramma dell'interfaccia \texttt{SimilarityModel}}
@@ -361,12 +345,11 @@ Importante inserire, all'interno del due metodi, un controllo che verifichi che 
 
 Viene definita la classe astratta \texttt{SurpriseModel} che estende \texttt{BaseEstimator} e \texttt{PersistableModel} e che gestisce il comportamento comune della \texttt{fit} e della \texttt{predict} di tutti i modelli della libreria \textit{Surprise}. Viene definito il metodo astratto \texttt{\_fit\_surprise\_model}, applicando il pattern \textit{Template Method}. Così facendo, l'implementazione di ogni modello deve definire solamente le modalità di addestramento del modello della libreria \textit{Surprise} e gli attributi, il cui nome termina con il carattere "\_", che vengono appresi.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[scale=0.17]{figures/UML/models/surprise_model.png}
     \caption{Diagramma della classe astratta \texttt{SurpriseModel}}
 \end{figure}
-
 
 La classe viene estesa creando i vari adapter dei modelli. Alcuni di essi estendono anche \texttt{SimilarityModel}:
 
@@ -378,18 +361,15 @@ La classe viene estesa creando i vari adapter dei modelli. Alcuni di essi estend
     \item \texttt{CoClustering}
 \end{itemize}
 
-Ogni modello riceve nel costruttore gli stessi parametri del modello originale della libreria \textit{Surprise}.
+Ogni modello riceve nel costruttore gli stessi parametri del modello originale della libreria \textit{Surprise}. Tutti i modelli sopra elencati gestiscono feedback espliciti e quindi i valori restituiti dal metodo \textit{predict} corrispondono a \textit{score}.
 
-Tutti i modelli sopra elencati gestiscono feedback espliciti e quindi i valori restituiti dal metodo \textit{predict} corrispondono a \textit{score}.
-
-
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[angle=90, scale=0.14]{figures/UML/models/surprise_models.png}
     \caption{Diagrammi dei modelli di \textit{Surprise}}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[angle=90, scale=0.095]{figures/UML/models/surprise_similarity_models.png}
     \caption{Diagrammi dei modelli di \textit{Surprise} che estendono anche \texttt{SimilarityModel}}
@@ -404,13 +384,13 @@ Il metodo \texttt{predict} di questi modelli può riceve due parametri extra:
     \item \texttt{verbose} (\texttt{boolean}): indica se stampare i dettagli della previsione. Il valore di default è \texttt{False}
 \end{itemize}
 
+\newpage
+
 \subsection{Modelli Implicit}
 
-Viene definita la classe astratta \texttt{ImplicitModel} che estende \texttt{BaseModel} e \\ \texttt{PersistableModel} e che gestisce il comportamento comune della \texttt{fit} e della \texttt{predict} di tutti i modelli della libreria \textit{Implicit}. Viene definito il metodo astratto \texttt{\_fit\_implicit\_model}, applicando il pattern \textit{Template Method}. Così facendo, l'implementazione di ogni modello deve definire solamente le modalità di addestramento del modello della libreria \textit{Implicit} e quali attributi, il cui nome termina con il carattere "\_", vengono appresi.
+Viene definita la classe astratta \texttt{ImplicitModel} che estende \texttt{BaseModel} e \\ \texttt{PersistableModel} e che gestisce il comportamento comune della \texttt{fit} e della \texttt{predict} di tutti i modelli della libreria \textit{Implicit}. Viene definito il metodo astratto \texttt{\_fit\_implicit\_model}, applicando il pattern \textit{Template Method}. Così facendo, l'implementazione di ogni modello deve definire solamente le modalità di addestramento del modello della libreria \textit{Implicit} e quali attributi, il cui nome termina con il carattere "\_", vengono appresi. Se il \textit{trainset} contiene una terza colonna, che deve essere numerica, questa viene considerata durante l'addestramento come il peso dell'interazione della coppia (\textit{user}, \textit{item}) (e.g. il numero di click o quante volte quel film è stato visionato). 
 
-Se il \textit{trainset} contiene una terza colonna, che deve essere numerica, questa viene considerata durante l'addestramento come il peso dell'interazione della coppia (\textit{user}, \textit{item}) (e.g. il numero di click o quante volte quel film è stato visionato). 
-
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[scale=0.15]{figures/UML/models/implicit_model.png}
     \caption{Diagramma della classe astratta \texttt{ImplicitModel}}
@@ -424,11 +404,9 @@ La classe è stata estesa creando diversi adapter per i modelli, ognuno dei qual
     \item \texttt{LMF}, che estende anche \texttt{SimilarityModel}
 \end{itemize}
 
-Ogni modello riceve nel costruttore gli stessi parametri del modello originale della libreria \textit{Implicit}.
+Ogni modello riceve nel costruttore gli stessi parametri del modello originale della libreria \textit{Implicit}. Tutti i modelli sopra elencati gestiscono feedback impliciti e quindi i valori restituiti dal metodo \textit{predict} corrispondono a \textit{rating}.
 
-Tutti i modelli sopra elencati gestiscono feedback impliciti e quindi i valori restituiti dal metodo \textit{predict} corrispondono a \textit{rating}.
-
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[angle=90, scale=0.1]{figures/UML/models/implicit_similarity_models.png}
     \caption{Diagrammi dei modelli di \textit{Implicit}}
@@ -450,13 +428,9 @@ Il metodo \texttt{fit} di questi modelli può riceve due parametri extra:
 \end{itemize}
 
 \subsection{Modello LightFM}
-Viene definita la classe \texttt{LightFM}, classe che estende \texttt{BaseModel}, \texttt{PersistableModel} e \texttt{SimilarityModel} e rappresenta l'\textit{Adapter} del modello \texttt{LightFM} dell'omonima libreria \texttt{LightFM}. 
+Viene definita la classe \texttt{LightFM}, classe che estende \texttt{BaseModel}, \texttt{PersistableModel} e \texttt{SimilarityModel} e rappresenta l'\textit{Adapter} del modello \texttt{LightFM} dell'omonima libreria \texttt{LightFM}. Il modello gestisce feedback impliciti e quindi i valori restituiti dal metodo \textit{predict} corrispondono a \textit{score}. Se il \textit{trainset} contiene una terza colonna, che deve essere numerica, questa viene considerata durante l'addestramento come il peso dell'interazione della coppia (\textit{user}, \textit{item}) (e.g. il numero di click o quante volte quel film è stato visionato). 
 
-Il modello gestisce feedback impliciti e quindi i valori restituiti dal metodo \textit{predict} corrispondono a \textit{score}.
-
-Se il \textit{trainset} contiene una terza colonna, che deve essere numerica, questa viene considerata durante l'addestramento come il peso dell'interazione della coppia (\textit{user}, \textit{item}) (e.g. il numero di click o quante volte quel film è stato visionato). 
-
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[scale=0.2]{figures/UML/models/light_fm.png}
     \caption{Diagramma della classe \textit{LightFM}}
@@ -483,9 +457,7 @@ Ciascun \textit{DataFrame} in input deve seguire la seguente struttura:
     \item le colonne successive devono essere avere un titolo
 \end{itemize}
 
-Le stesse considerazioni valgono per le features degli \textit{user}.
-
-Non è obbligatorio specificare entrambe le features contemporaneamente.
+Le stesse considerazioni valgono per le features degli \textit{user}. Non è obbligatorio specificare entrambe le features contemporaneamente.
 
 \begin{table}[H]
     \centering
@@ -526,18 +498,10 @@ Il metodo \texttt{predict} di questo modello può ricevere tre parametri extra:
 
 \section{Model Selection}
 
-Il modulo contiene le funzioni per poter eseguire lo split del 
-\textit{dataset} in \textit{trainset} e \textit{testset}. La principale, chiamata \texttt{train\_test\_split\_with\_coverage}, riceve in ingresso un \textit{DataFrame} o un \textit{NumPy array} che deve rispettare il formato standard definito sui dati che utilizzano i modelli. 
-
-Lo \textit{split} viene effettuato in modo che nel \textit{trainset} ci sia almeno un'interazione per ogni \textit{user} e ogni \textit{item} in modo che, durante la \textit{prediction}, sia possibile generare un risultato per qualunque \textit{user}/\textit{item} presente durante la fase di \textit{training}. Non ci sono invece sicurezze sul fatto che nel \textit{testset} ci sia, per ogni \textit{user}/\textit{item}, almeno un'interazione. Questo potrebbe portare ad un caso particolare di \textit{cold-start} nel \textit{testset}.
-
-Nel caso in cui non il modello non avesse problemi a gestire \textit{ids} mai visti durante la fase di addestramento e si vuole lavorare esclusivamente con \textit{DataFrame} è possibile utilizzare la seconda ed ultima funzione del modulo chiamata \texttt{random\_train\_test\_split} che effettua uno \textit{split} casuale del \textit{dataset} in \textit{trainset} e \textit{testset} senza alcun vincolo.
-
+Il modulo contiene le funzioni per poter eseguire lo split del \textit{dataset} in \textit{trainset} e \textit{testset}. La principale, chiamata \texttt{train\_test\_split\_with\_coverage}, riceve in ingresso un \textit{DataFrame} o un \textit{NumPy array} che deve rispettare il formato standard definito sui dati che utilizzano i modelli. Lo \textit{split} viene effettuato in modo che nel \textit{trainset} ci sia almeno un'interazione per ogni \textit{user} e ogni \textit{item} in modo che, durante la \textit{prediction}, sia possibile generare un risultato per qualunque \textit{user}/\textit{item} presente durante la fase di \textit{training}. Non ci sono invece sicurezze sul fatto che nel \textit{testset} ci sia, per ogni \textit{user}/\textit{item}, almeno un'interazione. Questo potrebbe portare ad un caso particolare di \textit{cold-start} nel \textit{testset}. Nel caso in cui non il modello non avesse problemi a gestire \textit{ids} mai visti durante la fase di addestramento e si vuole lavorare esclusivamente con \textit{DataFrame} è possibile utilizzare la seconda ed ultima funzione del modulo chiamata \texttt{random\_train\_test\_split} che effettua uno \textit{split} casuale del \textit{dataset} in \textit{trainset} e \textit{testset} senza alcun vincolo.
 
 \section{Model Evaluation}
-Il modulo comprende l'insieme delle funzioni per calcolare le prestazioni dei modelli addestrati.
-
-Per i modelli che gestiscono feedback espliciti sono presenti i seguenti algoritmi:
+Il modulo comprende l'insieme delle funzioni per calcolare le prestazioni dei modelli addestrati. Per i modelli che gestiscono feedback espliciti sono presenti i seguenti algoritmi:
 
 \begin{itemize}
     \item Root Mean Squared Error (RMSE) con la funzione \texttt{rmse}
@@ -606,11 +570,8 @@ Il modulo \texttt{utils} raccoglie un insieme di funzioni ausiliarie progettate 
 
 \end{itemize}
 
-
 \section{Visualization}
-Il modulo comprende l'insieme delle funzioni di supporto dedicate all'analisi esplorativa e alla visualizzazione di dati in formato \textit{DataFrame}. In particolare, fornisce strumenti per rappresentare graficamente la distribuzione di variabili continue e categoriali tramite istogrammi, curve di densità e grafici a barre, facilitando la comprensione della frequenza e della percentuale dei valori presenti.
-
-Questo modulo è stato pensato per poter visualizzare ed analizzare le distribuzioni di eventuali \textit{rating} e features di \textit{user} e \textit{item}.
+Il modulo comprende l'insieme delle funzioni di supporto dedicate all'analisi esplorativa e alla visualizzazione di dati in formato \textit{DataFrame}. In particolare, fornisce strumenti per rappresentare graficamente la distribuzione di variabili continue e categoriali tramite istogrammi, curve di densità e grafici a barre, facilitando la comprensione della frequenza e della percentuale dei valori presenti. Questo modulo è stato pensato per poter visualizzare ed analizzare le distribuzioni di eventuali \textit{rating} e features di \textit{user} e \textit{item}.
 
 \begin{itemize}
 

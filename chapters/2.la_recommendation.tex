@@ -48,21 +48,15 @@ Per esempio un utente, accedendo alla sua \textit{home page} di \textit{Spotify}
 
 \section{Creazione del sistema}
 
-Il sistema è composto da vari algoritmi che, interagendo in sequenza o in modo concorrente, svolgono i compiti sopra elencati. Per fare ciò si utilizzano algoritmi che, utilizzando i dati storici delle interazioni tra utenti e \textit{item} sono in grado di generare uno \textit{score} che indica quanto un \textit{item} è rilevante per un utente in un determinato contesto. Questi score possono essere delle previsioni, detti \textit{rating}, su quanto un utente apprezzerà un \textit{item} (per esempio il numero di "stelle" che l'utente metterebbe), su quanto è probabile che l'utente interagisca con quell'\textit{item} (per esempio 56\%) oppure un indicatore numerico puro che indica quanto è forte la relazione.
-
-Una volta ottenute queste previsioni, il sistema può ordinare gli \textit{item} in base agli score e presentare i risultati all'utente.
+Il sistema è composto da vari algoritmi che, interagendo in sequenza o in modo concorrente, svolgono i compiti sopra elencati. Per fare ciò si utilizzano algoritmi che, utilizzando i dati storici delle interazioni tra utenti e \textit{item} sono in grado di generare uno \textit{score} che indica quanto un \textit{item} è rilevante per un utente in un determinato contesto. Questi score possono essere delle previsioni, detti \textit{rating}, su quanto un utente apprezzerà un \textit{item} (per esempio il numero di "stelle" che l'utente metterebbe), su quanto è probabile che l'utente interagisca con quell'\textit{item} (per esempio 56\%) oppure un indicatore numerico puro che indica quanto è forte la relazione. Una volta ottenute queste previsioni, il sistema può ordinare gli \textit{item} in base agli score e presentare i risultati all'utente.
 
 \section{Tipologie di feedback}
 
-I sistemi di \textit{recommendation} si basano sull'analisi delle preferenze degli utenti, espresse attraverso due principali modalità: feedback esplicito e feedback implicito~\cite{ALS}. Ogni modalità presenta vantaggi, limitazioni e diverse tipologie di approcci. 
-
-Poiché ciascuna forma di feedback fornisce informazioni diverse, un approccio ibrido è spesso preferibile. Ad esempio, nei sistemi che dispongono di valutazioni esplicite, il feedback implicito può essere utilizzato per arricchire il contesto dell'utente, migliorando le prestazioni del modello nei casi in cui i dati espliciti siano scarsi. I modelli basati sul \textit{Deep Learning} possono essere progettati per combinare diverse fonti, sfruttando il feedback implicito arricchito da attributi contestuali (tempo, luogo, dispositivo, ecc.) per ottimizzare la previsione.
+I sistemi di \textit{recommendation} si basano sull'analisi delle preferenze degli utenti, espresse attraverso due principali modalità: feedback esplicito e feedback implicito~\cite{ALS}. Ogni modalità presenta vantaggi, limitazioni e diverse tipologie di approcci. Poiché ciascuna forma di feedback fornisce informazioni diverse, un approccio ibrido è spesso preferibile. Ad esempio, nei sistemi che dispongono di valutazioni esplicite, il feedback implicito può essere utilizzato per arricchire il contesto dell'utente, migliorando le prestazioni del modello nei casi in cui i dati espliciti siano scarsi. I modelli basati sul \textit{Deep Learning} possono essere progettati per combinare diverse fonti, sfruttando il feedback implicito arricchito da attributi contestuali (tempo, luogo, dispositivo, ecc.) per ottimizzare la previsione.
 
 \subsection{Feedback Esplicito}
 
-Il feedback esplicito si riferisce a tutte quelle situazioni in cui l'utente comunica consapevolmente il proprio grado di interesse per un oggetto. Esempi includono le valutazioni da $1$ a $5$ stelle per i prodotti su \textit{Amazon} o il pollice su/giù per i video su \textit{YouTube} o semplicemente il \textit{like} su \textit{Instagram}.
-
-I modelli che utilizzano feedback espliciti predicono il \textit{rating} che un dato utente assegnerebbe ad un \text{item}. Per esempio predicono che l'utente $u$ darebbe una votazione di $4$ su $5$ per la serie $i$.
+Il feedback esplicito si riferisce a tutte quelle situazioni in cui l'utente comunica consapevolmente il proprio grado di interesse per un oggetto. Esempi includono le valutazioni da $1$ a $5$ stelle per i prodotti su \textit{Amazon} o il pollice su/giù per i video su \textit{YouTube} o semplicemente il \textit{like} su \textit{Instagram}. I modelli che utilizzano feedback espliciti predicono il \textit{rating} che un dato utente assegnerebbe ad un \textit{item}. Per esempio predicono che l'utente $u$ darebbe una votazione di $4$ su $5$ per la serie $i$.
 
 Questi dati forniscono un segnale diretto, ma presentano però anche delle limitazioni:
 
@@ -87,9 +81,7 @@ Il feedback implicito, al contrario, non è fornito direttamente dall'utente, ma
     \item acquisto o meno di un prodotto
 \end{itemize}
 
-I feedback impliciti possono essere raccolti facilmente in modo automatico e passivo senza che l'utente debba interagire intenzionalmente. Inoltre, sono molto più abbondanti rispetto alla controparte esplicita. Forniscono una rappresentazione più completa del comportamento degli utenti, specialmente in contesti in cui il feedback esplicito è assente o insufficiente. Allo stato attuale, i modelli di \textit{Deep Learning} moderni utilizzano grandi quantità di feedback impliciti. 
-
-I modelli che utilizzano feedback impliciti non forniscono un \textit{rating} ma uno \textit{score} numerico per la coppia utente-\textit{item}. Questo numero può essere la probabilità che l'utente interagisca con quell'\textit{item} oppure un numero puro che da solo non ha alcun significato, ma che messo in relazione con altri \textit{score} calcolati per lo stesso utente su \textit{item} diversi, permette di ordinare gli \textit{item}.
+I feedback impliciti possono essere raccolti facilmente in modo automatico e passivo senza che l'utente debba interagire intenzionalmente. Inoltre, sono molto più abbondanti rispetto alla controparte esplicita. Forniscono una rappresentazione più completa del comportamento degli utenti, specialmente in contesti in cui il feedback esplicito è assente o insufficiente. Allo stato attuale, i modelli di \textit{Deep Learning} moderni utilizzano grandi quantità di feedback impliciti. Questi modelli non forniscono un \textit{rating} ma uno \textit{score} numerico per la coppia utente-\textit{item}. Questo numero può essere la probabilità che l'utente interagisca con quell'\textit{item} oppure un numero puro che da solo non ha alcun significato, ma che messo in relazione con altri \textit{score} calcolati per lo stesso utente su \textit{item} diversi, permette di ordinare gli \textit{item}.
 
 L'utilizzo di dati impliciti, però, può creare complicazioni:
 
@@ -122,17 +114,7 @@ Ogni modello potrebbe avere ibridi nelle varie caratteristiche, per esempio un m
 
 
 \subsection{Content-based filtering}
-Il \textit{content-based filtering} utilizza la similarità tra gli \textit{item} per raccomandare elementi simili a quelli che l'utente apprezza o ha apprezzato. Ad esempio, se l'utente $A$ guarda due film \textit{fantasy}, il sistema può raccomandargli altri film dello stesso genere.
-
-L'idea è che se ad un utente è piaciuto un certo \textit{item} con certe caratteristiche, il sistema proporrà altri \textit{item} simili per contenuto.
-
-Per prima cosa si crea un profilo degli \textit{item}, cioè viene rappresentato tramite un insieme di caratteristiche (\textit{feature}). Per un film, per esempio, si possono utilizzare il/i generi, gli attori principali, l'anno di uscita, la durata etc.
-
-Dopodiché si costruisce un profilo dell'utente analizzando gli \textit{item} che ha valutato positivamente. Il profilo rappresenta una media delle caratteristiche degli \textit{item} preferiti.
-
-Si confronta il profilo dell'utente con gli \textit{item} non ancora visti usando una metrica di similarità (es. coseno, distanza euclidea).
-
-Vengono raccomandati gli \textit{item} più simili al profilo dell'utente.
+Il \textit{content-based filtering} utilizza la similarità tra gli \textit{item} per raccomandare elementi simili a quelli che l'utente apprezza o ha apprezzato. Ad esempio, se l'utente $A$ guarda due film \textit{fantasy}, il sistema può raccomandargli altri film dello stesso genere. L'idea è che se ad un utente è piaciuto un certo \textit{item} con certe caratteristiche, il sistema proporrà altri \textit{item} simili per contenuto. Per prima cosa si crea un profilo degli \textit{item}, cioè viene rappresentato tramite un insieme di caratteristiche (\textit{feature}). Per un film, per esempio, si possono utilizzare il/i generi, gli attori principali, l'anno di uscita, la durata etc. Dopodiché si costruisce un profilo dell'utente analizzando gli \textit{item} che ha valutato positivamente. Il profilo rappresenta una media delle caratteristiche degli \textit{item} preferiti. Si confronta il profilo dell'utente con gli \textit{item} non ancora visti usando una metrica di similarità (es. coseno, distanza euclidea). Vengono raccomandati gli \textit{item} più simili al profilo dell'utente.
 
 \subsubsection{Esempio}
 
@@ -158,7 +140,7 @@ Poi si selezionano altri film dal catalogo, ad esempio:
     \item \textit{John Wick} il cui genere è \textit{Azione}
 \end{itemize}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[scale=0.5]{figures/content_based_filtering.PNG}
     \caption{La figura mostra i vettori delle caratteristiche dei film (in questo caso il genere) per i film in esempio. Se il film appartiene ad uno specifico genere viene posto il valore $1$, altrimenti $0$}
@@ -166,7 +148,6 @@ Poi si selezionano altri film dal catalogo, ad esempio:
 \end{figure}
 
 Si creano vettori per i film considerando tutti i generi analizzati fino ad ora e si calcola la similarità con il profilo dell'utente. Si ottiene, utilizzando per esempio la similarità coseno, un valore di $0.47$ per $Interstellar$ e di $0.67$ per \textit{John Wick}, quindi quest'ultimo viene raccomandato prima di \textit{Interstellar}, perché è più simile al profilo dell'utente.
-
 
 \subsubsection{Vantaggi e svantaggi}
 
@@ -183,11 +164,7 @@ Gli svantaggi di quest'approccio sono:
 \end{itemize}
 
 \subsection{Collaborative filtering}
-Il \textit{collaborative filtering} (\textit{CF}) viene introdotto per la prima volta dal sistema \textit{Tapestry}~\cite{Tapestry} e si riferiva al fatto che \textit{"people collaborate to help one another perform the filtering process in order to handle the large amounts of email and messages posted to newsgroups"}. Questo termine ha poi assunto significati più ampi. In senso generale, indica il processo di filtraggio di informazioni o pattern tramite tecniche che coinvolgono la collaborazione tra più utenti, agenti e fonti di dati. Il \textit{CF} esiste in molte forme e, sin dalla sua introduzione, sono stati proposti numerosi metodi basati su di esso.
-
-Per affrontare alcune delle limitazioni del \textit{content-base filtering}, il \textit{collaborative filtering} utilizza simultaneamente le somiglianze tra utenti e \textit{item} per fornire raccomandazioni. I modelli possono raccomandare un \textit{item} all'utente $A$ in base agli interessi di un utente simile $B$ anche se $A$ non ha mai visto \textit{item} simili.
-
-In generale, le tecniche di \textit{CF} possono essere suddivise in tre categorie: \textit{CF} basato sulla memoria, \textit{CF} basato su modelli e i modelli ibridi~\cite{Su}. Tra le tecniche rappresentative basate sulla memoria ci sono i metodi \textit{nearest neighbor-based}, come il \textit{CF} basato sugli utenti (\textit{user-based}) e quello basato sugli oggetti (\textit{item-based})~\cite{Sarwar}. I modelli a fattori latenti, come la \textit{Matrix Factorization}, sono esempi di \textit{CF} basato su modelli. Il \textit{CF} basato sulla memoria presenta delle limitazioni nella gestione di dati sparsi e su larga scala, poiché calcola la similarità basandosi sugli oggetti in comune. I metodi basati su modelli sono diventati più popolari grazie alla loro maggiore efficacia nel gestire la sparsità e la scalabilità. Molti approcci \textit{CF} basati su modelli possono essere estesi con reti neurali, permettendo modelli più flessibili e scalabili grazie all'accelerazione computazionale offerta dal \textit{Deep Learning}~\cite{Zhang}. In generale, il \textit{CF} utilizza i dati di interazione tra utenti e oggetti per fare previsioni e raccomandazioni.
+Il \textit{collaborative filtering} (\textit{CF}) viene introdotto per la prima volta dal sistema \textit{Tapestry}~\cite{Tapestry} e si riferiva al fatto che \textit{"people collaborate to help one another perform the filtering process in order to handle the large amounts of email and messages posted to newsgroups"}. Questo termine ha poi assunto significati più ampi. In senso generale, indica il processo di filtraggio di informazioni o pattern tramite tecniche che coinvolgono la collaborazione tra più utenti, agenti e fonti di dati. Il \textit{CF} esiste in molte forme e, sin dalla sua introduzione, sono stati proposti numerosi metodi basati su di esso. Per affrontare alcune delle limitazioni del \textit{content-base filtering}, il \textit{collaborative filtering} utilizza simultaneamente le somiglianze tra utenti e \textit{item} per fornire raccomandazioni. I modelli possono raccomandare un \textit{item} all'utente $A$ in base agli interessi di un utente simile $B$ anche se $A$ non ha mai visto \textit{item} simili. In generale, le tecniche di \textit{CF} possono essere suddivise in tre categorie: \textit{CF} basato sulla memoria, \textit{CF} basato su modelli e i modelli ibridi~\cite{Su}. Tra le tecniche rappresentative basate sulla memoria ci sono i metodi \textit{nearest neighbor-based}, come il \textit{CF} basato sugli utenti (\textit{user-based}) e quello basato sugli oggetti (\textit{item-based})~\cite{Sarwar}. I modelli a fattori latenti, come la \textit{Matrix Factorization}, sono esempi di \textit{CF} basato su modelli. Il \textit{CF} basato sulla memoria presenta delle limitazioni nella gestione di dati sparsi e su larga scala, poiché calcola la similarità basandosi sugli oggetti in comune. I metodi basati su modelli sono diventati più popolari grazie alla loro maggiore efficacia nel gestire la sparsità e la scalabilità. Molti approcci \textit{CF} basati su modelli possono essere estesi con reti neurali, permettendo modelli più flessibili e scalabili grazie all'accelerazione computazionale offerta dal \textit{Deep Learning}~\cite{Zhang}. In generale, il \textit{CF} utilizza i dati di interazione tra utenti e oggetti per fare previsioni e raccomandazioni.
 
 
 \subsubsection{Esempio}
@@ -207,13 +184,11 @@ La similarità coseno tra due vettori \( \mathbf{x}, \mathbf{y} \in \mathbb{R}^n
 \text{sim}(\mathbf{x}, \mathbf{y}) = \cos(\theta) = \frac{\mathbf{x} \cdot \mathbf{y}}{\|\mathbf{x}\|_2 \|\mathbf{y}\|_2}
 \]
 
-Nel contesto del modello, ad esempio, i vettori \( \mathbf{x} \) e \( \mathbf{y} \) rappresentano le rispettive righe della matrice di interazione, ossia le valutazioni degli utenti sui diversi film.
-
-Per prevedere la valutazione che l'utente potrebbe dare ad un film si considera la media delle valutazioni date dagli utenti al film pesata dalla similarità tra l'utente iniziale e gli altri.
+Nel contesto del modello, ad esempio, i vettori \( \mathbf{x} \) e \( \mathbf{y} \) rappresentano le rispettive righe della matrice di interazione, ossia le valutazioni degli utenti sui diversi film. Per prevedere la valutazione che l'utente potrebbe dare ad un film si considera la media delle valutazioni date dagli utenti al film pesata dalla similarità tra l'utente iniziale e gli altri.
 
 Si supponga di voler raccomandare un film all'utente \textit{Verde}, in particolare prevedere il punteggio che potrebbe assegnare al film \textit{Fight Club}, che non ha ancora visto.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[scale=0.5]{figures/collaborative_filtering/interaction_matrix.png}
     \caption{matrice di interazione tra utenti e film. Le righe rappresentano gli utenti, le colonne i film e gli elementi della matrice i voti che l'utente ha dato al film. Se l'utente non ha visto il film, l'elemento della matrice è vuoto.}
@@ -241,9 +216,7 @@ Ora, la predizione per l'utente \textit{Verde} per \textit{Fight Club} si calcol
 
 Quindi si prevede che l'utente verde valuterebbe il film \textit{Fight Club} con un voto intorno a 2.33.
 
-Il modello basato sulla similarità coseno è semplice da implementare e intuitivo, ma può soffrire di problemi come la scarsità di dati e l'effetto del rumore nelle valutazioni. Tuttavia, rimane un punto di partenza valido per sistemi di raccomandazione collaborativi.
-
-Se si considerassero solamente i contribuiti dei $k$ utenti più simili, si potrebbe migliorare la robustezza della previsione. Questo approccio è noto come \textit{K-Nearest Neighbors} (\textit{KNN}).
+Il modello basato sulla similarità coseno è semplice da implementare e intuitivo, ma può soffrire di problemi come la scarsità di dati e l'effetto del rumore nelle valutazioni. Tuttavia, rimane un punto di partenza valido per sistemi di raccomandazione collaborativi. Se si considerassero solamente i contribuiti dei $k$ utenti più simili, si potrebbe migliorare la robustezza della previsione. Questo approccio è noto come \textit{K-Nearest Neighbors} (\textit{KNN}).
 
 \subsubsection{Vantaggi e svantaggi}
 
@@ -273,9 +246,7 @@ Esistono due approcci principali per facilitare tale confronto, che costituiscon
 
 \section{Matrix Factorization}\label{matrix_factorization}
 
-La \textit{Matrix Factorization} è una tecnica utilizzata per rappresentare una matrice come prodotto di due o più matrici. Consente di estrarre automaticamente strutture latenti dai dati, rendendo possibile la scoperta di relazioni implicite tra entità \cite{MC}.
-
-Questa tecnica è alla base di molte applicazioni in ambiti diversi, tra cui l'elaborazione di segnali, la compressione dei dati, la visione artificiale e, in particolare, i sistemi di \textit{recommendation}.
+La \textit{Matrix Factorization} è una tecnica utilizzata per rappresentare una matrice come prodotto di due o più matrici. Consente di estrarre automaticamente strutture latenti dai dati, rendendo possibile la scoperta di relazioni implicite tra entità \cite{MC}. Questa tecnica è alla base di molte applicazioni in ambiti diversi, tra cui l'elaborazione di segnali, la compressione dei dati, la visione artificiale e, in particolare, i sistemi di \textit{recommendation}.
 
 Formalmente, data una matrice $R \in \mathbb{R}^{m \times n}$, la fattorizzazione mira a trovare due matrici $W \in \mathbb{R}^{m \times k}$ e $H \in \mathbb{R}^{n \times k}$ tali che:
 \[
@@ -288,27 +259,17 @@ dove
     \item $k \ll \min(m,n)$ è il rango latente scelto
 \end{itemize}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[scale=0.5]{figures/collaborative_filtering/matrix_factorization.PNG}
     \caption{rappresentazione della matrice $R$ come prodotto delle due matrici $W$ e $H$}
     \label{fig:matrix_factorization}
 \end{figure}
 
-Questa approssimazione riduce la dimensionalità dei dati, semplifica il modello e cattura le relazioni principali presenti nella matrice originaria.
-
-Un celebre esempio dell'efficacia di questa tecnica nei sistemi di \textit{recommendation} è il \textit{Netflix Prize} del 2006. Il team vincente la utilizzò per migliorare le previsioni di rating del 10\% rispetto al sistema originario di Netflix \cite{TheNP}.
-
-I principali vantaggi nel suo utilizzo sono la scalabilità, poiché i modelli sono efficienti da memorizzare e computare, e la capacità di generalizzazione, in quanto riescono a catturare relazioni latenti non esplicitamente osservate. Tuttavia, esistono anche alcuni limiti, tra cui il problema della \textit{cold start}, che rende difficile raccomandare per nuovi utenti o nuovi \textit{item}, e la sparsità, che può portare a una una bassa qualità delle raccomandazioni\cite{SVD_analysis}.
-
-Pur con alcune limitazioni, essa costituisce la base per molti degli algoritmi di \textit{recommendation} più efficaci oggi in uso, ed è spesso integrata con approcci più complessi, come i modelli Deep Learning o i grafi.
+Questa approssimazione riduce la dimensionalità dei dati, semplifica il modello e cattura le relazioni principali presenti nella matrice originaria. Un celebre esempio dell'efficacia di questa tecnica nei sistemi di \textit{recommendation} è il \textit{Netflix Prize} del 2006. Il team vincente la utilizzò per migliorare le previsioni di rating del 10\% rispetto al sistema originario di Netflix \cite{TheNP}. I principali vantaggi nel suo utilizzo sono la scalabilità, poiché i modelli sono efficienti da memorizzare e computare, e la capacità di generalizzazione, in quanto riescono a catturare relazioni latenti non esplicitamente osservate. Tuttavia, esistono anche alcuni limiti, tra cui il problema della \textit{cold start}, che rende difficile raccomandare per nuovi utenti o nuovi \textit{item}, e la sparsità, che può portare a una una bassa qualità delle raccomandazioni\cite{SVD_analysis}. Pur con alcune limitazioni, essa costituisce la base per molti degli algoritmi di \textit{recommendation} più efficaci oggi in uso, ed è spesso integrata con approcci più complessi, come i modelli \textit{Deep Learning} o i grafi.
 
 \subsection{Concetto di Spazio Latente ed Embedding}
-Nel contesto della \textit{Matrix Factorization}, uno dei concetti centrali è lo spazio latente. Questo spazio rappresenta un insieme di dimensioni astratte, non osservabili direttamente, ma che spiegano le correlazioni nei dati.
-
-Ad esempio, in un sistema di raccomandazione di film, utenti e film possono essere rappresentati come vettori in uno spazio $k$-dimensionale, dove ogni dimensione può rappresentare una caratteristica latente come la preferenza per il genere "azione", la complessità della trama, il livello di drammaticità, ecc. Queste dimensioni non sono etichettate esplicitamente, ma vengono apprese automaticamente durante l'addestramento.
-
-Questa rappresentazione vettoriale in uno spazio latente prende il nome di \textit{embedding}. Ogni utente e ogni \textit{item} (ad esempio, film, prodotto o articolo) viene associato a un vettore numerico che cattura le sue proprietà implicite in modo compatto.
+Nel contesto della \textit{Matrix Factorization}, uno dei concetti centrali è lo spazio latente. Questo spazio rappresenta un insieme di dimensioni astratte, non osservabili direttamente, ma che spiegano le correlazioni nei dati. Ad esempio, in un sistema di raccomandazione di film, utenti e film possono essere rappresentati come vettori in uno spazio $k$-dimensionale, dove ogni dimensione può rappresentare una caratteristica latente come la preferenza per il genere "azione", la complessità della trama, il livello di drammaticità, ecc. Queste dimensioni non sono etichettate esplicitamente, ma vengono apprese automaticamente durante l'addestramento. Questa rappresentazione vettoriale in uno spazio latente prende il nome di \textit{embedding}. Ogni utente e ogni \textit{item} (ad esempio, film, prodotto o articolo) viene associato a un vettore numerico che cattura le sue proprietà implicite in modo compatto.
 
 \subsection{Apprendimento delle Feature}
 Le feature apprese nel contesto della matrix factorization non sono predefinite, ma emergono come risultato dell'ottimizzazione. In pratica, si cerca di minimizzare una funzione di perdita, tipicamente la somma dei quadrati degli errori tra le valutazioni osservate e quelle predette:
@@ -323,9 +284,7 @@ dove:
     \item $\lambda$ è un termine di regolarizzazione che evita l'overfitting.
 \end{itemize}
 
-Durante l'ottimizzazione, i vettori $W_i$ e $H_j$ vengono aggiornati in modo tale da minimizzare l'errore sulle osservazioni note, catturando implicitamente le caratteristiche principali che influenzano le preferenze.
-
-I modelli apprendono automaticamente un vettore di \textit{embedding} per ciascun utente che spieghi al meglio le sue preferenze. Di conseguenza, gli \textit{embedding} di utenti con gusti simili risulteranno vicini tra loro. Allo stesso modo il modello apprende gli \textit{embedding} dei 
+Durante l'ottimizzazione, i vettori $W_i$ e $H_j$ vengono aggiornati in modo tale da minimizzare l'errore sulle osservazioni note, catturando implicitamente le caratteristiche principali che influenzano le preferenze. I modelli apprendono automaticamente un vettore di \textit{embedding} per ciascun utente che spieghi al meglio le sue preferenze. Di conseguenza, gli \textit{embedding} di utenti con gusti simili risulteranno vicini tra loro. Allo stesso modo il modello apprende gli \textit{embedding} dei 
 \textit{item} in modo da spiegare al meglio la matrice di feedback
 
 \subsection{Esempio}
@@ -351,15 +310,9 @@ Quando un utente visita la homepage, il sistema dovrebbe raccomandare film basat
     \item film che utenti simili hanno apprezzato
 \end{enumerate}
 
-Il modello, applicando la tecnica di \textit{Matrix Factorization} ottiene in maniera automatica una rappresentazione degli utenti e dei film in uno spazio di \textit{embedding} a bassa dimensione. In questo spazio, gli utenti e i film sono rappresentati da vettori che catturano le loro caratteristiche latenti.
+Il modello, applicando la tecnica di \textit{Matrix Factorization} ottiene in maniera automatica una rappresentazione degli utenti e dei film in uno spazio di \textit{embedding} a bassa dimensione. In questo spazio, gli utenti e i film sono rappresentati da vettori che catturano le loro caratteristiche latenti. Per esempio il modello potrebbe apprendere due dimensioni latenti per i film: la prima esprime se il film è per adulti o per bambini mentre la seconda esprime il grado in cui il film è un \textit{blockbuster} (film molto popolare e di grande successo al botteghino) o un film d'autore. Stessa cosa succede per gli utenti: il modello apprende le preferenze degli utenti in relazione a queste due dimensioni latenti. Si può pensare allo spazio di \textit{embedding} come a una rappresentazione astratta comune sia agli \textit{item} che agli utenti.
 
-Per esempio il modello potrebbe apprendere due dimensioni latenti per i film: la prima esprime se il film è per adulti o per bambini mentre la seconda esprime il grado in cui il film è un \textit{blockbuster} (film molto popolare e di grande successo al botteghino) o un film d'autore. 
-
-Stessa cosa per gli utenti: il modello apprende le preferenze degli utenti in relazione a queste due dimensioni latenti.
-
-Nel grafico sono rappresentati sia gli elementi che gli utenti nello stesso spazio di \textit{embedding}. Questo perché si può pensare allo spazio di \textit{embedding} come a una rappresentazione astratta comune sia agli \textit{item} che agli utenti.
-
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[scale=0.4]{figures/collaborative_filtering/2D_matrix.PNG}
     \caption{matrice che mostra i film guardati dagli utenti, le categorie dei film e le preferenze degli utenti estese}

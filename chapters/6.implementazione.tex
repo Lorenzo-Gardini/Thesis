@@ -210,7 +210,7 @@ Per i grafici generati dalle funzioni presenti nel modulo di \texttt{visualizati
 
 Un esempio di quello che si può ottenere analizzando \textit{dataset} e features:
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
 
     \begin{subfigure}[b]{0.60\textwidth}
@@ -241,22 +241,13 @@ L'algoritmo procede nel modo seguente:
     \item in caso non fosse possibile possibile generare un \textit{testset} della dimensione specificata viene sollevata un'eccezione
 \end{enumerate}
 
-Questo approccio garantisce che il \textit{trainset} contenga almeno un'interazione per ogni \textit{user} e ogni \textit{item}, evitando problemi di id mai visti durante la predizione.
-
-La funzione \texttt{random\_train\_test\_split} è ispirata alla omonima funzione della libreria \textit{Scikit-learn}, ma i tipo di dati in input e in output è un \textit{DataFrame}.
+Questo approccio garantisce che il \textit{trainset} contenga almeno un'interazione per ogni \textit{user} e ogni \textit{item}, evitando problemi di id mai visti durante la predizione. La funzione \texttt{random\_train\_test\_split} è ispirata alla omonima funzione della libreria \textit{Scikit-learn}, ma i tipo di dati in input e in output è un \textit{DataFrame}.
 
 \section{Evaluation}
 
-Le funzioni all'interno del modulo di \textit{evaluation} sono state pensate per essere utilizzate all'interno dell'oggetto \texttt{GridSearchCV} di \textit{Scikit-learn}, che permette di effettuare la ricerca dei migliori iperparametri per un modello tramite \textit{cross-validation}.
+Le funzioni all'interno del modulo di \textit{evaluation} sono state pensate per essere utilizzate all'interno dell'oggetto \texttt{GridSearchCV} di \textit{Scikit-learn}, che permette di effettuare la ricerca dei migliori iperparametri per un modello tramite \textit{cross-validation}. L'oggetto riceve come parametro \texttt{scoring} una funzione che calcola la metrica di valutazione desiderata. Per i modelli espliciti, le metriche di valutazione \textit{RMSE} e \textit{MAE} sono già presenti all'interno di \textit{Scikit-learn} e non necessitano di adattamenti. Tuttavia, per i modelli impliciti, è necessario definire una funzione di valutazione personalizzata che calcoli la metrica desiderata, dato che i modelli non restituiscono direttamente i valori previsti, ma piuttosto degli \textit{score}. Tutte le metriche sono calcolate considerando il \textit{ranking} costruito utilizzando gli \textit{score} di tutti i possibili \textit{item} per tutti i possibili \textit{user}. Le funzioni di scoring passate al parametro \texttt{scoring} di \textit{Scikit-learn} ricevono in ingresso il modello, \texttt{X}, che corrisponde al \textit{DataFrame} o \textit{NumPy array} di \textit{testset}, e \texttt{y}, non utilizzato ma specificato per compatibilità con la libreria. Il problema è che i modelli hanno bisogno di tutti gli id di \textit{user} e \textit{item} in modo da poter calcolare lo score per tutte le possibili coppie (\textit{user\_id}, \textit{item\_id}); inoltre, alcune di esse erano già presenti nel \textit{trainset} e non devono essere considerate nuovamente. Queste informazioni sono contenute negli attributi \texttt{user\_ids\_}, \texttt{item\_ids\_} e \texttt{train\_user\_item\_pairs\_} che vengono apprese dal modello durante la fase di addestramento.
 
-L'oggetto riceve come parametro \texttt{scoring} una funzione che calcola la metrica di valutazione desiderata. Per i modelli espliciti, le metriche di valutazione \textit{RMSE} e \textit{MAE} sono già presenti all'interno di \textit{Scikit-learn} e non necessitano di adattamenti. 
-
-Tuttavia, per i modelli impliciti, è necessario definire una funzione di valutazione personalizzata che calcoli la metrica desiderata, dato che i modelli non restituiscono direttamente i valori previsti, ma piuttosto degli \textit{score}. Tutte le metriche sono calcolate considerando il \textit{ranking} costruito utilizzando gli \textit{score} di tutti i possibili \textit{item} per tutti i possibili \textit{user}.
-
-Le funzioni di scoring passate al parametro \texttt{scoring} di \textit{Scikit-learn} ricevono in ingresso il modello, \texttt{X}, che corrisponde al \textit{DataFrame} o \textit{NumPy array} di \textit{testset}, e \texttt{y}, non utilizzato ma specificato per compatibilità con la libreria. Il problema è che i modelli hanno bisogno di tutti gli id di \textit{user} e \textit{item} in modo da poter calcolare lo score per tutte le possibili coppie (\textit{user\_id}, \textit{item\_id}); inoltre, alcune di esse erano già presenti nel \textit{trainset} e non devono essere considerate nuovamente. Queste informazioni sono contenute negli attributi \texttt{user\_ids\_}, \texttt{item\_ids\_} e \texttt{train\_user\_item\_pairs\_} che vengono apprese dal modello durante la fase di addestramento.
-
-
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[scale=0.7]{figures/algorithms/precision_@_k.png}
     \caption{L'immagine mostra un esempio di $Precision@10 = 0{.}6$, dove 6 delle 10 raccomandazioni principali risultano \textit{rilevanti} (in verde) e 4 \textit{non rilevanti} (in grigio). La linea rossa evidenzia il cutoff a $K = 10$.}
@@ -279,7 +270,6 @@ Per questo motivo ogni funzione di evaluation all'interno del modulo è stata im
 \end{itemize}
 
 Le funzioni di evaluation implicite utilizzano la funzione \\ \texttt{create\_rankings\_from\_implicit} presente nel modulo \texttt{utils} per calcolare il ranking dei \textit{k} migliori \textit{item} per ogni \textit{user} a partire dagli \textit{score} calcolati dal modello.
-
 
 \section{Utils}
 
