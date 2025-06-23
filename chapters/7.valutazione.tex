@@ -151,5 +151,14 @@ Per garantire la qualità del codice e l'affidabilità della libreria, è stato 
 
 \section{Limiti della soluzione proposta}
 
+La libreria è stata progettata per essere modulare e flessibile, ma presenta alcuni limiti:
+
+\begin{itemize}
+    \item non supporta modelli basati su \textit{deep learning} come \textit{Neural Collaborative Filtering}
+    \item tutto il codice è scritto in \textit{Python} nativo o in \textit{Cython}, quindi non godendo di ottimizzazioni su \textit{GPU} può limitare le prestazioni su dataset di grandi dimensioni. Questo potrebbe rendere l'addestramento, la predizione e i test molto lenti, soprattutto per modelli complessi
+    \item gli algoritmi proposti, soprattutto quelli di \textit{Surprise}, hanno difficoltà a gestire dataset di dimensioni grandi. Inoltre, utilizzano solamente le informazioni di interazione tra utenti e \textit{item}, senza considerare altre informazioni sull'interazione o le features degli utenti e degli \textit{item} (tranne \textit{LightFM}) che potrebbero migliorare le prestazioni del modello
+    \item non offre nessuna funzionalità per calcolare la similarità tra \textit{item} tramite immagini o testi, che sono spesso utilizzate nei sistemi di raccomandazione moderni    
+\end{itemize}
+
 
 
