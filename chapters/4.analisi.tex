@@ -2,7 +2,7 @@
 
 \section{Analisi del problema}
 
-L'azienda \textit{Data Reply} ha bisogno di sviluppare una libreria che raccolga diversi algoritmi per la \textit{recommendation} di tipo utente-prodotto. Attualmente, le librerie open-source più conosciute in questo ambito, come \textit{Surprise}, \textit{LightFM} e \textit{Implicit}, presentano delle interfacce abbastanza complesse e non standardizzate, che risultano difficili da utilizzare, specialmente per chi non è completamente familiare con il loro funzionamento interno. Questo può causare rallentamenti nello sviluppo dei modelli e difficoltà nell’integrazione dei vari algoritmi nei flussi di lavoro aziendali. Per risolvere questa situazione, l'azienda ha deciso di creare una libreria personalizzata, che permetta di sviluppare modelli di \textit{recommendation} con dimensioni più ridotte rispetto alle soluzioni più moderne e complesse. La motivazione alla base di questa scelta è quella di poter gestire meglio i costi operativi, garantendo comunque buone prestazioni. Inoltre, questa libreria sarà progettata per essere facilmente estendibile, permettendo ai dipendenti di adattarla a esigenze future, come l'integrazione di nuovi algoritmi o il trattamento di diversi tipi di dati. Un ulteriore vantaggio nello sviluppare una libreria interna riguarda il controllo che l'azienda può mantenere sui dati e sulla gestione della privacy. A differenza delle piattaforme esterne, che potrebbero avere politiche di gestione dei dati non completamente trasparenti, lo sviluppo di modelli personalizzati consente all'azienda di avere un maggiore controllo sulla protezione dei dati sensibili e di garantire che vengano rispettate le normative vigenti, come il GDPR. Questo approccio consente anche una maggiore flessibilità nei sistemi e nelle soluzioni che possono essere adottate.
+L'azienda \textit{Data Reply} ha bisogno di sviluppare una libreria che raccolga diversi algoritmi per la \textit{recommendation} di tipo utente-prodotto. Attualmente, le librerie open-source più conosciute in questo ambito, come \textit{Surprise}, \textit{LightFM} e \textit{Implicit}, presentano delle interfacce abbastanza complesse e non standardizzate, che risultano difficili da utilizzare, specialmente per chi non è completamente familiare con il loro funzionamento interno. Questo può causare rallentamenti nello sviluppo dei modelli e difficoltà nell'integrazione dei vari algoritmi nei flussi di lavoro aziendali. Per risolvere questa situazione, l'azienda ha deciso di creare una libreria personalizzata, che permetta di sviluppare modelli di \textit{recommendation} con dimensioni più ridotte rispetto alle soluzioni più moderne e complesse. La motivazione alla base di questa scelta è quella di poter gestire meglio i costi operativi, garantendo comunque buone prestazioni. Inoltre, questa libreria sarà progettata per essere facilmente estendibile, permettendo ai dipendenti di adattarla a esigenze future, come l'integrazione di nuovi algoritmi o il trattamento di diversi tipi di dati. Un ulteriore vantaggio nello sviluppare una libreria interna riguarda il controllo che l'azienda può mantenere sui dati e sulla gestione della privacy. A differenza delle piattaforme esterne, che potrebbero avere politiche di gestione dei dati non completamente trasparenti, lo sviluppo di modelli personalizzati consente all'azienda di avere un maggiore controllo sulla protezione dei dati sensibili e di garantire che vengano rispettate le normative vigenti, come il GDPR. Questo approccio consente anche una maggiore flessibilità nei sistemi e nelle soluzioni che possono essere adottate.
 
 \section{Obiettivi e requisiti del progetto}
 
@@ -12,11 +12,9 @@ Di seguito sono elencati i principali requisiti funzionali che la libreria deve 
 
 \begin{itemize}
     \item deve seguire lo stile e la struttura di \textit{Scikit-learn}, in modo da garantire un utilizzo intuitivo per gli utenti che già conoscono questa piattaforma
-    \item deve includere, come base, algoritmi provenienti da librerie esistenti come \textit{Surprise}, \textit{LightFM} e \textit{Implicit}, ma con interfacce standardizzate per semplificare l'uso e renderle più facili da integrare
+    \item deve includere, come base, algoritmi provenienti da librerie esistenti come \textit{Surprise} e \textit{LightFM}, ma con interfacce standardizzate per semplificare l'uso e renderle più facili da integrare
     \item deve supportare algoritmi per gestire diversi tipi di dati, come feedback espliciti (e.g. valutazioni dirette) e impliciti (e.g. acquisti, visualizzazioni, click)
     \item gli utenti devono poter creare e integrare facilmente modelli personalizzati che siano compatibili con l'interfaccia della libreria e possano sfruttare tutte le funzionalità di \textit{preprocessing} e valutazione già standardizzate
-    \item deve essere incluso un modulo che contiene classi per la manipolazione dei \textit{DataFrame} che permetta operazioni generiche (e.g. rimozione di colonne, normalizzazione e mapping)
-    \item la libreria deve fornire anche funzioni per analizzare e visualizzare facilmente i dataset, offrendo grafici e statistiche che aiutino a comprendere meglio i dati
     \item la \textit{coverage} degli \textit{unit test} deve essere almeno del 90\%, per garantire che le funzionalità principali siano ben coperte e funzionanti
 \end{itemize}
 
@@ -33,5 +31,15 @@ Per quanto riguarda i requisiti non funzionali, la libreria dovrà:
 
 In generale, l'obiettivo finale è quello di creare una libreria modulare, estendibile e facile da usare, che rispetti i vincoli aziendali e che, al contempo, risponda alle esigenze specifiche di modelli di \textit{recommendation} meno complessi ma altamente efficaci.
 
+\section{Estensione dei requisiti iniziali}
 
+Partendo dai requisiti iniziali sono state poi proposte soluzioni nuove migliorative:
+
+\begin{itemize}
+    \item deve essere incluso un modulo che contiene classi per la manipolazione dei \textit{DataFrame} che permetta operazioni generiche (e.g. rimozione di colonne, normalizzazione e mapping)
+    \item viene aggiunto l'utilizzo della libreria \textit{Implicit} per poter coprire una varietà più ampia di casi che utilizzano dataset di feedback impliciti
+    \item la libreria deve fornire anche funzioni per analizzare e visualizzare facilmente i dataset, offrendo grafici e statistiche che aiutino a comprendere meglio i dati 
+    \item funzionalità extra come la similarità \textit{user-user} o \textit{item-item} permettendo \textit{up-selling}, calcolo del \textit{ranking} per \textit{item} permettendo \textit{item-to-user recommendation}
+    \item la possibilità di poter creare versioni custom delle metriche di \textit{evaluation}
+\end{itemize}
 

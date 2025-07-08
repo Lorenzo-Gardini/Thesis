@@ -1,41 +1,44 @@
 \chapter{Valutazione}
 
-Tutto il codice della libreria è stato soggetto a \textit{unit test}, che sono stati eseguiti con il framework \textit{Pytest}. Non sono stati implementati \textit{integration test}, poiché la libreria è progettata per essere utilizzata in modo modulare e le interazioni tra i componenti sono state verificate singolarmente. In aggiunta ai test è stata calcolata la percentuale di \textit{coverage} raggiunta utilizzando il tool \textit{coverage}. In totale la \textit{coverage} raggiunta è del 100\%. Il modulo di \texttt{visualization} è stato testato manualmente, poiché non è possibile automatizzare completamente la verifica dei grafici generati. Tuttavia, sono stati effettuati controlli visivi per garantire che i grafici fossero corretti e rappresentativi dei dati.
+Tutto il codice della libreria è stato soggetto a \textit{unit test}, che sono stati eseguiti con il framework \textit{Pytest}. I principali tipi di test utilizzati sono stati:
+
+\begin{itemize}
+    \item \textit{compatibility tests}: verificano se il codice è compatibile con la libreria \textit{Scikit-learn}. Il test viene eseguito con l'utilizzo della funzione \texttt{check\_estimator} di \textit{Scikit-learn}, permette di testare se il componente rispetta le interfacce e le convenzioni stabilite dalla libreria
+    \item \textit{parity tests}: verificano che due versioni o sistemi producano lo stesso risultato a parità di input. Per diversi test in cui era necessario testare multipli parametri o iperparametri è stato utilizzato l'oggetto \texttt{ParameterGrid} di \textit{Scikit-learn}, che crea tutte le combinazioni possibili di parametri da un dizionario di liste in modo da testare ogni configurazione possibile
+    \item \textit{performance test}: misurare quanto tempo impiega un'operazione o quanto è efficiente una funzionalità
+    \item \textit{usability tests}: valutano quanto è facile, intuitivo e piacevole usare un sistema o un'interfaccia
+\end{itemize}
+
+Non sono stati implementati \textit{integration test}, poiché la libreria è progettata per essere utilizzata in modo modulare e le interazioni tra i componenti sono state verificate singolarmente. In aggiunta ai test è stata calcolata la percentuale di \textit{coverage} raggiunta utilizzando il tool \textit{coverage}. In totale la \textit{coverage} raggiunta è del 100\%. Il modulo di \texttt{visualization} è stato testato manualmente, poiché non è possibile automatizzare completamente la verifica dei grafici generati. Tuttavia, sono stati effettuati controlli visivi per garantire che i grafici fossero corretti e rappresentativi dei dati.
 
 \textit{Dataset utilizzati per i test}:
 
 \begin{itemize}
-    \item \textit{LovieLens-1M}: esempio classico di dataset per sistemi di raccomandazione, con 1 milione di valutazioni di film da parte degli utenti. Contiene anche features sui film e sugli utenti, come generi, età e sesso
+    \item \textit{MovieLens-1M}: esempio classico di dataset per sistemi di raccomandazione, con 1 milione di valutazioni di film da parte degli utenti. Contiene anche features sui film e sugli utenti, come generi, età e sesso
     \item \textit{Retailrocket Dataset}: presente su \textit{Kaggle}, contiene dati di interazioni tra utenti e \textit{item} in un negozio online, con informazioni su visualizzazioni, aggiunte al carrello e acquisti. È utile per testare modelli di raccomandazione basati su interazioni implicite
     \item \textit{dataset interno}: contiene dati di interazioni tra utenti e polizze assicurative. Le features degli utenti includono età, sesso e nazionalità, mentre le polizze hanno informazioni su tipo, durata e costo. È utile per testare modelli di raccomandazione in ambito assicurativo
 \end{itemize}
 
 \section{Test preprocessing}
+Per il testing dei \textit{transformers} sono stati utilizzati un misto di dataset reali e sintetici. I dataset sintetici sono stati creati per coprire casi d'uso specifici, come la presenza di valori mancanti o la necessità di utilizzare le varie tipologie di \textit{binning}. I dataset reali sono stati utilizzati per verificare che i \textit{transformers} funzionassero correttamente con dati del mondo reale.  
 
-Per il testing dei \textit{transformers} sono stati utilizzati un misto di dataset reali e sintetici. I dataset sintetici sono stati creati per coprire casi d'uso specifici, come la presenza di valori mancanti o la necessità di utilizzare le varie tipologie di \textit{binning}. I dataset reali sono stati utilizzati per verificare che i \textit{transformers} funzionassero correttamente con dati del mondo reale. Ogni \textit{transformer} è stato testato rispetto alle operazioni equivalenti implementate in \textit{Pandas}, \textit{NumPy} e \textit{Scikit-learn}. I risultati sono stati confrontati per garantire che la libreria producesse gli stessi output. Per i \textit{transformers} che utilizzano possibili modalità come parametri di input (e.g. \texttt{FillNa} con il campo \texttt{method}) sono state usate singole liste o l'oggetto \texttt{ParameterGrid} di \textit{Scikit-learn} per generare tutte le combinazioni possibili di parametri.
+Per i \textit{parity tests} ogni \textit{transformer} è stato testato rispetto alle operazioni equivalenti implementate in \textit{Pandas}, \textit{NumPy} e \textit{Scikit-learn} in modo da confrontare i risultati per garantire che ogni componente producesse gli stessi output. Per i \textit{transformers} i cui parametri possono assumere diversi valori (e.g. \texttt{FillNa} con il campo \texttt{method}) il test è stato effettuato iterando sui possibili valori o utilizzando l'oggetto \texttt{ParameterGrid} di \textit{Scikit-learn} per generare tutte le combinazioni possibili di parametri. 
+
+I \textit{performance tests} sono stati effettuati registrando il tempo di esecuzione della versione con e senza libreria, sia utilizzando \textit{DataFrame} che \textit{NumPy array} e imponendo che non ci fosse un amento del tempo di esecuzione di non più di un secondo. Dai test è emerso che sono presenti differenze trascurabili tra le tempistiche di esecuzione.
+
+Per gli \textit{usability tests} un sottoinsieme di \textit{transformers} è stato testato da dipendenti aziendali. Sono state raccolte tempistiche di sviluppo con e senza l'utilizzo della libreria e sono stati raccolti i feedback. L'utilizzo della libreria non solo è risultato più intuitivo rispetto alla versione senza, ma il tempo di sviluppo si è ridotto di diversi minuti. 
 
 \section{Test modelli}
-
-Per i modelli l'obbiettivo dei test è stato in primis di verificare che i modelli fossero compatibili con la libreria \textit{Scikit-learn}. Questa verifica è stata possibile grazie alla funzione \texttt{check\_estimator} di \textit{Scikit-learn}, che ha permesso di testare i modelli rispetto a un insieme di casi d'uso standardizzati. Successivamente, si è proceduto a testare i modelli rispetto al formato dei dati in ingresso e in uscita, per garantire che i modelli potessero essere utilizzati con il formato standard. Infine si è verificato che ciascun modello riproducesse le stesse predizioni dei modelli delle librerie originali a parità di configurazione. Tutti i test sono stati eseguiti utilizzando i dataset di test descritti in precedenza. Per il modello di \textit{LightFM} sono state testate tutte le combinazioni che in includevano o escludevano le features degli utenti e dei \textit{item}.
-
-Per i modelli che implementano \texttt{similar\_items} e \texttt{similar\_users}:
+I \textit{parity tests} sui modelli hanno lo scopo di verificare che, utilizzando gli stessi dati di \textit{train} e \textit{test} sui modelli originali e sulla corrispettiva versione della libreria non ci fosse nessun tipo di differenza su \textit{score/rating} predetti. I dati in input sono stati generati a partire da diversi split attuati sui dataset reali utilizzando la funzione \texttt{train\_test\_split\_with\_coverage} presente nel modulo di \texttt{model\_selection}. Ogni coppia di modelli è stata testata variando i possibili iperparametri grazie all'oggetto \texttt{ParameterGrid}. Per il modello di \textit{LightFM} sono state testate tutte le combinazioni che in includevano o escludevano le features degli utenti e dei \textit{item} in tutti in metodi che ne possono fare uso. I successivi \textit{parity tests} hanno lo scopo testare le implementazioni di \texttt{similar\_items} e \texttt{similar\_users}:
 
 \begin{itemize}
-    \item per i modelli di \textit{Implicit} si è fatto un confronto con i metodi della libreria originale, verificando che i risultati fossero equivalenti
+    \item per i modelli di \textit{Implicit} si è fatto un confronto con gli omonimi metodi della libreria originale, verificando che i risultati fossero equivalenti
     \item per il modello \textit{LightFM} e i modelli di \textit{Surprise} si è verificato che i risultati fossero equivalenti a quelli ottenuti eseguendo il calcolo della similarità \texttt{cosine\_similarity} di \textit{Scikit-learn} o, nel caso specifico del modello \textit{KNNBaseline}, ai risultati ottenuti dalle funzioni di similarità \\ \texttt{surprise.similarities.pearson} \\ o  \texttt{surprise.similarities.pearson\_baseline} e \\ \texttt{surprise.similarities.msd} di \textit{Surprise}
 \end{itemize}
 
-Per testare le varie combinazioni di parametri si è utilizzato l'oggetto \\ \texttt{ParameterGrid} di \textit{Scikit-learn}, che permette di generare tutte le combinazioni possibili di parametri per i modelli. Importante sottolineare che alcuni modelli, soprattutto quelli più complessi come \texttt{SVD++}, richiedono un tempo di addestramento significativo, che può variare da pochi secondi a diversi minuti a seconda della configurazione e del dataset utilizzato. Inoltre bisogna considerare che i modelli delle librerie non godono di ottimizzazioni su \textit{GPU} e la libreria \textit{Surprise} nemmeno di ottimizzazioni \textit{Cython} il che la rende lenta nelle fasi di addestramento e predizione. 
+I \textit{performance tests} sono stati effettuati registrando il tempo di esecuzione della versione con e senza libreria imponendo che non ci fosse un amento del tempo di esecuzione di non più di due secondi. Dai test è emerso che l'\textit{overhead} introdotto dall'utilizzo di \textit{DataFrame} come struttura dati non ha inficiato sulle tempistiche in quanto la totalità dei modelli implementati trasforma i dati da \textit{DataFrame} a \textit{NumPy array}, operazione che viene eseguita anche nei casi senza libreria.
 
-\section{Test evaluation}
-
-Per il modulo di \textit{evaluation} sono stati implementati confrontando il valore della metrica rispetto al valore calcolato in modo grezzo, senza l'utilizzo della libreria. In questo modo si è verificato che le metriche calcolate dalla libreria fossero corrette e coerenti con i risultati attesi. Sono state testate anche le metriche per feedback implicito nella loro versione \textit{Factory} con il modello \textit{LightFM}. Le metriche per feedback esplicito in versione \textit{Factory} sono state testate utilizzando come parametro \texttt{predict\_fn} quella base dei modelli di \textit{Surprise} perché non esiste un modello per dati espliciti che potrebbe necessitare di modifiche custom alla metrica. Importante sottolineare che il tempo di calcolo delle metriche dipende sia dalla velocità di predizione del modello sia dalla dimensione del dataset di test. Inoltre, per le metriche implicite la predizione per ciascun utente viene calcolata su tutto l'insieme di \textit{item}, il che può richiedere un tempo significativo, soprattutto per modelli complessi e dataset di grandi dimensioni.
-
-\section{Test altri moduli}
-Per tutte le funzioni presenti nei moduli di \texttt{utils} e \texttt{model\_selection} sono state implementate dalle due alle tre funzioni di test sufficienti per coprire i vari casi d'uso.
-
-\section{Usabilità}
-La libreria, un volta completata, è stata testata da un gruppo di utenti interni all'azienda \textit{Data Reply} per valutarne l'usabilità e l'efficacia, soprattutto rispetto alle librerie già esistenti ed utilizzate. I feedback raccolti sono stati utilizzati per apportare miglioramenti e ottimizzazioni alla libreria. Si consideri la differenza di linee di codice tra un utilizzo completo di \textit{LightFM} e l'utilizzo della libreria non includendo il preprocessing dei dati:
+Per gli \textit{usability tests} sono stati selezionati alcuni modelli in modo da coprire più casistiche possibili che sono stati testati da dipendenti aziendali per valutarne l'usabilità e l'efficacia, soprattutto rispetto alle librerie già esistenti ed utilizzate. Sono state raccolte tempistiche di sviluppo con e senza l'utilizzo della libreria e sono stati raccolti i feedback. L'utilizzo della libreria ha ridotto notevolmente il tempo di sviluppo e il livello complessità che erano necessari in precedenza. I feedback raccolti sono stati utilizzati per apportare miglioramenti e ottimizzazioni alla libreria. Si consideri la differenza di linee di codice tra un utilizzo completo di \textit{LightFM} e l'utilizzo della libreria non includendo il preprocessing dei dati:
 
 \begin{lstlisting}[caption=esempio di utilizzo completo della libreria \textit{LightFM}]
 RANDOM_STATE = 1234
@@ -86,9 +89,7 @@ lightfm_scores = lightfm_model.predict(predictions_user_ids,
                                        user_features=user_features)
 # zip together unchanged ids and predictions scores
 total_prediction = [{'user_id': user_id, 'item_id': item_id, 'interaction_weight': score}
-                    for user_id, item_id, score in zip(unchanged_user_ids, unchanged_item_ids,lightfm_scores)]
-sort_function = lambda x: (x['interaction_weight'], x['item_id'])
-map_function =
+                    for user_id, item_id, score in zip(unchanged_user_ids, unchanged_item_ids, lightfm_scores)]
 
 
 def select_predictions(grouped_predictions):
@@ -124,9 +125,9 @@ new_lightfm_model.fit(trainset,
                       user_features=user_features, 
                       epochs=EPOCHS)
 # create predictions
-new_total_prediction = new_lightfm_model.predict(testset, 
-                                                 user_features=user_features,
-                                                 item_features=item_features)
+new_total_predictions = new_lightfm_model.predict(testset, 
+                                                  user_features=user_features,
+                                                  item_features=item_features)
 # create rankings from predictions
 new_rankings = create_rankings_from_implicit(dataset=testset,
                                              scores=new_total_prediction, 
@@ -135,6 +136,15 @@ new_rankings = create_rankings_from_implicit(dataset=testset,
 \end{lstlisting}
 
 Come si può notare, l'utilizzo della libreria consente di ridurre significativamente il numero di linee di codice necessarie per addestrare e utilizzare un modello di \textit{LightFM}, rendendo il codice più leggibile e mantenibile.
+
+Importante sottolineare che alcuni modelli, soprattutto quelli più complessi come \texttt{SVD++}, richiedono un tempo di addestramento significativo, che può variare da pochi secondi a diversi minuti a seconda della configurazione e del dataset utilizzato. Inoltre bisogna considerare che i modelli delle librerie non godono di ottimizzazioni su \textit{GPU} e la libreria \textit{Surprise} nemmeno di ottimizzazioni \textit{Cython} il che la rende lenta nelle fasi di addestramento e predizione. 
+
+\section{Test evaluation}
+
+Per il modulo di \textit{evaluation} sono stati effettuati solamente \textit{unit tests} confrontando il valore della metrica rispetto al valore calcolato in modo grezzo, senza l'utilizzo della libreria. In questo modo si è verificato che le metriche calcolate dalla libreria fossero corrette e coerenti con i risultati attesi. Sono state testate anche le metriche per feedback implicito nella loro versione \textit{Factory} con il modello \textit{LightFM}. Le metriche per feedback esplicito in versione \textit{Factory} sono state testate utilizzando come parametro \texttt{predict\_fn} quella base dei modelli di \textit{Surprise} perché non esiste un modello per dati espliciti che potrebbe necessitare di modifiche custom alla metrica. Importante sottolineare che il tempo di calcolo delle metriche dipende sia dalla velocità di predizione del modello sia dalla dimensione del dataset di test. Inoltre, per le metriche implicite la predizione per ciascun utente viene calcolata su tutto l'insieme di \textit{item}, il che può richiedere un tempo significativo, soprattutto per modelli complessi e dataset di grandi dimensioni.
+
+\section{Test altri moduli}
+Per tutte le funzioni presenti nei moduli di \texttt{utils} e \texttt{model\_selection} sono state implementati \textit{unit tests} per ciascuna funzione in modo da coprire i vari casi d'uso.
 
 \section{Documentazione}
 Per garantire la facilità d'uso della libreria, è stata creata una documentazione completa utilizzando \textit{Sphinx} utilizzando il tema \texttt{sphinx\_rtd\_theme}. La documentazione include:
